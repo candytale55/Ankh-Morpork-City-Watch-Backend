@@ -4,7 +4,7 @@ const Character = require("../models/Character");
 
 
 
-const getCharacters = async (req, res) => { 
+const getCharacter = async (req, res) => { 
     try {
         const characters = await Character.find();
         return res.status(200).json(characters);
@@ -47,7 +47,7 @@ const deleteCharacter = async (req, res) => {
 }
 
 module.exports = {
-    getCharacters,
+    getCharacter,
     postCharacter,
     updateCharacter,
     deleteCharacter

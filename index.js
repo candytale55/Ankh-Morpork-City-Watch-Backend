@@ -1,6 +1,7 @@
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const { connectDB } = require('./src/config/db');
+const charactersRouter = require('./src/api/routes/characters.routes');
 
 const PORT = process.env.PORT;
 const app = express();
@@ -10,6 +11,8 @@ connectDB(); // Connect to the database
 
 // Middleware to parse JSON requests
 app.use(express.json());
+
+app.use("/api/v1/characters", charactersRouter);
 
 
 // Routes
@@ -22,7 +25,6 @@ router.get('/characters', (req, res) => {
     const characters = ["Vimes", "Carrot", "Nanny Ogg", "Granny Weatherwax"];
     res.send(characters);
 });
-
 
 
 app.use('/', router);

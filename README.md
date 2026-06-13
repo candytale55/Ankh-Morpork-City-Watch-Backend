@@ -14,3 +14,4 @@ Este proyecto es crear un backend de cero, manualmente.
 ### Para comentar / dudas
 
 - Issue con la conexión a la BD - mongodb:// vs mongodb+srv:// 
+- Enums in the models -> to other file?
