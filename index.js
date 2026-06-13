@@ -1,5 +1,10 @@
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
+const { connectDB } = require('./src/config/db');
+
 const app = express();
+
+connectDB(); // Connect to the database
 
 // Middleware to parse JSON requests
 app.use(express.json());
