@@ -1,0 +1,26 @@
+{
+  "name": "backend-project-the-power",
+  "version": "1.0.0",
+  "description": "Este proyecto es crear un backend de cero, manualmente.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/candytale55/backend-project-the-power.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/candytale55/backend-project-the-power/issues"
+  },
+  "homepage": "https://github.com/candytale55/backend-project-the-power#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
