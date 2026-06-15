@@ -10,8 +10,11 @@ Este proyecto es crear un backend de cero, manualmente.
 
 **Dotenv**: Sirve para leer las variables de entorno.
 
+**Insomnia**: (Insomnia.Core-12.6.0) Herramienta de prueba de API que permite crear y enviar peticiones HTTP y observar las respuestas. Simulación de frontend.
+
 
 ### Para comentar / dudas
 
 - Issue con la conexión a la BD - mongodb:// vs mongodb+srv:// 
 - Enums in the models -> to other file?
+- Porqué v1 (versión 1) ?

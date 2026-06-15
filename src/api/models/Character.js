@@ -16,7 +16,7 @@ const speciesEnum = [
     'pictsie',
     'igor',
     'orangutan',
-    'other',
+    'other'
 ];
 
 
