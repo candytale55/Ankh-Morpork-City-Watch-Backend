@@ -1,2 +1,4 @@
 /node_modules
+# /data             Normalmente no se commitea
+# /utils/seeds      Normalmente no se commitea
 .env
