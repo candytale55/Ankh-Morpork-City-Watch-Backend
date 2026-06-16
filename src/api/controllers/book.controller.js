@@ -27,7 +27,7 @@ const updateBook = async (req, res) => {
         const { id } = req.params;
         const newBook = new Book(req.body);
         newBook._id = id;
-        const updatedBook = await Book.findByIdAndUpdate(id, newBook, { new: true });
+        const updatedBook = await Book.findByIdAndUpdate(id, newBook, { new: true }).populate('characters');
         return res.status(200).json(updatedBook);
     } catch (error) {
         return res.status(400).json("Error in updating Book");
