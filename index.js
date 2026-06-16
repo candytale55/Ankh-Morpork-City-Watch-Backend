@@ -4,6 +4,7 @@ const { connectDB } = require('./src/config/db');
 
 const charactersRouter = require('./src/api/routes/characters.routes');
 const booksRouter = require('./src/api/routes/books.routes');
+const usersRouter = require('./src/api/routes/user.routes');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use("/api/v1/characters", charactersRouter);
 app.use("/api/v1/books", booksRouter);
+app.use("/api/v1/", usersRouter);
 
 app.use("/", (req, res) => {
     return res.status(404).json({ message: "Route not found" });
