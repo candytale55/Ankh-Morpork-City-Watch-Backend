@@ -1,11 +1,10 @@
 // CRUD - Create, Read, Update, Delete
-const express = require('express');
 const Book = require('../models/Book');
 
 const getBooks = async (req, res) => {
     try {
         const books = await Book.find();
-        return res.status(200).json(books).populate('characters');
+        return res.status(200).json(books);
     } catch (error) {
 
         return res.status(400).json("Error in getting Books")
@@ -25,11 +24,17 @@ const postBook = async (req, res) => {
 const updateBook = async (req, res) => {
     try {
         const { id } = req.params;
-        const newBook = new Book(req.body);
-        newBook._id = id;
-        const updatedBook = await Book.findByIdAndUpdate(id, newBook, { new: true }).populate('characters');
+        
+        const updatedBook = await Book.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true }
+        ).populate('characters'); 
+        
         return res.status(200).json(updatedBook);
+
     } catch (error) {
+
         return res.status(400).json("Error in updating Book");
     }
 };

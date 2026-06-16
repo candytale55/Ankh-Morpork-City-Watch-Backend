@@ -15,13 +15,16 @@ const bookSchema = new mongoose.Schema({
         required: true
     },
     characters: {
-        type: [{type: mongoose.Types.ObjectId, ref: 'Character'}],
+        type: [{
+            type: mongoose.Types.ObjectId,
+            ref: 'Character'
+        }],
     }
 }, {
     timestamps: true
 });
 
-const Books = moongoose.model('books', bookSchema, 'books');
+const Book = mongoose.model('Book', bookSchema, 'books');
 
-module.exports = Books;
+module.exports = Book;
 

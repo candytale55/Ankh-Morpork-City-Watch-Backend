@@ -1,5 +1,4 @@
 // CRUD - Create, Read, Update, Delete
-const express = require("express");
 const Character = require("../models/Character");
 
 
@@ -29,7 +28,11 @@ const updateCharacter = async (req, res) => {
         const { id } = req.params;
         const newCharacter = new Character(req.body);
         newCharacter._id = id;
-        const updatedCharacter = await Character.findByIdAndUpdate(id, newCharacter, { new: true });
+        const updatedCharacter = await Character.findByIdAndUpdate(
+            id,
+            newCharacter,
+            { new: true }
+        );
         return res.status(200).json(updatedCharacter);
     } catch (error) {
         return res.status(400).json("Error in updating Character")
