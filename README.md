@@ -12,6 +12,8 @@ Este proyecto es crear un backend de cero, manualmente.
 
 **Insomnia**: (Insomnia.Core-12.6.0) Herramienta de prueba de API que permite crear y enviar peticiones HTTP y observar las respuestas. Simulación de frontend.
 
+**Bcrypt**: Para encriptar las contraseñas. 
+
 
 ### Para comentar / dudas
 

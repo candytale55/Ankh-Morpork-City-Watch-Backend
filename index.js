@@ -18,7 +18,7 @@ app.use(express.json());
 // Routes
 app.use("/api/v1/characters", charactersRouter);
 app.use("/api/v1/books", booksRouter);
-app.use("/api/v1/", usersRouter);
+app.use("/api/v1/users", usersRouter);
 
 app.use("/", (req, res) => {
     return res.status(404).json({ message: "Route not found" });
