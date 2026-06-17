@@ -14,6 +14,8 @@ Este proyecto es crear un backend de cero, manualmente.
 
 **Bcrypt**: Para encriptar las contraseñas. 
 
+**JSON Web Token**: 
+
 
 ### Para comentar / dudas
 
