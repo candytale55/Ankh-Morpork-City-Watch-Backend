@@ -6,3 +6,6 @@
 # Files to create transcriptions of my code
 project_concanator.py
 project_context.txt
+
+docs/chats
+!docs/justificacion-requisitos.md
