@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
+const { generateToken } = require('../../utils/jwt');
 
 const register = async (req, res) => {
     try {
@@ -22,7 +24,22 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        return res.status(200).json("Login route working");
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json("Error: Invalid email or password");
+        }
+
+        /* Si llega aquí, es que el usuario existe y hay que comprobar la contraseña */
+        if (bcrypt.compareSync(password, user.password)) { 
+            const token = generateToken(user._id);
+            return res.status(200).json({token, user});
+
+        } else {
+            return res.status(400).json("Error: Invalid email or password");
+        }
+
     } catch (error) {
         return res.status(400).json("Login Error")
     }
@@ -61,7 +78,7 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
-        return res.status(200).json("User deleted successfully", deletedUser);
+        return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
     } catch (error) {
         return res.status(400).json("Error in deleting User");
     }
@@ -74,5 +91,4 @@ module.exports = {
     getUsers,
     getUser,
     deleteUser
-
 };
