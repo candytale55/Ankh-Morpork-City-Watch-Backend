@@ -1,6 +1,7 @@
 require('dotenv').config(); 
 const express = require('express');
 const { connectDB } = require('./src/config/db');
+const { connectCloudinary } = require('./src/config/cloudinary');
 
 const charactersRouter = require('./src/api/routes/characters.routes');
 const booksRouter = require('./src/api/routes/books.routes');
@@ -9,7 +10,11 @@ const usersRouter = require('./src/api/routes/user.routes');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-connectDB(); // Connect to the database
+// Connect to the database
+connectDB();
+// Connect to Cloudinary
+connectCloudinary();
+
 
 // Middleware to parse JSON requests
 app.use(express.json());

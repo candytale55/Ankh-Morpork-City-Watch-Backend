@@ -46,6 +46,10 @@ const characterSchema = new mongoose.Schema({
         required: true,
         enum: speciesEnum
     },
+    img: {
+        type: String,
+        required: true
+    }
 }, { timestamps: true });
 
 const Character = mongoose.model('Character', characterSchema, 'characters');
