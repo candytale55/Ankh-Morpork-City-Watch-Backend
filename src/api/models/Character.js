@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { speciesEnum } = require("../../utils/enums");
+const { speciesEnum, genderEnum } = require("../../utils/enums");
 
 const characterSchema = new mongoose.Schema({
     name: {
@@ -20,7 +20,7 @@ const characterSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
-        enum: ['male', 'female', 'non-binary', 'unknown']
+        enum: genderEnum
     },
     species: {
         type: String,

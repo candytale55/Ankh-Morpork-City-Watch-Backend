@@ -16,4 +16,11 @@ const speciesEnum = [
     'other'
 ];
 
-module.exports = { speciesEnum };
+const genderEnum = [
+    'male',
+    'female',
+    'non-binary',
+    'unknown'
+];
+
+module.exports = { speciesEnum, genderEnum };
