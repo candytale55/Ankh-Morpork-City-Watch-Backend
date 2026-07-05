@@ -1,4 +1,5 @@
 const express = require('express');
+const upload = require('../../middlewares/file');
 const {
 	getCharacter,
 	postCharacter,
@@ -9,8 +10,8 @@ const {
 const charactersRouter = express.Router();
 
 charactersRouter.get('/', getCharacter);
-charactersRouter.post('/', postCharacter);
-charactersRouter.put('/:id', updateCharacter);
+charactersRouter.post('/', upload.single('img'), postCharacter);
+charactersRouter.put('/:id', upload.single('img'), updateCharacter);
 charactersRouter.delete('/:id', deleteCharacter);
 
 module.exports = charactersRouter;

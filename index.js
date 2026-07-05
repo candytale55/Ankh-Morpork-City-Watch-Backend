@@ -3,6 +3,8 @@ const express = require('express');
 const { connectDB } = require('./src/config/db');
 const { connectCloudinary } = require('./src/config/cloudinary');
 
+const upload = require('./src/middlewares/file');
+
 const charactersRouter = require('./src/api/routes/characters.routes');
 const booksRouter = require('./src/api/routes/books.routes');
 const usersRouter = require('./src/api/routes/user.routes');
