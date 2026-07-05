@@ -16,6 +16,11 @@ const getCharacter = async (req, res) => {
 const postCharacter = async (req, res) => {
     try {
         const newCharacter = new Character(req.body);
+
+        if (req.file) {
+            newCharacter.img = req.file.path; // Save the file path to the img field
+        }
+
         const savedCharacter = await newCharacter.save();
         return res.status(201).json(savedCharacter);
     } catch (error) {
