@@ -1,9 +1,10 @@
 // CRUD - Create, Read, Update, Delete
 const Character = require("../models/Character");
+const { deleteFile } = require("../../utils/deleteFile");
 
 
 
-const getCharacter = async (req, res) => { 
+const getCharacter = async (req, res) => {
     try {
         const characters = await Character.find();
         return res.status(200).json(characters);
@@ -47,9 +48,21 @@ const updateCharacter = async (req, res) => {
 const deleteCharacter = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedCharacter = await Character.findByIdAndDelete(id);
-        return res.status(200).json({ message: "Character deleted successfully", element: deletedCharacter });
+        const deletedCharacter = await Character.findById(id);
+
+        if (!deletedCharacter) {
+            return res.status(404).json("Character not found");
+        }
+
+        await deleteFile(deletedCharacter.img);
+        await deletedCharacter.deleteOne();
+
+        return res.status(200).json({
+            message: "Character deleted successfully", element: deletedCharacter
+        });
+
     } catch (error) {
+        console.error("Error deleting character", error);
         return res.status(400).json("Error in deleting Character")
     }
 }
