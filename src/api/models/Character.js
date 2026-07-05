@@ -1,24 +1,5 @@
 const mongoose = require("mongoose");
-
-// TODO: Enumeración de especies válidas - Move later to a separate file
-const speciesEnum = [
-    'human',
-    'dwarf',
-    'troll',
-    'vampire',
-    'werewolf',
-    'zombie',
-    'golem',
-    'gnome',
-    'goblin',
-    'elf',
-    'gargoyle',
-    'pictsie',
-    'igor',
-    'orangutan',
-    'other'
-];
-
+const { speciesEnum } = require("../../utils/enums");
 
 const characterSchema = new mongoose.Schema({
     name: {
