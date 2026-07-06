@@ -8,9 +8,7 @@ const cases = [
         "location": "The Shades, Ankh-Morpork",
         "reportedBy": "Throat Dibbler",
         "suspectName": "Lupine Wonse",
-        "suspectSpecies": "human",
-        "assignedAgents": [],
-        "createdBy": null
+        "suspectSpecies": "human" 
     },
     {
         "title": "Suspicious Deaths at the Dwarf Bread Museum",
@@ -21,9 +19,7 @@ const cases = [
         "location": "Ankh-Morpork, various",
         "reportedBy": "Lord Vetinari",
         "suspectName": "Dragon King of Arms",
-        "suspectSpecies": "human",
-        "assignedAgents": [],
-        "createdBy": null
+        "suspectSpecies": "human" 
     },
     {
         "title": "Riot Prevention: Troll and Dwarf Altercation at Treacle Mine Road",
@@ -34,9 +30,7 @@ const cases = [
         "location": "Treacle Mine Road, Ankh-Morpork",
         "reportedBy": "Constable Detritus",
         "suspectName": "Grag Ardent",
-        "suspectSpecies": "dwarf",
-        "assignedAgents": [],
-        "createdBy": null
+        "suspectSpecies": "dwarf"
     }
 ]
 
