@@ -1,10 +1,15 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../../utils/jwt');
+const { deleteFile } = require('../../utils/deleteFile');
 
 const register = async (req, res) => {
     try {
         const newUser = new User(req.body);
+
+        if (req.file) {
+            newUser.img = req.file.path;
+        }
 
         const userDuplicated = await User.findOne({ email: newUser.email });
         if (userDuplicated) {
@@ -18,7 +23,7 @@ const register = async (req, res) => {
             user: savedUser
         });
     } catch (error) {
-        return res.status(400).json("Error: Couldn't create user")
+        return res.status(400).json("Error: Couldn't create user: " + error.message);
     }
 };
 
@@ -41,7 +46,7 @@ const login = async (req, res) => {
         }
 
     } catch (error) {
-        return res.status(400).json("Login Error")
+        return res.status(400).json("Login Error: " + error.message);
     }
 };
 
@@ -50,7 +55,7 @@ const getUsers = async (req, res) => {
         const users = await User.find();
         return res.status(200).json(users);
     } catch (error) {
-        return res.status(400).json("Error in getting Users")
+        return res.status(400).json("Error in getting Users: " + error.message);
     }
 };
 
@@ -77,6 +82,9 @@ const deleteUser = async (req, res) => {
         if (!deletedUser) {
             return res.status(404).json("Error: User not found");
         }
+
+        await deleteFile(deletedUser.img);
+        await deletedUser.deleteOne();
 
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
     } catch (error) {
