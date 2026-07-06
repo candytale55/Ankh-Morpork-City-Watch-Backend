@@ -5,7 +5,7 @@ const { connectCloudinary } = require('./src/config/cloudinary');
 
 const upload = require('./src/middlewares/file');
 
-const charactersRouter = require('./src/api/routes/characters.routes');
+const agentsRouter = require('./src/api/routes/agents.routes');
 const booksRouter = require('./src/api/routes/books.routes');
 const usersRouter = require('./src/api/routes/user.routes');
 
@@ -23,7 +23,7 @@ app.use(express.json());
 
 
 // Routes
-app.use("/api/v1/characters", charactersRouter);
+app.use("/api/v1/agents", agentsRouter);
 app.use("/api/v1/books", booksRouter);
 app.use("/api/v1/users", usersRouter);
 

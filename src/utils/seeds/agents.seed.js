@@ -1,18 +1,18 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Character = require('../../api/models/Character');
-const characters = require('../../api/data/characters.data');
+const Agent = require('../../api/models/Agent');
+const agents = require('../../api/data/agents.data');
 
 const launchSeed = async () => {
     try {
         await mongoose.connect(process.env.DB_URL);
         console.log("Connected to the database successfully for seeding");
 
-        await Character.collection.drop(); // Drop the collection to avoid duplicates
-        console.log("Characters collection dropped");
+        await Agent.collection.drop(); // Drop the collection to avoid duplicates
+        console.log("Agents collection dropped");
 
-        await Character.insertMany(characters);
-        console.log("Characters seeded successfully");
+        await Agent.insertMany(agents);
+        console.log("Agents seeded successfully");
         
         await mongoose.connection.close(); // Close the connection after seeding
         //process.exit(0); // Exit the process after seeding
