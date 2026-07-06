@@ -5,7 +5,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "human",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Samuel_Vimes_zitot8.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Samuel_Vimes_zitot8.jpg"
     },
     {
         "name": "Carrot Ironfoundersson",
@@ -13,7 +13,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "human",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Carrot_Ironfoundersson_pfjoja.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Carrot_Ironfoundersson_pfjoja.jpg"
     },
     {
         "name": "Angua von Überwald",
@@ -21,7 +21,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "female",
         "species": "werewolf",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Angua_von_Uberwald_hsqnbj.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Angua_von_Uberwald_hsqnbj.jpg"
     },
     {
         "name": "Fred Colon",
@@ -29,7 +29,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "human",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Fred_Colon_r1tk6p.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Fred_Colon_r1tk6p.jpg"
     },
     {
         "name": "Nobby Nobbs",
@@ -37,7 +37,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "human",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317495/Nobby_Nobbs_s8tsbz.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317495/Nobby_Nobbs_s8tsbz.jpg"
     },
     {
         "name": "Detritus",
@@ -45,7 +45,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "troll",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Detritus_mz2yhm.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Detritus_mz2yhm.jpg"
     },
     {
         "name": "Cheery Littlebottom",
@@ -53,7 +53,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "female",
         "species": "dwarf",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Cheery_Littlebottom_pdybzr.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Cheery_Littlebottom_pdybzr.jpg"
     },
     {
         "name": "Reg Shoe",
@@ -61,7 +61,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "zombie",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Cheery_Littlebottom_pdybzr.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Cheery_Littlebottom_pdybzr.jpg"
     },
     {
         "name": "Dorfl",
@@ -69,7 +69,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "non-binary",
         "species": "golem",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Dorfl_fneebn.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Dorfl_fneebn.jpg"
     },
     {
         "name": "Sally von Humperdinck",
@@ -77,7 +77,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "female",
         "species": "vampire",
-        "img": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Sally_von_Humperdinck_visible_j0fe2a.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Sally_von_Humperdinck_visible_j0fe2a.jpg"
     }
 ]
 

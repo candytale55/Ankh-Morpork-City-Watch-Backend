@@ -19,7 +19,7 @@ const postAgent = async (req, res) => {
         const newAgent = new Agent(req.body);
 
         if (req.file) {
-            newAgent.img = req.file.path; // Save the file path to the img field
+            newAgent.image = req.file.path; // Save the file path to the image field
         }
 
         const savedAgent = await newAgent.save();
@@ -54,7 +54,7 @@ const deleteAgent = async (req, res) => {
             return res.status(404).json("Agent not found");
         }
 
-        await deleteFile(deletedAgent.img);
+        await deleteFile(deletedAgent.image);
         await deletedAgent.deleteOne();
 
         return res.status(200).json({

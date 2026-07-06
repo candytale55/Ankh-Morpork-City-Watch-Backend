@@ -10,8 +10,8 @@ const {
 const agentsRouter = express.Router();
 
 agentsRouter.get('/', getAgents);
-agentsRouter.post('/', upload.single('img'), postAgent);
-agentsRouter.put('/:id', upload.single('img'), updateAgent);
+agentsRouter.post('/', upload.single('image'), postAgent);
+agentsRouter.put('/:id', upload.single('image'), updateAgent);
 agentsRouter.delete('/:id', deleteAgent);
 
 module.exports = agentsRouter;

@@ -27,7 +27,7 @@ const agentSchema = new mongoose.Schema({
         required: true,
         enum: speciesEnum
     },
-    img: {
+    image: {
         type: String,
         required: true
     }
