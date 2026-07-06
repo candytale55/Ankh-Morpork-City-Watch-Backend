@@ -8,6 +8,7 @@ project_concanator.py
 project_context.txt
 
 docs/chats
+docs/markdowns
 !docs/justificacion-requisitos.md
 
 src/assets
