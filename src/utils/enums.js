@@ -24,6 +24,19 @@ const genderEnum = [
 ];
 
 const roleEnum = ['user', 'admin'];
+
+const caseTypeEnum = ['case', 'patrol', 'report', 'incident'];
+
+const caseStatusEnum = ['open', 'under investigation', 'closed'];
+
+const casePriorityEnum = ['low', 'medium', 'high'];
     
-module.exports = { speciesEnum, genderEnum, roleEnum };
+module.exports = {
+    speciesEnum,
+    genderEnum,
+    roleEnum,
+    caseTypeEnum,
+    caseStatusEnum,
+    casePriorityEnum
+};
     

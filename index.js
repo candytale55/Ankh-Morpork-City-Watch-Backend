@@ -8,6 +8,7 @@ const upload = require('./src/middlewares/file');
 const agentsRouter = require('./src/api/routes/agents.routes');
 const booksRouter = require('./src/api/routes/books.routes');
 const usersRouter = require('./src/api/routes/user.routes');
+const casesRouter = require('./src/api/routes/cases.routes');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use("/api/v1/agents", agentsRouter);
 app.use("/api/v1/books", booksRouter);
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/cases", casesRouter);
 
 app.use("/", (req, res) => {
     return res.status(404).json({ message: "Route not found" });
