@@ -8,7 +8,7 @@ const register = async (req, res) => {
         const newUser = new User(req.body);
 
         if (req.file) {
-            newUser.img = req.file.path;
+            newUser.image = req.file.path;
         }
 
         const userDuplicated = await User.findOne({ email: newUser.email });
@@ -83,7 +83,7 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
-        await deleteFile(deletedUser.img);
+        await deleteFile(deletedUser.image);
         await deletedUser.deleteOne();
 
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });

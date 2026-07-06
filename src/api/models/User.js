@@ -18,27 +18,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    organization: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    gender: {
-        type: String,
-        required: true,
-        enum: genderEnum
-    },
-    species: {
-        type: String,
-        required: true,
-        enum: speciesEnum
-    },
-    img: {
+    image: {
         type: String,
         required: true
     },
