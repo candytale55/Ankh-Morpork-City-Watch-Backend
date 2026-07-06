@@ -1,5 +1,5 @@
 const express = require('express');
-const upload = require('../../middlewares/file');
+const { uploadAgent } = require('../../middlewares/file');
 const {
 	getAgents,
 	postAgent,
@@ -10,8 +10,8 @@ const {
 const agentsRouter = express.Router();
 
 agentsRouter.get('/', getAgents);
-agentsRouter.post('/', upload.single('image'), postAgent);
-agentsRouter.put('/:id', upload.single('image'), updateAgent);
+agentsRouter.post('/', uploadAgent.single('image'), postAgent);
+agentsRouter.put('/:id', uploadAgent.single('image'), updateAgent);
 agentsRouter.delete('/:id', deleteAgent);
 
 module.exports = agentsRouter;
