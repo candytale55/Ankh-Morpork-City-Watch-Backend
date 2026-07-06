@@ -92,11 +92,31 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true }
+        );
+        return res.status(200).json(updatedUser);
+
+        if (!updatedUser) {
+            return res.status(404).json("Error: User not found");
+        }
+
+        return res.status(200).json({ message: "User updated successfully", user: updatedUser });
+    } catch (error) {
+        return res.status(400).json("Error in updating User: " + error.message);
+    }
+};
 
 module.exports = {
     register,
     login,
     getUsers,
     getUser,
+    updateUser,
     deleteUser
 };
