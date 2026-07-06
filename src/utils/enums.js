@@ -23,4 +23,7 @@ const genderEnum = [
     'unknown'
 ];
 
-module.exports = { speciesEnum, genderEnum };
+const roleEnum = ['user', 'admin'];
+    
+module.exports = { speciesEnum, genderEnum, roleEnum };
+    
