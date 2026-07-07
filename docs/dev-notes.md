@@ -1,6 +1,6 @@
 # Dev notes
 
-Notas de implementacion y decisiones tecnicas del proyecto.
+Notas de implementacion y decisiones tecnicas del proyecto. Este archivo amplia detalles que en `docs/justificacion-requisitos.md` quedarian demasiado largos.
 
 ## Autenticacion y permisos
 
@@ -16,6 +16,18 @@ usersRouter.patch('/:id/role', isAuth, requireRole('admin'), updateUserRole);
 
 Esto deja claro que solo un usuario autenticado con rol admin puede cambiar roles.
 
+## Registro y primer admin
+
+El registro fuerza siempre `role: "user"` en el controller:
+
+```js
+newUser.role = 'user';
+```
+
+El primer admin se crea siguiendo el enunciado: se registra como usuario normal y luego se cambia manualmente su `role` a `"admin"` desde MongoAtlas.
+
+No se seedean usuarios para evitar sobrescribir o borrar accidentalmente ese primer admin. Las semillas dependen de que exista un admin con el email esperado por `cases.seed.js`.
+
 ## Cambio de roles
 
 El cambio de rol se separo en una ruta especifica:
@@ -24,9 +36,55 @@ El cambio de rol se separo en una ruta especifica:
 PATCH /api/v1/users/:id/role
 ```
 
-La decision se tomo para no mezclar la actualizacion normal del perfil con una accion sensible de permisos. `PUT /users/:id` actualiza datos generales y elimina `role` del body con `delete req.body.role`, de modo que un usuario normal no pueda elevar sus permisos usando la ruta general.
+La decision se tomo para no mezclar la actualizacion normal del perfil con una accion sensible de permisos. `PUT /api/v1/users/:id` actualiza datos generales, pero elimina del body los campos sensibles:
 
-La ruta de roles usa `requireRole('admin')`, por lo que un usuario normal recibe `403 Forbidden`.
+```js
+delete req.body.role;
+delete req.body.assignedCases;
+delete req.body.password;
+```
+
+Asi un usuario no puede elevar sus permisos, asignarse casos ni cambiar la contrasena desde la ruta general de actualizacion.
+
+`updateUserRole` usa `runValidators: true` para que Mongoose valide el enum del modelo y solo acepte roles validos.
+
+## Relacion entre Users y Cases
+
+El requisito pide que `User` tenga un array con datos relacionados de otra coleccion y que no haya duplicados ni perdida de datos anteriores.
+
+La relacion implementada es:
+
+- `User.assignedCases`: array de referencias a `Case`.
+- `Case.assignedTo`: array de referencias a `User`.
+
+La asignacion se hace desde una ruta especifica de admin:
+
+```txt
+PUT /api/v1/cases/:caseId/assign/:userId
+```
+
+El controller `assignCaseToUser` actualiza ambos lados con `$addToSet`:
+
+```js
+{ $addToSet: { assignedTo: userId } }
+{ $addToSet: { assignedCases: caseId } }
+```
+
+`$addToSet` evita duplicados y agrega sin borrar los valores existentes.
+
+Para evitar que la asignacion se salte desde rutas generales:
+
+- `postCase` elimina `assignedTo` y `createdBy` del body.
+- `updateCase` elimina `assignedTo` y `createdBy` del body.
+- `updateUser` elimina `assignedCases` del body.
+
+## Limpieza de relaciones
+
+Cuando se elimina un usuario, `deleteUser` usa `$pull` para quitar su id de `Case.assignedTo`. Luego elimina su imagen de Cloudinary y el documento de usuario.
+
+Cuando se elimina un caso, `deleteCase` usa `$pull` para quitar el id del caso de `User.assignedCases`.
+
+Esto evita referencias rotas en los arrays relacionados.
 
 ## Eliminacion de usuarios
 
@@ -42,11 +100,7 @@ const isAdmin = req.user.role === 'admin';
 const isSameUser = req.user._id.toString() === id;
 ```
 
-Si no es admin ni propietario de la cuenta, responde `403`. Si esta autorizado, borra la imagen de Cloudinary y despues elimina el documento de usuario.
-
-## Books
-
-`Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin.
+Si no es admin ni propietario de la cuenta, responde `403`.
 
 ## Cloudinary
 
@@ -55,9 +109,17 @@ El proyecto usa dos configuraciones de subida en `file.js`:
 - `uploadUser`, que guarda imagenes en `userPortrait`;
 - `uploadAgent`, que guarda imagenes en `agentPortrait`.
 
-El campo usado por la API es `image`. En multipart/form-data, el archivo debe enviarse con ese nombre de campo.
+El campo usado por la API es `image`. En `multipart/form-data`, el archivo debe enviarse con ese nombre de campo.
 
 Cuando se elimina un usuario o agente, se llama a `deleteFile`, que obtiene el `publicId` desde la URL y usa `cloudinary.uploader.destroy`.
+
+## Passwords en respuestas
+
+Las respuestas de usuario evitan devolver `password`:
+
+- Las consultas usan `.select('-password')`.
+- En registro y login se limpia `password` antes de responder.
+- `isAuth` limpia `password` antes de guardar el usuario en `req.user`.
 
 ## Seeds
 
@@ -85,12 +147,8 @@ Los casos necesitan ids reales de agentes, por eso `cases.seed.js` se ejecuta de
 
 Asi los documentos cumplen el schema de `Case` al momento de insertarse.
 
-## Primer admin
+## Agents y Books
 
-El primer admin se crea siguiendo el enunciado: se registra como usuario normal y luego se cambia manualmente su `role` a `"admin"` desde MongoAtlas. No se seedearon usuarios para evitar sobrescribir o borrar accidentalmente ese primer admin.
+`Agent` forma parte de la tematica del proyecto y permite conservar referencias a personajes/agentes de la City Watch. Se usa tambien en las semillas y en la relacion `Case.assignedAgents`.
 
-## Pendiente: array relacionado en User
-
-El requisito pide que `User` tenga un array con datos relacionados de otra coleccion y que no haya duplicados ni perdida de datos anteriores. La opcion prevista es agregar un array como `createdCases` con referencias a `Case`.
-
-Cuando se implemente, las actualizaciones deberian usar `$addToSet` para evitar duplicados sin pisar los valores existentes.
+`Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin.
