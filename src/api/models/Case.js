@@ -53,6 +53,10 @@ const caseSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'Agent'
     }],
+    assignedTo: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
     createdBy: {
         type: mongoose.Types.ObjectId,
         ref: 'User',

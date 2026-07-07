@@ -80,7 +80,7 @@ const getUser = async (req, res) => {
 const getMe = async (req, res) => {
     try {
         return res.status(200).json(req.user);
-
+        //funciona porque isAuth ya pone el usuario en req.user
     } catch (error) {
         return res.status(400).json("Error in getting current User: " + error.message);
     }

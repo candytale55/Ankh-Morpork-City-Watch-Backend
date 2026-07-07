@@ -27,7 +27,11 @@ const userSchema = new mongoose.Schema({
         required: true, 
         enum: roleEnum,
         default: 'user'
-    }
+    },
+    assignedCases: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Case'
+    }]
 }, { timestamps: true });
 
 
