@@ -21,6 +21,7 @@ const register = async (req, res) => {
         }
 
         const savedUser = await newUser.save();
+        savedUser.password = undefined; // Remove password from the user object before sending it in the response
 
         return res.status(201).json({
             message: "User created successfully",
@@ -43,6 +44,7 @@ const login = async (req, res) => {
         /* Si llega aquí, es que el usuario existe y hay que comprobar la contraseña */
         if (bcrypt.compareSync(password, user.password)) { 
             const token = generateToken(user._id);
+            user.password = undefined; // Remove password from the user object before sending it in the response
             return res.status(200).json({token, user});
 
         } else {
@@ -56,7 +58,7 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password'); 
         return res.status(200).json(users);
     } catch (error) {
         return res.status(400).json("Error in getting Users: " + error.message);
@@ -66,7 +68,7 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = await User.findById(id);
+        const user = await User.findById(id).select('-password');
 
         if (!user) {
             return res.status(404).json("Error: User not found");
@@ -105,12 +107,13 @@ const updateUser = async (req, res) => {
 
         delete req.body.role; // Remove role from the request body to prevent unauthorized role changes
         delete req.body.assignedCases; // Prevent users from assigning cases to themselves or others (Only Admins can assign cases)
+        delete req.body.password; // Prevent users from changing their password through this endpoint (Password change should be handled separately)
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
             req.body,
             { new: true }
-        );
+        ).select('-password');
         
         if (!updatedUser) {
             return res.status(404).json("Error: User not found");
@@ -131,7 +134,7 @@ const updateUserRole = async (req, res) => {
             id,
             { role },
             { new: true }
-        );
+        ).select('-password');
 
         if (!updatedUser) {
             return res.status(404).json("Error: User not found");
@@ -159,7 +162,7 @@ const deleteUser = async (req, res) => {
             return res.status(403).json("Error: Forbidden - Users can only delete their own account");
         }
 
-        const deletedUser = await User.findById(id);
+        const deletedUser = await User.findById(id).select('-password');
 
         if (!deletedUser) {
             return res.status(404).json("Error: User not found");
