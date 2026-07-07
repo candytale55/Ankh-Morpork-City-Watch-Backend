@@ -108,6 +108,32 @@ const updateUser = async (req, res) => {
     }
 };
 
+const updateUserRole = async (req, res) => { 
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+        
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { role },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json("Error: User not found");
+        }
+
+        return res.status(200).json({
+            message: "User role updated successfully",
+            user: updatedUser
+        });
+
+    } catch (error) {
+        return res.status(400).json("Error in updating User role - Only an admin can update roles: " + error.message);
+    }
+};
+    
+
 
 const deleteUser = async (req, res) => {
     try {
@@ -141,5 +167,7 @@ module.exports = {
     getUsers,
     getUser,
     updateUser,
+    updateUserRole,
     deleteUser
 };
+
