@@ -78,6 +78,20 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
+
+        const isAdmin = req.user.role === 'admin';
+        const isSameUser = req.user._id.toString() === id;
+
+        if (!isAdmin && !isSameUser) {
+            return res.status(403).json("Error: Forbidden - Users can only update their own account");
+        }
+
+        if (req.body.role && !isAdmin) {
+            return res.status(403).json("Error: Forbidden - Users cannot change roles");
+        }
+
+        delete req.body.role; // Remove role from the request body to prevent unauthorized role changes
+
         const updatedUser = await User.findByIdAndUpdate(
             id,
             req.body,
