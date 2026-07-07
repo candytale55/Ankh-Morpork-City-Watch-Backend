@@ -1,5 +1,5 @@
 # Ankh-Morpork City Watch Backend
-
+ 
 Backend REST desarrollado con Node.js, Express y MongoDB/MongoAtlas para un proyecto de Master. La API gestiona usuarios, casos, agentes y libros de referencia, con autenticacion JWT, roles, subida de imagenes a Cloudinary y relaciones entre colecciones.
 
 La documentacion de requisitos esta en:
