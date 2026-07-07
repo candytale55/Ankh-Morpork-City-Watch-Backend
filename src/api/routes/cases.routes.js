@@ -4,6 +4,7 @@ const { requireRole } = require('../../middlewares/requireRole');
 
 const {
     getCases,
+    getCase,
     postCase,
     updateCase,
     deleteCase,
@@ -13,6 +14,7 @@ const {
 const casesRouter = express.Router();
 
 casesRouter.get('/', isAuth, getCases);
+casesRouter.get('/:id', isAuth, getCase);
 casesRouter.post('/', isAuth, postCase);
 casesRouter.put('/:id', isAuth, updateCase);
 casesRouter.delete('/:id', isAuth, requireRole('admin'), deleteCase);

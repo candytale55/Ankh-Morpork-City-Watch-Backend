@@ -10,9 +10,31 @@ const getCases = async (req, res) => {
     }
 }
 
+const getCase = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const oneCase = await Case.findById(id);
+
+        if (!oneCase) {
+            return res.status(404).json({ message: 'Case not found' });
+        }
+        return res.status(200).json(oneCase);
+
+    } catch (error) {
+        return res.status(400).json({ message: 'Error getting case', error: error.message });
+    }
+};
+
+
 const postCase = async (req, res) => {
     try {
-        const newCase = new Case(req.body);
+        delete req.body.assignedTo; // Prevent assigning users during case creation
+        delete req.body.createdBy; // Prevent setting createdBy during case creation
+
+        const newCase = new Case({
+            ...req.body,
+            createdBy: req.user._id // Set to the authenticated user's ID
+        });
         const savedCase = await newCase.save();
         return res.status(201).json(savedCase);
     } catch (error) {
@@ -24,6 +46,8 @@ const postCase = async (req, res) => {
 const updateCase = async (req, res) => {
     try {
         const { id } = req.params;
+        delete req.body.assignedTo; // Prevent assigning users during case creation
+        delete req.body.createdBy; // Prevent setting createdBy during case creation
         const updatedCase = await Case.findByIdAndUpdate(
             id,
             req.body,
@@ -92,6 +116,7 @@ const assignCaseToUser = async (req, res) => {
 
 module.exports = {
     getCases,
+    getCase,
     postCase,
     updateCase,
     deleteCase,
