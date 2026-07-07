@@ -46,8 +46,8 @@ const postCase = async (req, res) => {
 const updateCase = async (req, res) => {
     try {
         const { id } = req.params;
-        delete req.body.assignedTo; // Prevent assigning users during case creation
-        delete req.body.createdBy; // Prevent setting createdBy during case creation
+        delete req.body.assignedTo; // Prevent assigning users during case update
+        delete req.body.createdBy; // Prevent setting createdBy during case update
         const updatedCase = await Case.findByIdAndUpdate(
             id,
             req.body,
@@ -71,6 +71,11 @@ const deleteCase = async (req, res) => {
         if (!deletedCase) {
             return res.status(404).json({ message: 'Case not found' });
         }
+
+        await User.updateMany(
+            { assignedCases: id },
+            { $pull: { assignedCases: id } }
+        ); // Remove the case from assignedCases array in all users
 
         return res.status(200).json({
             message: 'Case deleted successfully',
