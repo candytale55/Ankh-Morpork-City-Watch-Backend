@@ -70,27 +70,10 @@ const getUser = async (req, res) => {
 
         return res.status(200).json(user);
     } catch (error) {
-        return res.status(400).json("Error in getting User");
+        return res.status(400).json("Error in getting User: " + error.message);
     }
 };
 
-const deleteUser = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deletedUser = await User.findByIdAndDelete(id);
-
-        if (!deletedUser) {
-            return res.status(404).json("Error: User not found");
-        }
-
-        await deleteFile(deletedUser.image);
-        await deletedUser.deleteOne();
-
-        return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
-    } catch (error) {
-        return res.status(400).json("Error in deleting User");
-    }
-};
 
 const updateUser = async (req, res) => {
     try {
@@ -100,8 +83,7 @@ const updateUser = async (req, res) => {
             req.body,
             { new: true }
         );
-        return res.status(200).json(updatedUser);
-
+        
         if (!updatedUser) {
             return res.status(404).json("Error: User not found");
         }
@@ -109,6 +91,33 @@ const updateUser = async (req, res) => {
         return res.status(200).json({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
         return res.status(400).json("Error in updating User: " + error.message);
+    }
+};
+
+
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const isAdmin = req.user.role === 'admin';
+        const isSameUser = req.user._id.toString() === id;
+
+        if (!isAdmin && !isSameUser) {
+            return res.status(403).json("Error: Forbidden - Users can only delete their own account");
+        }
+
+        const deletedUser = await User.findById(id);
+
+        if (!deletedUser) {
+            return res.status(404).json("Error: User not found");
+        }
+
+        await deleteFile(deletedUser.image); // Eliminar la imagen del usuario si existe
+        await deletedUser.deleteOne(); // Eliminar el usuario de la base de datos
+
+        return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
+        
+    } catch (error) {
+        return res.status(400).json("Error in deleting User: " + error.message);
     }
 };
 
