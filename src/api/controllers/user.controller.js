@@ -104,6 +104,7 @@ const updateUser = async (req, res) => {
         }
 
         delete req.body.role; // Remove role from the request body to prevent unauthorized role changes
+        delete req.body.assignedCases; // Prevent users from assigning cases to themselves or others (Only Admins can assign cases)
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
