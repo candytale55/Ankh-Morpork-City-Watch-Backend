@@ -112,7 +112,7 @@ const updateUser = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             id,
             req.body,
-            { new: true }
+            { new: true, runValidators: true } // Ensure the updated data adheres to the schema
         ).select('-password');
         
         if (!updatedUser) {
@@ -133,7 +133,7 @@ const updateUserRole = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(
             id,
             { role },
-            { new: true }
+            { new: true, runValidators: true } // Ensure the new role is valid according to the schema
         ).select('-password');
 
         if (!updatedUser) {

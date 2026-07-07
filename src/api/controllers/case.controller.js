@@ -51,7 +51,7 @@ const updateCase = async (req, res) => {
         const updatedCase = await Case.findByIdAndUpdate(
             id,
             req.body,
-            { new: true });
+            { new: true, runValidators: true });
 
         if (!updatedCase) {
             return res.status(404).json({ message: 'Case not found' });
