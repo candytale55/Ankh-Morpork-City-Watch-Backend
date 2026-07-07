@@ -7,6 +7,9 @@ const register = async (req, res) => {
     try {
         const newUser = new User(req.body);
 
+        // Force the role to 'user' to prevent users from registering as admins
+        newUser.role = 'user';
+
         if (req.file) {
             newUser.image = req.file.path;
         }
@@ -71,6 +74,15 @@ const getUser = async (req, res) => {
         return res.status(200).json(user);
     } catch (error) {
         return res.status(400).json("Error in getting User: " + error.message);
+    }
+};
+
+const getMe = async (req, res) => {
+    try {
+        return res.status(200).json(req.user);
+
+    } catch (error) {
+        return res.status(400).json("Error in getting current User: " + error.message);
     }
 };
 
@@ -166,6 +178,7 @@ module.exports = {
     login,
     getUsers,
     getUser,
+    getMe,
     updateUser,
     updateUserRole,
     deleteUser

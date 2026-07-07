@@ -7,6 +7,7 @@ const {
     login,
     getUsers,
     getUser,
+    getMe,
     deleteUser,
     updateUser,
     updateUserRole
@@ -15,8 +16,9 @@ const {
 
 usersRouter.post('/register', uploadUser.single('image'), register);
 usersRouter.post('/login', login);
-usersRouter.get('/', isAuth, getUsers);
-usersRouter.get('/:id', isAuth, getUser);
+usersRouter.get('/me', isAuth, getMe); // Ruta para obtener los datos del usuario autenticado
+usersRouter.get('/', isAuth, requireRole('admin'), getUsers);
+usersRouter.get('/:id', isAuth, requireRole('admin'), getUser);
 usersRouter.put('/:id', isAuth, uploadUser.single('image'), updateUser);
 usersRouter.patch('/:id/role', isAuth, requireRole('admin'), updateUserRole);
 usersRouter.delete('/:id', isAuth, deleteUser); // Un usuario puede eliminar su propia cuenta, pero no la de otros usuarios. La lógica para verificar que es el mismo usuario se implementará en el controlador.
