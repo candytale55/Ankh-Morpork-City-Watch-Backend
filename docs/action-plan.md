@@ -8,7 +8,7 @@ This plan focuses on completing the backend requirements first, while leaving ro
 - [✔️] Decide the final collections to use:
   - `User`
   - `Case`
-- [ ] Decide whether to remove the current `Book` model or replace it with `Case`.
+- [✔️ ] Decide whether to remove the current `Book` model or replace it with `Case`.
 - [✔️] Decide whether to keep `Character` as temporary seed/reference data or remove it once `User` and `Case` are complete.
 
 ## 2. Update the data models
@@ -22,9 +22,9 @@ This plan focuses on completing the backend requirements first, while leaving ro
   - `rank`
   - `species`
   - `assignedCases`
-- [ ] Make `role` default to `"user"` and restrict it to `"user"` or `"admin"`.
+- [✔️] Make `role` default to `"user"` and restrict it to `"user"` or `"admin"`.
 - [ ] Make `assignedCases` an array of `ObjectId` references to `Case`.
-- [ ] Create a `Case` model with simple fields:
+- [✔️] Create a `Case` model with simple fields:
   - `title`
   - `description`
   - `type`
@@ -35,7 +35,7 @@ This plan focuses on completing the backend requirements first, while leaving ro
   - `suspectSpecies`
   - `assignedOfficers`
 - [ ] Make `assignedOfficers` an array of `ObjectId` references to `User`.
-- [ ] Use enums only where they help keep data clean, such as `role`, `status`, `priority`, `type`, and `species`.
+- [✔️] Use enums only where they help keep data clean, such as `role`, `status`, `priority`, `type`, and `species`.
 
 ## 3. Fix authentication
 
@@ -47,22 +47,23 @@ This plan focuses on completing the backend requirements first, while leaving ro
 
 ## 4. Add role-based authorization
 
-- [ ] Create an `isAdmin` middleware.
-- [ ] Allow only admins to:
+- [✔️] Create an `isAdmin` middleware.
+- [✔️] Allow only admins to:
   - create cases
   - update cases
   - delete cases
   - assign cases to users
   - change user roles
   - delete other users
-- [ ] Allow normal users to:
+- [✔️] Allow normal users to:
   - register
   - login
   - view cases
+  - create cases (and assign agents)
   - view their own account
   - update their own account, except role
   - delete their own account
-- [ ] Prevent normal users from changing their own role or another user's role.
+- [✔️] Prevent normal users from changing their own role or another user's role.
 
 ## 5. Update user registration and profile management
 
@@ -70,29 +71,29 @@ This plan focuses on completing the backend requirements first, while leaving ro
 - [ ] Force every registered user to be created with role `"user"`, regardless of what is sent in the request body.
 - [ ] Hash passwords before saving users.
 - [ ] Avoid returning hashed passwords in API responses.
-- [ ] Add a route for users to update their own profile.
-- [ ] Add an admin-only route to update a user's role.
-- [X] Delete the user's Cloudinary image when the user account is deleted.
+- [✔️] Add a route for users to update their own profile.
+- [✔️] Add an admin-only route to update a user's role.
+- [✔️] Delete the user's Cloudinary image when the user account is deleted.
 
 ## 6. Build complete user CRUD
 
-- [ ] `POST /api/v1/users/register` - create user with image upload.
-- [ ] `POST /api/v1/users/login` - login and return token.
-- [ ] `GET /api/v1/users` - admin-only list of users.
+- [✔️] `POST /api/v1/users/register` - create user with image upload.
+- [✔️] `POST /api/v1/users/login` - login and return token.
+- [✔️] `GET /api/v1/users` - admin-only list of users.
 - [ ] `GET /api/v1/users/me` - logged-in user's own profile.
 - [ ] `GET /api/v1/users/:id` - admin-only user detail, or restrict carefully.
-- [ ] `PUT /api/v1/users/me` - logged-in user updates their own profile.
-- [ ] `PUT /api/v1/users/:id/role` - admin-only role update.
-- [ ] `DELETE /api/v1/users/me` - logged-in user deletes their own account.
-- [ ] `DELETE /api/v1/users/:id` - admin-only deletion of another user.
+- [✔️] `PUT /api/v1/users/me` - logged-in user updates their own profile.
+- [✔️] `PATCH` /api/v1/users/:id/role` - admin-only role update.
+- [✔️] `DELETE /api/v1/users/me` - logged-in user deletes their own account.
+- [✔️] `DELETE /api/v1/users/:id` - admin-only deletion of another user.
 
 ## 7. Build complete case CRUD
 
-- [ ] `GET /api/v1/cases` - authenticated users can view cases.
-- [ ] `GET /api/v1/cases/:id` - authenticated users can view one case.
-- [ ] `POST /api/v1/cases` - admin-only case creation.
-- [ ] `PUT /api/v1/cases/:id` - admin-only case update.
-- [ ] `DELETE /api/v1/cases/:id` - admin-only case deletion.
+- [✔️] `GET /api/v1/cases` - authenticated users can view cases.
+- [✔️] `GET /api/v1/cases/:id` - authenticated users can view one case.
+- [✔️] `POST /api/v1/cases` - admin / user case creation.
+- [ ] `PUT /api/v1/cases/:id` - admin / user case update.
+- [✔️] `DELETE /api/v1/cases/:id` - admin-only case deletion.
 - [ ] Consider adding `GET /api/v1/cases/my-cases` so normal users can easily see their assigned work.
 
 ## 8. Add case assignment logic
@@ -107,34 +108,34 @@ This plan focuses on completing the backend requirements first, while leaving ro
 
 ## 9. Replace or remove old project pieces
 
-- [ ] Replace `Book` files with `Case` files:
+- [✔️] WONT Replace `Book` files with `Case` files:
   - model
   - controller
   - routes
   - seed data if needed
-- [ ] Update `index.js` to mount `/api/v1/cases`.
+- [✔️] Update `index.js` to mount `/api/v1/cases`.
 - [ ] Remove unused imports and old routes after the new routes work.
-- [ ] Decide whether `Character` remains part of the final project.
-- [ ] If `Character` stays, make sure it also has complete CRUD or clearly document why it exists.
+- [✔️] NOPE: CHANGED TO AGENTS - Decide whether `Character` remains part of the final project.
+- [✔️] CHANGED TO AGENTS If `Character` stays, make sure it also hascomplete CRUD or clearly document why it exists.
 
 ## 10. Add seed data
 
-- [X] Create a seed file for the `Case` collection.
-- [X] Include a small number of simple City Watch assignments, such as:
+- [✔️] Create a seed file for the `Case` collection.
+- [✔️] Include a small number of simple City Watch assignments, such as:
   - patrol in The Shades
   - missing dragon report
   - guild complaint
   - suspicious clacks message
-- [X] Add or update the `npm run seed` script.
-- [ ] Make sure the seed can run without breaking required fields.
+- [✔️] Add or update the `npm run seed` script.
+- [] Make sure the seed can run without breaking required fields.
 (validate that agents exist)
 
 ## 11. Review Cloudinary behavior
 
-- [ ] Confirm upload middleware saves user images correctly.
-- [ ] Confirm deleting a user deletes the image from Cloudinary.
+- [✔️] Confirm upload middleware saves user images correctly.
+- [✔️] onfirm deleting a user deletes the image from Cloudinary.
 - [ ] If user image is updated, delete the previous Cloudinary image after the new one is saved.
-- [ ] Keep Cloudinary folder naming consistent.
+- [✔️] Keep Cloudinary folder naming consistent.
 
 ## 12. Improve error handling and response shape
 
@@ -161,9 +162,9 @@ This plan focuses on completing the backend requirements first, while leaving ro
   - auth flow
   - role permissions
   - example requests
-- [ ] Explain how the first admin is created manually in MongoAtlas.
+- [✔️] Explain how the first admin is created manually in MongoAtlas.
 - [ ] Explain which routes require a Bearer token.
-- [ ] Explain which routes require admin role.
+- [✔️] Explain which routes require admin role.
 
 ## 14. Prepare for a simple frontend
 
