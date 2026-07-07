@@ -16,9 +16,9 @@ const casesRouter = express.Router();
 casesRouter.get('/', isAuth, getCases);
 casesRouter.get('/:id', isAuth, getCase);
 casesRouter.post('/', isAuth, postCase);
-casesRouter.put('/:id', isAuth, updateCase);
+casesRouter.patch('/:id', isAuth, updateCase);
 casesRouter.delete('/:id', isAuth, requireRole('admin'), deleteCase);
-casesRouter.patch(
+casesRouter.put(
     '/:caseId/assign/:userId',
     isAuth,
     requireRole('admin'),
