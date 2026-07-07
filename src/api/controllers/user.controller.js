@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Case = require('../models/Case');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
@@ -163,8 +164,15 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
+        await Case.updateMany(
+            { assignedTo: id },
+            { $pull: { assignedTo: id } }
+        ); // Remove the user from assignedTo array in all cases
+
         await deleteFile(deletedUser.image); // Eliminar la imagen del usuario si existe
+        
         await deletedUser.deleteOne(); // Eliminar el usuario de la base de datos
+
 
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
         
