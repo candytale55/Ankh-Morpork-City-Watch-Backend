@@ -1,9 +1,10 @@
 // CRUD - Create, Read, Update, Delete
 const Book = require('../models/Book');
+const Agent = require('../models/Agent');
 
 const getBooks = async (req, res) => {
     try {
-        const books = await Book.find();
+        const books = await Book.find().populate('agents');
         return res.status(200).json(books);
     } catch (error) {
 
@@ -28,8 +29,8 @@ const updateBook = async (req, res) => {
         const updatedBook = await Book.findByIdAndUpdate(
             id,
             req.body,
-            { new: true }
-        ).populate('characters'); 
+            { new: true, runValidators: true }
+        ).populate.name('agents'); 
         
         return res.status(200).json(updatedBook);
 

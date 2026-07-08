@@ -14,10 +14,10 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    characters: {
+    agents: {
         type: [{
             type: mongoose.Types.ObjectId,
-            ref: 'Character'
+            ref: 'Agent'
         }],
     }
 }, {
