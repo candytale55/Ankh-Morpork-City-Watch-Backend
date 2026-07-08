@@ -61,7 +61,7 @@ const agents = [
         "organization": "Ankh-Morpork City Watch",
         "gender": "male",
         "species": "zombie",
-        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317494/Cheery_Littlebottom_pdybzr.jpg"
+        "image": "https://res.cloudinary.com/zaeweyxf/image/upload/v1783317493/Reg_Shoe_h7gkvx.jpg"
     },
     {
         "name": "Dorfl",

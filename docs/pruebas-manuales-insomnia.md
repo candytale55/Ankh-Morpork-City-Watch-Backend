@@ -1,4 +1,33 @@
-## Pruebas manuales de flujo crítico
+## Pruebas manuales de flujo critico
+
+Base URL local:
+
+```txt
+http://localhost:3000
+```
+
+Variables recomendadas en Insomnia:
+
+```txt
+USER_TOKEN
+ADMIN_TOKEN
+USER_ID
+OTHER_USER_ID
+CASE_ID
+AGENT_ID
+BOOK_ID
+```
+
+Resumen de metodos importantes:
+
+- Actualizar usuario: `PUT /api/v1/users/:id`
+- Cambiar rol: `PATCH /api/v1/users/:id/role`
+- Actualizar caso: `PATCH /api/v1/cases/:id`
+- Asignar caso a usuario: `PUT /api/v1/cases/:caseId/assign/:userId`
+- Actualizar agente: `PUT /api/v1/agents/:id`
+- Actualizar libro: `PUT /api/v1/books/:id`
+
+---
 
 ### 1. Register con intento de admin
 
@@ -28,7 +57,7 @@ image: archivo de imagen
 
 ---
 
-### 2. Login
+### 2. Login como usuario normal
 
 **Request**
 
@@ -50,8 +79,7 @@ Content-Type: application/json
 - La respuesta devuelve `token`.
 - La respuesta devuelve datos del usuario.
 - La respuesta no devuelve `password`.
-
-Guardar el token como `USER_TOKEN`.
+- Guardar el token como `USER_TOKEN`.
 
 ---
 
@@ -124,12 +152,72 @@ Content-Type: application/json
 
 ---
 
-### 6. User normal no puede asignar casos
+### 6. User normal puede listar casos
 
 **Request**
 
 ```http
-PATCH /api/v1/cases/CASE_ID/assign/USER_ID
+GET /api/v1/cases
+Authorization: Bearer USER_TOKEN
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- Devuelve un array de casos.
+
+---
+
+### 7. User normal puede ver un caso por id
+
+**Request**
+
+```http
+GET /api/v1/cases/CASE_ID
+Authorization: Bearer USER_TOKEN
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- Devuelve el caso indicado.
+
+---
+
+### 8. User normal actualiza un caso con PATCH
+
+**Request**
+
+```http
+PATCH /api/v1/cases/CASE_ID
+Authorization: Bearer USER_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "status": "under investigation",
+  "priority": "high",
+  "assignedTo": ["000000000000000000000000"],
+  "createdBy": "000000000000000000000000"
+}
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- `status` y `priority` se actualizan.
+- `assignedTo` no cambia desde esta ruta.
+- `createdBy` no cambia desde esta ruta.
+
+---
+
+### 9. User normal no puede asignar casos
+
+**Request**
+
+```http
+PUT /api/v1/cases/CASE_ID/assign/USER_ID
 Authorization: Bearer USER_TOKEN
 ```
 
@@ -140,7 +228,7 @@ Authorization: Bearer USER_TOKEN
 
 ---
 
-### 7. Login como admin
+### 10. Login como admin
 
 **Request**
 
@@ -162,12 +250,11 @@ Content-Type: application/json
 - Devuelve `token`.
 - El usuario tiene `role: "admin"`.
 - La respuesta no devuelve `password`.
-
-Guardar el token como `ADMIN_TOKEN`.
+- Guardar el token como `ADMIN_TOKEN`.
 
 ---
 
-### 8. Admin puede listar usuarios
+### 11. Admin puede listar usuarios
 
 **Request**
 
@@ -185,12 +272,29 @@ Authorization: Bearer ADMIN_TOKEN
 
 ---
 
-### 9. Admin asigna caso a usuario
+### 12. Admin puede ver usuario por id
 
 **Request**
 
 ```http
-PATCH /api/v1/cases/CASE_ID/assign/USER_ID
+GET /api/v1/users/USER_ID
+Authorization: Bearer ADMIN_TOKEN
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- Devuelve el usuario indicado.
+- No devuelve `password`.
+
+---
+
+### 13. Admin asigna caso a usuario con PUT
+
+**Request**
+
+```http
+PUT /api/v1/cases/CASE_ID/assign/USER_ID
 Authorization: Bearer ADMIN_TOKEN
 ```
 
@@ -204,12 +308,12 @@ Authorization: Bearer ADMIN_TOKEN
 
 ---
 
-### 10. Admin asigna el mismo caso otra vez
+### 14. Admin asigna el mismo caso otra vez
 
 **Request**
 
 ```http
-PATCH /api/v1/cases/CASE_ID/assign/USER_ID
+PUT /api/v1/cases/CASE_ID/assign/USER_ID
 Authorization: Bearer ADMIN_TOKEN
 ```
 
@@ -221,7 +325,7 @@ Authorization: Bearer ADMIN_TOKEN
 
 ---
 
-### 11. User normal no puede cambiar su rol
+### 15. User normal no puede cambiar su rol
 
 **Request**
 
@@ -244,7 +348,7 @@ Content-Type: application/json
 
 ---
 
-### 12. Admin puede cambiar rol de usuario
+### 16. Admin puede cambiar rol de usuario
 
 **Request**
 
@@ -276,7 +380,7 @@ Opcional: volver a dejarlo como user.
 
 ---
 
-### 13. Admin no puede asignar un rol inválido
+### 17. Admin no puede asignar un rol invalido
 
 **Request**
 
@@ -299,7 +403,235 @@ Content-Type: application/json
 
 ---
 
-### 14. Borrar caso limpia assignedCases del usuario
+### 18. Agents: GET publico lista agentes
+
+**Request**
+
+```http
+GET /api/v1/agents
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- Devuelve un array de agentes.
+- Cada agente contiene datos como `name`, `title`, `organization`, `species`, `gender` e `image`.
+
+---
+
+### 19. Agents: user normal no puede crear agente
+
+**Request**
+
+```http
+POST /api/v1/agents
+Authorization: Bearer USER_TOKEN
+Content-Type: multipart/form-data
+```
+
+Enviar campos:
+
+```txt
+name: Test Agent
+title: Constable
+organization: Ankh-Morpork City Watch
+gender: unknown
+species: human
+image: archivo de imagen
+```
+
+**Resultado esperado**
+
+- Status `403`.
+- El usuario normal no puede crear agentes.
+
+---
+
+### 20. Agents: admin crea agente con imagen
+
+**Request**
+
+```http
+POST /api/v1/agents
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: multipart/form-data
+```
+
+Enviar campos:
+
+```txt
+name: Test Agent
+title: Constable
+organization: Ankh-Morpork City Watch
+gender: unknown
+species: human
+image: archivo de imagen
+```
+
+**Resultado esperado**
+
+- Status `201`.
+- El agente se crea.
+- La respuesta incluye `image` con URL de Cloudinary.
+- Guardar el `_id` como `AGENT_ID`.
+
+---
+
+### 21. Agents: admin actualiza agente con PUT
+
+**Request**
+
+```http
+PUT /api/v1/agents/AGENT_ID
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: multipart/form-data
+```
+
+Enviar campos:
+
+```txt
+name: Test Agent Updated
+title: Sergeant
+organization: Ankh-Morpork City Watch
+gender: unknown
+species: human
+image: archivo de imagen
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- El agente se actualiza.
+- `name` o `title` reflejan los nuevos datos.
+
+---
+
+### 22. Agents: admin borra agente y elimina imagen
+
+**Request**
+
+```http
+DELETE /api/v1/agents/AGENT_ID
+Authorization: Bearer ADMIN_TOKEN
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- El agente se elimina.
+- La imagen asociada se elimina de Cloudinary.
+
+---
+
+### 23. Books: GET publico lista libros
+
+**Request**
+
+```http
+GET /api/v1/books
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- Devuelve un array de libros.
+
+---
+
+### 24. Books: user normal no puede crear libro
+
+**Request**
+
+```http
+POST /api/v1/books
+Authorization: Bearer USER_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "Guards! Guards!",
+  "publishedDate": "1989-01-01",
+  "saga": "Discworld"
+}
+```
+
+**Resultado esperado**
+
+- Status `403`.
+- El usuario normal no puede crear libros.
+
+---
+
+### 25. Books: admin crea libro
+
+**Request**
+
+```http
+POST /api/v1/books
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "Guards! Guards!",
+  "publishedDate": "1989-01-01",
+  "saga": "Discworld"
+}
+```
+
+**Resultado esperado**
+
+- Status `201`.
+- El libro se crea.
+- Guardar el `_id` como `BOOK_ID`.
+
+---
+
+### 26. Books: admin actualiza libro con PUT
+
+**Request**
+
+```http
+PUT /api/v1/books/BOOK_ID
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "Guards! Guards! Updated",
+  "publishedDate": "1989-01-01",
+  "saga": "Discworld - City Watch"
+}
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- El libro se actualiza.
+- La respuesta refleja los nuevos datos.
+
+---
+
+### 27. Books: admin borra libro
+
+**Request**
+
+```http
+DELETE /api/v1/books/BOOK_ID
+Authorization: Bearer ADMIN_TOKEN
+```
+
+**Resultado esperado**
+
+- Status `200`.
+- El libro se elimina.
+
+---
+
+### 28. Borrar caso limpia assignedCases del usuario
 
 **Request**
 
@@ -327,7 +659,7 @@ Authorization: Bearer ADMIN_TOKEN
 
 ---
 
-### 15. Borrar usuario elimina imagen y limpia assignedTo en casos
+### 29. Borrar usuario elimina imagen y limpia assignedTo en casos
 
 Crear o usar otro caso asignado al usuario antes de esta prueba.
 
@@ -354,7 +686,7 @@ Authorization: Bearer ADMIN_TOKEN
 
 ---
 
-### 16. User normal no puede borrar otro usuario
+### 30. User normal no puede borrar otro usuario
 
 Crear un segundo usuario normal y obtener su id como `OTHER_USER_ID`.
 
