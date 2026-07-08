@@ -68,6 +68,27 @@ Las rutas de la API se montan bajo:
 /api/v1
 ```
 
+## Frontend de pruebas
+
+El proyecto incluye un frontend estatico sencillo para probar el backend de forma visual. Se sirve desde el mismo servidor Express, por lo que no requiere instalacion adicional ni proceso de build.
+
+Con el servidor levantado, abrir:
+
+```txt
+http://localhost:3000
+```
+
+El tester permite:
+
+- iniciar sesion y guardar el token en el navegador;
+- registrar usuarios con imagen;
+- consultar agentes con foto y datos;
+- consultar, crear, editar, asignar y borrar casos;
+- consultar usuarios como admin;
+- cambiar roles y borrar usuarios como admin;
+- filtrar la vista actual con una barra de busqueda;
+- ver errores y mensajes de la API en pantalla.
+
 ## Seed
 
 El proyecto incluye semillas para `Agent` y `Case`.

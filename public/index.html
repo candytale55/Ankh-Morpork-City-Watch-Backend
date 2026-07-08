@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Watch API Tester</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <div>
+            <p class="eyebrow">Ankh-Morpork City Watch</p>
+            <h1>Backend API Tester</h1>
+        </div>
+        <section class="session-panel" aria-label="Current session">
+            <p id="sessionStatus" class="session-status">Not logged in</p>
+            <button id="logoutButton" class="secondary-button" type="button">Logout</button>
+        </section>
+    </header>
+
+    <main class="app-shell">
+        <aside class="sidebar" aria-label="Authentication panel">
+            <section class="panel">
+                <h2>Login</h2>
+                <form id="loginForm" class="form-stack">
+                    <label>
+                        Email
+                        <input name="email" type="email" autocomplete="email" required>
+                    </label>
+                    <label>
+                        Password
+                        <input name="password" type="password" autocomplete="current-password" required>
+                    </label>
+                    <button type="submit">Login</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Register User</h2>
+                <form id="registerForm" class="form-stack">
+                    <label>
+                        Name
+                        <input name="name" type="text" required>
+                    </label>
+                    <label>
+                        Email
+                        <input name="email" type="email" required>
+                    </label>
+                    <label>
+                        Password
+                        <input name="password" type="password" required>
+                    </label>
+                    <label>
+                        Image
+                        <input name="image" type="file" accept="image/*" required>
+                    </label>
+                    <button type="submit">Create User</button>
+                </form>
+            </section>
+
+            <section class="panel message-panel" aria-live="polite">
+                <h2>Messages</h2>
+                <div id="messageBox" class="message-box">Ready.</div>
+            </section>
+        </aside>
+
+        <section class="workspace">
+            <nav class="tab-list" aria-label="Main views">
+                <button class="tab-button active" type="button" data-view="agents">Agents</button>
+                <button class="tab-button" type="button" data-view="cases">Cases</button>
+                <button class="tab-button" type="button" data-view="users">Users</button>
+            </nav>
+
+            <section class="toolbar" aria-label="Search and refresh controls">
+                <label class="search-field">
+                    Search
+                    <input id="globalSearch" type="search" placeholder="Filter current view">
+                </label>
+                <button id="refreshButton" class="secondary-button" type="button">Refresh</button>
+            </section>
+
+            <section id="agentsView" class="view-section active-view" aria-labelledby="agentsTitle">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="agentsTitle">Agents</h2>
+                        <p>Public catalogue with portraits and profile data.</p>
+                    </div>
+                </div>
+
+                <section class="panel admin-panel">
+                    <h3>Create Agent</h3>
+                    <form id="agentForm" class="form-grid">
+                        <label>
+                            Name
+                            <input name="name" type="text" required>
+                        </label>
+                        <label>
+                            Title
+                            <input name="title" type="text" required>
+                        </label>
+                        <label>
+                            Organization
+                            <input name="organization" type="text" value="Ankh-Morpork City Watch" required>
+                        </label>
+                        <label>
+                            Gender
+                            <select name="gender" required></select>
+                        </label>
+                        <label>
+                            Species
+                            <select name="species" required></select>
+                        </label>
+                        <label>
+                            Image
+                            <input name="image" type="file" accept="image/*" required>
+                        </label>
+                        <button type="submit">Create Agent</button>
+                    </form>
+                </section>
+
+                <div id="agentsList" class="card-grid"></div>
+            </section>
+
+            <section id="casesView" class="view-section" aria-labelledby="casesTitle">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="casesTitle">Cases</h2>
+                        <p>Create, inspect, update, assign and delete cases.</p>
+                    </div>
+                </div>
+
+                <section class="panel">
+                    <h3 id="caseFormTitle">Create Case</h3>
+                    <form id="caseForm" class="form-grid">
+                        <input name="caseId" type="hidden">
+                        <label>
+                            Title
+                            <input name="title" type="text" required>
+                        </label>
+                        <label>
+                            Type
+                            <select name="type" required></select>
+                        </label>
+                        <label>
+                            Status
+                            <select name="status" required></select>
+                        </label>
+                        <label>
+                            Priority
+                            <select name="priority" required></select>
+                        </label>
+                        <label>
+                            Location
+                            <input name="location" type="text" required>
+                        </label>
+                        <label>
+                            Reported by
+                            <input name="reportedBy" type="text">
+                        </label>
+                        <label>
+                            Suspect name
+                            <input name="suspectName" type="text">
+                        </label>
+                        <label>
+                            Suspect species
+                            <select name="suspectSpecies"></select>
+                        </label>
+                        <label class="wide-field">
+                            Description
+                            <textarea name="description" rows="4" required></textarea>
+                        </label>
+                        <div class="form-actions">
+                            <button type="submit">Save Case</button>
+                            <button id="clearCaseFormButton" class="secondary-button" type="button">Clear</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="panel admin-panel">
+                    <h3>Assign Case to User</h3>
+                    <form id="assignForm" class="form-grid compact-form">
+                        <label>
+                            Case
+                            <select name="caseId" required></select>
+                        </label>
+                        <label>
+                            User
+                            <select name="userId" required></select>
+                        </label>
+                        <button type="submit">Assign</button>
+                    </form>
+                </section>
+
+                <div id="casesList" class="case-list"></div>
+            </section>
+
+            <section id="usersView" class="view-section" aria-labelledby="usersTitle">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="usersTitle">Users</h2>
+                        <p>Admin view for accounts, roles and assigned cases.</p>
+                    </div>
+                </div>
+                <div id="usersList" class="table-wrap"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="./app.js"></script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 require('dotenv').config(); 
 const express = require('express');
+const path = require('path');
 const { connectDB } = require('./src/config/db');
 const { connectCloudinary } = require('./src/config/cloudinary');
 
@@ -21,6 +22,7 @@ connectCloudinary();
 
 // Middleware to parse JSON requests
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Routes
