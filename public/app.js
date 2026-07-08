@@ -239,8 +239,7 @@ function renderUsers() {
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>User</th>
                     <th>Role</th>
                     <th>Assigned cases</th>
                     <th>Actions</th>
@@ -249,8 +248,15 @@ function renderUsers() {
             <tbody>
                 ${users.map((user) => `
                     <tr>
-                        <td>${escapeHtml(user.name)}</td>
-                        <td>${escapeHtml(user.email)}</td>
+                        <td>
+                            <div class="user-profile-cell">
+                                <img src="${escapeHtml(user.image)}" alt="${escapeHtml(user.name)} profile image">
+                                <div>
+                                    <strong>${escapeHtml(user.name)}</strong>
+                                    <span>${escapeHtml(user.email)}</span>
+                                </div>
+                            </div>
+                        </td>
                         <td><span class="badge">${escapeHtml(user.role)}</span></td>
                         <td>${escapeHtml(getIdListLabel(user.assignedCases))}</td>
                         <td>

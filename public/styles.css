@@ -357,7 +357,7 @@ textarea {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 760px;
+    min-width: 720px;
 }
 
 th,
@@ -383,6 +383,35 @@ th {
 
 .inline-controls select {
     min-width: 110px;
+}
+
+.user-profile-cell {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    min-width: 220px;
+}
+
+.user-profile-cell img {
+    width: 54px;
+    height: 54px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface-strong);
+}
+
+.user-profile-cell strong,
+.user-profile-cell span {
+    display: block;
+}
+
+.user-profile-cell span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
 }
 
 .empty-state {
@@ -423,6 +452,54 @@ th {
 
     .card-grid {
         grid-template-columns: 1fr;
+    }
+
+    .table-wrap {
+        overflow-x: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+        display: block;
+        min-width: 0;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        margin-bottom: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    td {
+        border-bottom: 1px solid var(--line);
+    }
+
+    td:last-child {
+        border-bottom: 0;
+    }
+
+    .inline-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .inline-controls select,
+    .inline-controls button {
+        width: 100%;
     }
 
     .tab-button,
