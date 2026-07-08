@@ -1,24 +1,36 @@
 const cloudinary = require('cloudinary').v2;
 
+const getPublicIdFromUrl = (url) => {
+    const uploadMarker = '/upload/';
+    const uploadIndex = url.indexOf(uploadMarker);
+
+    if (uploadIndex === -1) {
+        throw new Error(`Invalid Cloudinary URL: ${url}`);
+    }
+
+    let pathAfterUpload = url.slice(uploadIndex + uploadMarker.length);
+
+    pathAfterUpload = pathAfterUpload.split('?')[0];
+    pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, '');
+
+    return pathAfterUpload.replace(/\.[^/.]+$/, '');
+};
+
 const deleteFile = async (url) => {
     if (!url) {
         return;
     }
 
-    /* https://res.cloudinary.com/zaeweyxf/image/upload/v1783263507/agent_portrait/dhbbcuz2oa0xskzujwvx.jpg */
-
-    const array = url.split('/');
-    const cloudinaryFolder = array.at(-2);
-
-    const publicId = `${cloudinaryFolder}/${array.at(-1).split('.')[0]}`;
-
+    const publicId = getPublicIdFromUrl(url);
     const result = await cloudinary.uploader.destroy(publicId);
 
-    if (result.result !== 'ok' && result.result !== 'not found') {
-        throw new Error(`Cloudinary deletion failed for ${publicId}`);
-    }
+    console.log('Cloudinary delete URL:', url);
+    console.log('Cloudinary delete publicId:', publicId);
+    console.log('Cloudinary delete result:', result);
 
-    console.log(`File deleted successfully from Cloudinary: ${publicId}`);
-}
+    if (result.result !== 'ok') {
+        throw new Error(`Failed to delete file from Cloudinary for ${publicId}: ${result.result}`);
+    }
+};
 
 module.exports = { deleteFile };
