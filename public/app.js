@@ -36,7 +36,8 @@ const elements = {
     viewSections: document.querySelectorAll('.view-section'),
     agentsList: document.querySelector('#agentsList'),
     casesList: document.querySelector('#casesList'),
-    usersList: document.querySelector('#usersList')
+    usersList: document.querySelector('#usersList'),
+    meProfile: document.querySelector('#meProfile')
 };
 
 function setMessage(message, type = 'info') {
@@ -104,6 +105,7 @@ function fillSelect(select, values, placeholder = '') {
 function setupEnumSelects() {
     fillSelect(elements.agentForm.elements.gender, enums.gender, 'Select gender');
     fillSelect(elements.agentForm.elements.species, enums.species, 'Select species');
+    fillSelect(elements.registerForm.elements.role, enums.roles);
     fillSelect(elements.caseForm.elements.type, enums.caseTypes);
     fillSelect(elements.caseForm.elements.status, enums.caseStatuses);
     fillSelect(elements.caseForm.elements.priority, enums.casePriorities);
@@ -275,6 +277,33 @@ function renderUsers() {
     `;
 }
 
+function renderMe() {
+    if (!state.token) {
+        elements.meProfile.innerHTML = '<div class="empty-state">Login to view your profile.</div>';
+        return;
+    }
+
+    if (!state.currentUser) {
+        elements.meProfile.innerHTML = '<div class="empty-state">Profile not loaded. Click Refresh.</div>';
+        return;
+    }
+
+    const user = state.currentUser;
+
+    elements.meProfile.innerHTML = `
+        <div class="user-profile-cell">
+            <img src="${escapeHtml(user.image)}" alt="${escapeHtml(user.name || 'User')} profile image">
+            <div>
+                <h3>${escapeHtml(user.name || 'Unnamed user')}</h3>
+                <p class="meta-line">${escapeHtml(user.email || 'No email')}</p>
+            </div>
+        </div>
+        <p class="meta-line"><strong>Role:</strong> ${escapeHtml(user.role || 'user')}</p>
+        <p class="meta-line"><strong>User ID:</strong> ${escapeHtml(user._id || 'unknown')}</p>
+        <p class="meta-line"><strong>Assigned cases:</strong> ${escapeHtml(getIdListLabel(user.assignedCases || []))}</p>
+    `;
+}
+
 function renderAssignOptions() {
     const caseOptions = state.cases.map((caseItem) => `<option value="${caseItem._id}">${escapeHtml(caseItem.title)}</option>`).join('');
     const userOptions = state.users.map((user) => `<option value="${user._id}">${escapeHtml(user.name || user.email)} (${escapeHtml(user.role)})</option>`).join('');
@@ -294,6 +323,10 @@ function renderActiveView() {
 
     if (state.activeView === 'users') {
         renderUsers();
+    }
+
+    if (state.activeView === 'me') {
+        renderMe();
     }
 
     renderAssignOptions();

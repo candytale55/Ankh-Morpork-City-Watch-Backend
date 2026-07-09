@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Watch API Tester</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
 <body>
     <header class="app-header">
         <div>
@@ -51,6 +53,13 @@
                         <input name="password" type="password" required>
                     </label>
                     <label>
+                        Role
+                        <select name="role" required>
+                            <option value="user" selected>user</option>
+                            <option value="admin">admin</option>
+                        </select>
+                    </label>
+                    <label>
                         Image
                         <input name="image" type="file" accept="image/*" required>
                     </label>
@@ -69,6 +78,7 @@
                 <button class="tab-button active" type="button" data-view="agents">Agents</button>
                 <button class="tab-button" type="button" data-view="cases">Cases</button>
                 <button class="tab-button" type="button" data-view="users">Users</button>
+                <button class="tab-button" type="button" data-view="me">Me</button>
             </nav>
 
             <section class="toolbar" aria-label="Search and refresh controls">
@@ -203,9 +213,20 @@
                 </div>
                 <div id="usersList" class="table-wrap"></div>
             </section>
+
+            <section id="meView" class="view-section" aria-labelledby="meTitle">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="meTitle">My Profile</h2>
+                        <p>Current authenticated user profile via /users/me.</p>
+                    </div>
+                </div>
+                <div id="meProfile" class="panel"></div>
+            </section>
         </section>
     </main>
 
     <script src="./app.js"></script>
 </body>
+
 </html>
