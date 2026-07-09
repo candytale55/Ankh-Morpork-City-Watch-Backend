@@ -93,6 +93,16 @@ Este frontend fue generado con ayuda de Codex como interfaz de apoyo para prueba
 
 La validacion principal de la API se realizo en Insomnia siguiendo la checklist de `docs/pruebas-manuales-insomnia.md`, y todas las pruebas registradas en ese documento pasaron. El frontend basico complementa esa validacion y permite repetir los flujos principales desde navegador.
 
+## Screenshots
+
+### API Tester - Cases
+
+![API Tester Cases](docs/shots/scsh-API-Tester%20Cases.png)
+
+### API Tester - Users
+
+![API Tester Users](docs/shots/scsh-API-Tester%20Users.png)
+
 ## Seed
 
 El proyecto incluye semillas para `Agent` y `Case`.
