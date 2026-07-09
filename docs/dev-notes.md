@@ -152,3 +152,46 @@ Asi los documentos cumplen el schema de `Case` al momento de insertarse.
 `Agent` forma parte de la tematica del proyecto y permite conservar referencias a personajes/agentes de la City Watch. Se usa tambien en las semillas y en la relacion `Case.assignedAgents`.
 
 `Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin.
+
+## Esquema de relaciones y permisos (Mermaid)
+
+```mermaid
+flowchart TD
+		U[User]
+		C[Case]
+		A[Agent]
+
+		UA[Usuario autenticado]
+		AD[Usuario con role=admin]
+		IA[isAuth]
+		RR[requireRole('admin')]
+
+		U -- "assignedCases[] (ObjectId)" --> C
+		C -- "assignedTo[] (ObjectId)" --> U
+		C -- "assignedAgents[] (ObjectId)" --> A
+		C -- "createdBy (ObjectId)" --> U
+
+		UA --> IA
+		IA --> RR
+		RR --> AD
+
+		AD -- "PATCH /users/:id/role" --> U
+		AD -- "PUT /cases/:caseId/assign/:userId" --> C
+
+		AD -- "DELETE /cases/:id" --> C
+		AD -- "DELETE /agents/:id" --> A
+		AD -- "DELETE /books/:id" --> B[Book]
+
+		UA -- "DELETE /users/:id (solo si id propio)" --> U
+		AD -- "DELETE /users/:id (cualquier usuario)" --> U
+```
+
+Lectura rapida:
+
+- Relaciones de datos: `Case` referencia a `User` por `createdBy` y por `assignedTo[]`.
+- Relaciones de datos: `Case` referencia a `Agent` por `assignedAgents[]`.
+- Relaciones de datos: `User` referencia a `Case` por `assignedCases[]`.
+- Autorizacion: `isAuth` valida token y carga `req.user`.
+- Autorizacion: `requireRole('admin')` se usa encima de `isAuth` para rutas sensibles.
+- Borrados: Admin puede borrar `cases`, `agents`, `books` y cualquier `user`.
+- Borrados: Usuario normal solo puede borrar su propia cuenta.
