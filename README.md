@@ -89,6 +89,10 @@ El tester permite:
 - filtrar la vista actual con una barra de busqueda;
 - ver errores y mensajes de la API en pantalla.
 
+Este frontend fue generado con ayuda de Codex como interfaz de apoyo para pruebas manuales rapidas. Como este proyecto es principalmente de backend, la interfaz es basica: su objetivo es facilitar validaciones visuales, no actuar como producto frontend final.
+
+La validacion principal de la API se realizo en Insomnia siguiendo la checklist de `docs/pruebas-manuales-insomnia.md`, y todas las pruebas registradas en ese documento pasaron. El frontend basico complementa esa validacion y permite repetir los flujos principales desde navegador.
+
 ## Seed
 
 El proyecto incluye semillas para `Agent` y `Case`.

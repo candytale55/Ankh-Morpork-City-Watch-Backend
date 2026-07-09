@@ -149,49 +149,57 @@ Asi los documentos cumplen el schema de `Case` al momento de insertarse.
 
 ## Agents y Books
 
-`Agent` forma parte de la tematica del proyecto y permite conservar referencias a personajes/agentes de la City Watch. Se usa tambien en las semillas y en la relacion `Case.assignedAgents`.
+El proyecto usa personajes de los libros sobre [la Guardia (City Watch)](https://en.wikipedia.org/wiki/Ankh-Morpork_City_Watch) del universo Discworld de Terry Pratchett.
 
-`Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin.
+Escogi este tema porque me resulta mas facil recordar lo que estoy probando al seguir la logica de las historias.
 
-## Esquema de relaciones y permisos (Mermaid)
+Lo ideal seria que usuarios y agentes fueran una sola coleccion, pero los requisitos del proyecto lo complican, porque el admin inicial debe crearse como user y luego modificarse manualmente en MongoDB, por lo que no puedo seedear usuarios. 
+
+`Users` son asignados a casos por los `Admin` y entonces agregan los `Agentes` a los mismos. Podría entenderse que son los *Owners* del caso. 
+
+`Agent` permite conservar referencias a personajes/agentes de la City Watch. Se usa tambien en las semillas y en la relacion `Case.assignedAgents`.
+
+`Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin. En un principio pensaba borrar esta coleccion, pero ya fue documentada e incluida en `docs/pruebas-manuales-insomnia.md`.
+
+## Esquema (Mermaid)
 
 ```mermaid
-flowchart TD
-		U[User]
-		C[Case]
-		A[Agent]
+flowchart LR
+    U[Usuario]
+    AD[Admin]
 
-		UA[Usuario autenticado]
-		AD[Usuario con role=admin]
-		IA[isAuth]
-		RR[requireRole('admin')]
+    UC1((Crear cuenta 'user'))
+    UC2((Borrar su propia cuenta))
+    UC3((Asignar usuario a caso))
+    UC4((Borrar cualquier cuenta))
+    UC5((Crear agente))
+    UC6((Asignar agente a caso))
+    UC7((Borrar agente))
 
-		U -- "assignedCases[] (ObjectId)" --> C
-		C -- "assignedTo[] (ObjectId)" --> U
-		C -- "assignedAgents[] (ObjectId)" --> A
-		C -- "createdBy (ObjectId)" --> U
+    U --> UC1
+    U --> UC2
 
-		UA --> IA
-		IA --> RR
-		RR --> AD
+    AD --> UC1
+    AD --> UC3
+    AD --> UC4
+    AD --> UC5
+    AD --> UC7
 
-		AD -- "PATCH /users/:id/role" --> U
-		AD -- "PUT /cases/:caseId/assign/:userId" --> C
+    U -. "hoy puede via PATCH /cases/:id" .-> UC6
+    AD -. "tambien puede via PATCH /cases/:id" .-> UC6
 
-		AD -- "DELETE /cases/:id" --> C
-		AD -- "DELETE /agents/:id" --> A
-		AD -- "DELETE /books/:id" --> B[Book]
-
-		UA -- "DELETE /users/:id (solo si id propio)" --> U
-		AD -- "DELETE /users/:id (cualquier usuario)" --> U
+    UC3 -. "solo admin\nrequireRole('admin')" .-> AD
+    UC2 -. "si id autenticado = id objetivo" .-> U
+    UC5 -. "solo admin\nPOST /agents" .-> AD
+    UC7 -. "solo admin\nDELETE /agents/:id" .-> AD
 ```
 
 Lectura rapida:
 
-- Relaciones de datos: `Case` referencia a `User` por `createdBy` y por `assignedTo[]`.
-- Relaciones de datos: `Case` referencia a `Agent` por `assignedAgents[]`.
-- Relaciones de datos: `User` referencia a `Case` por `assignedCases[]`.
-- Autorizacion: `isAuth` valida token y carga `req.user`.
-- Autorizacion: `requireRole('admin')` se usa encima de `isAuth` para rutas sensibles.
-- Borrados: Admin puede borrar `cases`, `agents`, `books` y cualquier `user`.
-- Borrados: Usuario normal solo puede borrar su propia cuenta.
+- Cualquier persona puede crear cuenta por register, pero siempre nace con role user.
+- Un usuario autenticado puede borrar su propia cuenta.
+- Solo admin puede asignar usuarios a casos.
+- Admin tambien puede borrar cuentas de otros usuarios.
+- Solo admin puede crear agentes y borrar agentes.
+- Asignar agentes a casos hoy no tiene endpoint dedicado de admin: actualmente se puede enviar `assignedAgents` en `PATCH /cases/:id` (ruta autenticada, no restringida por rol).
+- Esta combinacion refleja la regla de negocio actual: auto-gestion de cuenta para user, asignacion de usuarios reservada a admin, y asignacion de agentes pendiente de endurecer si se quiere regla estricta de admin.
