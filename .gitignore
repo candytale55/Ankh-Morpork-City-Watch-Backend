@@ -7,10 +7,6 @@
 project_concanator.py
 project_context.txt
 
-# dev notes and agent chats
-docs/chats
-docs/markdowns
-!docs/justificacion-requisitos.md
 
 # images inside
 src/assets

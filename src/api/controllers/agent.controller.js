@@ -10,7 +10,8 @@ const getAgents = async (req, res) => {
         return res.status(200).json(agents);
 
     } catch (error) {
-        return res.status(400).json("Error in getting Agents")
+        console.error("Error in getting Agents", error);
+        return res.status(400).json({ message: "Error in getting Agents", error: error.message });
     }
 };
 
