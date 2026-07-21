@@ -4,6 +4,12 @@ const Agent = require("../models/Agent");
 const { deleteFile } = require("../../utils/deleteFile");
 
 
+/**
+ * Escapes user input before embedding it in a regular expression.
+ */
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+
 
 /**
  * Returns every agent stored in the database.
@@ -16,6 +22,36 @@ const getAgents = async (req, res) => {
     } catch (error) {
         console.error("Error in getting Agents", error);
         return res.status(400).json({ message: "Error in getting Agents", error: error.message });
+    }
+};
+
+/**
+ * Finds agents whose name matches the query string, ignoring case.
+ */
+const getAgentByName = async (req, res) => {
+    try {
+        const { name } = req.query;
+
+        if (!name || name.trim() === "") {
+            return res.status(400).json({ message: "Agent name is required" });
+        }
+
+        const normalizedName = name.trim();
+        const agents = await Agent.find({
+            name: { $regex: escapeRegExp(normalizedName), $options: 'i' }
+        });
+
+        if (!agents.length) {
+            return res.status(404).json({ message: `No agents found matching "${normalizedName}"` });
+        }
+
+        return res.status(200).json({
+            message: `Found ${agents.length} agent(s) matching "${normalizedName}"`,
+            agents
+        });
+    } catch (error) {
+        console.error("Error in searching Agent by name", error);
+        return res.status(400).json({ message: "Error in searching Agent by name", error: error.message });
     }
 };
 
@@ -83,6 +119,7 @@ const deleteAgent = async (req, res) => {
 
 module.exports = {
     getAgents,
+    getAgentByName,
     postAgent,
     updateAgent,
     deleteAgent
