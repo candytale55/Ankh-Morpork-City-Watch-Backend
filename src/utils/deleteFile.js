@@ -1,5 +1,10 @@
+// Deletes Cloudinary assets using the public id extracted from their stored URL.
+
 const cloudinary = require('cloudinary').v2;
 
+/**
+ * Extracts the Cloudinary public id from a stored file URL.
+ */
 const getPublicIdFromUrl = (url) => {
     const uploadMarker = '/upload/';
     const uploadIndex = url.indexOf(uploadMarker);
@@ -10,12 +15,16 @@ const getPublicIdFromUrl = (url) => {
 
     let pathAfterUpload = url.slice(uploadIndex + uploadMarker.length);
 
+    // Remove query params, the version prefix, and the file extension.
     pathAfterUpload = pathAfterUpload.split('?')[0];
     pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, '');
 
     return pathAfterUpload.replace(/\.[^/.]+$/, '');
 };
 
+/**
+ * Deletes a file from Cloudinary when a URL is available.
+ */
 const deleteFile = async (url) => {
     if (!url) {
         return;

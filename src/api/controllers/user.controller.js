@@ -1,9 +1,14 @@
+// Handles user registration, authentication, profile access, and admin actions.
+
 const User = require('../models/User');
 const Case = require('../models/Case');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
 
+/**
+ * Registers a new user and returns the created profile without the password.
+ */
 const register = async (req, res) => {
     try {
         const newUser = new User(req.body);
@@ -32,6 +37,9 @@ const register = async (req, res) => {
     }
 };
 
+/**
+ * Validates credentials and returns a signed token plus the user profile.
+ */
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -42,10 +50,10 @@ const login = async (req, res) => {
         }
 
         /* Si llega aquí, es que el usuario existe y hay que comprobar la contraseña */
-        if (bcrypt.compareSync(password, user.password)) { 
+        if (bcrypt.compareSync(password, user.password)) {
             const token = generateToken(user._id);
             user.password = undefined; // Remove password from the user object before sending it in the response
-            return res.status(200).json({token, user});
+            return res.status(200).json({ token, user });
 
         } else {
             return res.status(400).json("Error: Invalid email or password");
@@ -56,15 +64,21 @@ const login = async (req, res) => {
     }
 };
 
+/**
+ * Returns all users without their password hashes.
+ */
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password'); 
+        const users = await User.find().select('-password');
         return res.status(200).json(users);
     } catch (error) {
         return res.status(400).json("Error in getting Users: " + error.message);
     }
 };
 
+/**
+ * Returns one user by id without its password hash.
+ */
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -80,6 +94,9 @@ const getUser = async (req, res) => {
     }
 };
 
+/**
+ * Returns the authenticated user stored by the auth middleware.
+ */
 const getMe = async (req, res) => {
     try {
         return res.status(200).json(req.user);
@@ -90,6 +107,9 @@ const getMe = async (req, res) => {
 };
 
 
+/**
+ * Updates the current user or an admin-managed user while protecting sensitive fields.
+ */
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -114,7 +134,7 @@ const updateUser = async (req, res) => {
             req.body,
             { new: true, runValidators: true } // Ensure the updated data adheres to the schema
         ).select('-password');
-        
+
         if (!updatedUser) {
             return res.status(404).json("Error: User not found");
         }
@@ -125,11 +145,14 @@ const updateUser = async (req, res) => {
     }
 };
 
-const updateUserRole = async (req, res) => { 
+/**
+ * Updates only the role field of a user.
+ */
+const updateUserRole = async (req, res) => {
     try {
         const { id } = req.params;
         const { role } = req.body;
-        
+
         const updatedUser = await User.findByIdAndUpdate(
             id,
             { role },
@@ -149,9 +172,12 @@ const updateUserRole = async (req, res) => {
         return res.status(400).json("Error in updating User role - Only an admin can update roles: " + error.message);
     }
 };
-    
 
 
+
+/**
+ * Deletes a user and removes their references from assigned cases.
+ */
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -174,12 +200,12 @@ const deleteUser = async (req, res) => {
         ); // Remove the user from assignedTo array in all cases
 
         await deleteFile(deletedUser.image); // Eliminar la imagen del usuario si existe
-        
+
         await deletedUser.deleteOne(); // Eliminar el usuario de la base de datos
 
 
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
-        
+
     } catch (error) {
         return res.status(400).json("Error in deleting User: " + error.message);
     }

@@ -1,3 +1,5 @@
+// Declares the HTTP routes for case CRUD and assignment operations.
+
 const express = require('express');
 const { isAuth } = require('../../middlewares/isAuth');
 const { requireRole } = require('../../middlewares/requireRole');

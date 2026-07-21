@@ -1,8 +1,13 @@
+// Connects Mongoose to the MongoDB database used by the API.
+
 // Configuración de la base de datos
 
 const mongoose = require('mongoose');
 
 // Función para conectar a la base de datos
+/**
+ * Opens the MongoDB connection used by the application.
+ */
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_URL)

@@ -1,6 +1,11 @@
+// Handles the case CRUD and assignment workflow for the backend API.
+
 const Case = require('../models/Case');
 const User = require('../models/User');
 
+/**
+ * Returns all cases with the assigned users and agents populated.
+ */
 const getCases = async (req, res) => {
     try {
         const cases = await Case.find()
@@ -12,6 +17,9 @@ const getCases = async (req, res) => {
     }
 }
 
+/**
+ * Returns a single case by id with its related documents populated.
+ */
 const getCase = async (req, res) => {
     try {
         const { id } = req.params;
@@ -30,6 +38,9 @@ const getCase = async (req, res) => {
 };
 
 
+/**
+ * Creates a new case for the authenticated user.
+ */
 const postCase = async (req, res) => {
     try {
         delete req.body.assignedTo; // Prevent assigning users during case creation
@@ -47,6 +58,9 @@ const postCase = async (req, res) => {
     }
 }
 
+/**
+ * Updates a case by id without allowing direct reassignment of protected fields.
+ */
 const updateCase = async (req, res) => {
     try {
         const { id } = req.params;
@@ -67,6 +81,9 @@ const updateCase = async (req, res) => {
     }
 }
 
+/**
+ * Deletes a case and removes its id from every user's assigned cases list.
+ */
 const deleteCase = async (req, res) => {
     try {
         const { id } = req.params;
@@ -90,6 +107,9 @@ const deleteCase = async (req, res) => {
     }
 }
 
+/**
+ * Assigns a case to a user and keeps both sides of the relationship in sync.
+ */
 const assignCaseToUser = async (req, res) => {
     try {
         const { caseId, userId } = req.params;

@@ -1,3 +1,5 @@
+// Seeds the cases collection and links each case to related users and agents.
+
 const Case = require('../../api/models/Case');
 const cases = require('../../api/data/cases.data');
 
@@ -7,13 +9,13 @@ const Agent = require('../../api/models/Agent');
 
 
 
+/**
+ * Clears and repopulates the cases collection with related documents.
+ */
 const launchCasesSeed = async () => {
     try {
- 
-        // TODO: Old code to drop the collection, but can create issues if the collection doesn't exist. Using deleteMany instead to clear the collection. Remove once I tested the new approach and confirmed it works as expected.
         // await Case.collection.drop();
-        // Drop the collection to avoid duplicates
-        // console.log("Cases collection dropped");
+        // Clear the collection before inserting the static seed data.
 
 
         /* --- Para incluir elementos de las otras colecciones en los casos --- */
@@ -26,6 +28,7 @@ const launchCasesSeed = async () => {
         const cheery = await Agent.findOne({ name: 'Cheery Littlebottom' });
         const detritus = await Agent.findOne({ name: 'Detritus' });
 
+        // Attach the related user and agent ids to each seeded case.
         const casesWithRelations = cases.map((caseItem) => {
             if (caseItem.title === 'Dragon Sightings in the Shades') {
                 return {
@@ -70,5 +73,5 @@ const launchCasesSeed = async () => {
         console.error("Error connecting to the database when seeding Cases", error);
     }
 };
- 
+
 module.exports = { launchCasesSeed };

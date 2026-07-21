@@ -1,3 +1,5 @@
+// Defines the MongoDB schema for books that reference related agents.
+
 const mongoose = require('mongoose');
 
 const bookSchema = new mongoose.Schema({

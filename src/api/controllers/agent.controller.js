@@ -1,9 +1,13 @@
-// CRUD - Create, Read, Update, Delete
+// Handles the agent CRUD endpoints used by the public catalog and admin actions.
+
 const Agent = require("../models/Agent");
 const { deleteFile } = require("../../utils/deleteFile");
 
 
 
+/**
+ * Returns every agent stored in the database.
+ */
 const getAgents = async (req, res) => {
     try {
         const agents = await Agent.find();
@@ -15,6 +19,9 @@ const getAgents = async (req, res) => {
     }
 };
 
+/**
+ * Creates a new agent and stores its uploaded image path when present.
+ */
 const postAgent = async (req, res) => {
     try {
         const newAgent = new Agent(req.body);
@@ -30,6 +37,9 @@ const postAgent = async (req, res) => {
     }
 }
 
+/**
+ * Updates an existing agent by id.
+ */
 const updateAgent = async (req, res) => {
     try {
         const { id } = req.params;
@@ -46,6 +56,9 @@ const updateAgent = async (req, res) => {
     }
 }
 
+/**
+ * Deletes an agent and removes its Cloudinary image when one exists.
+ */
 const deleteAgent = async (req, res) => {
     try {
         const { id } = req.params;

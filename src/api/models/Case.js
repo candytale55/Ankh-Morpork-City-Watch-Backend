@@ -1,3 +1,5 @@
+// Defines the MongoDB schema for police cases and their relations.
+
 const mongoose = require('mongoose');
 const {
     speciesEnum,

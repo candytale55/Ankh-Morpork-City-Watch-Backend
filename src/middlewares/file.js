@@ -1,3 +1,5 @@
+// Configures Multer storage for uploading agent and user images to Cloudinary.
+
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
@@ -5,7 +7,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const agentStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'agentPortrait', 
+        folder: 'agentPortrait',
         allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp', 'jfif']
     }
 });

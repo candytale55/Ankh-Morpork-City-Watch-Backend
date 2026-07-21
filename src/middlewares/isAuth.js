@@ -1,10 +1,15 @@
+// Verifies bearer tokens and loads the authenticated user into the request.
+
 const { verifyToken } = require('../utils/jwt');
 const User = require('../api/models/User');
 
+/**
+ * Checks the Authorization header, validates the token, and attaches the user.
+ */
 const isAuth = async (req, res, next) => {
     try {
         const token = req.headers.authorization.split(" ")[1]; // Obtener el token sin Bearer
-        console.log("Token:", token); 
+        console.log("Token:", token);
         if (!token) {
             return res.status(401).json({ message: "Unauthorized" });
         }

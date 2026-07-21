@@ -1,3 +1,5 @@
+// Defines the MongoDB schema for users and their assigned cases.
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { speciesEnum, genderEnum, roleEnum } = require('../../utils/enums');
@@ -24,7 +26,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        required: true, 
+        required: true,
         enum: roleEnum,
         default: 'user'
     },
@@ -35,6 +37,9 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
+/**
+ * Hashes the password before saving a user document.
+ */
 userSchema.pre('save', function () {
     this.password = bcrypt.hashSync(this.password, 10);
 

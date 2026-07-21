@@ -1,7 +1,12 @@
+// Configures the Cloudinary SDK with environment credentials for file uploads.
+
 require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 
 
+/**
+ * Sets the Cloudinary runtime configuration.
+ */
 const connectCloudinary = () => {
     try {
         cloudinary.config({

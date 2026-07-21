@@ -1,3 +1,5 @@
+// Declares the HTTP routes for registration, login, and user management.
+
 const usersRouter = require('express').Router();
 const { requireRole } = require('../../middlewares/requireRole');
 const { isAuth } = require('../../middlewares/isAuth');

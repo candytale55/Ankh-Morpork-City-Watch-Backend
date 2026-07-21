@@ -1,3 +1,5 @@
+// Static seed data for the default City Watch agents.
+
 const agents = [
     {
         "name": "Samuel Vimes",

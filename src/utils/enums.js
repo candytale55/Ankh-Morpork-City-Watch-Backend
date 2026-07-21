@@ -1,3 +1,5 @@
+// Centralizes the allowed values shared by schemas and the frontend forms.
+
 const speciesEnum = [
     'human',
     'dwarf',
@@ -30,7 +32,7 @@ const caseTypeEnum = ['case', 'patrol', 'report', 'incident'];
 const caseStatusEnum = ['open', 'under investigation', 'closed'];
 
 const casePriorityEnum = ['low', 'medium', 'high'];
-    
+
 module.exports = {
     speciesEnum,
     genderEnum,
@@ -39,4 +41,4 @@ module.exports = {
     caseStatusEnum,
     casePriorityEnum
 };
-    
+

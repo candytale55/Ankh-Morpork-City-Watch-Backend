@@ -1,3 +1,5 @@
+// Declares the HTTP routes for agent CRUD operations.
+
 const express = require('express');
 const { isAuth } = require('../../middlewares/isAuth');
 const { requireRole } = require('../../middlewares/requireRole');

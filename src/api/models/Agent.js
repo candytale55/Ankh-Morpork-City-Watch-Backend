@@ -1,3 +1,5 @@
+// Defines the MongoDB schema for an agent in the City Watch catalog.
+
 const mongoose = require("mongoose");
 const { speciesEnum, genderEnum } = require("../../utils/enums");
 

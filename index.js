@@ -1,4 +1,6 @@
-require('dotenv').config(); 
+// Entry point for the backend API server and static frontend assets.
+
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { connectDB } = require('./src/config/db');
@@ -31,10 +33,12 @@ app.use("/api/v1/books", booksRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/cases", casesRouter);
 
+// Returns a 404 response for any route that is not registered above.
 app.use("/", (req, res) => {
     return res.status(404).json({ message: "Route not found" });
 });
 
+// Starts the HTTP server on the configured port.
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
