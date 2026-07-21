@@ -7,6 +7,21 @@ const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
 
 /**
+ * Deletes a newly uploaded user image when an operation fails.
+ */
+const rollbackUploadedUserImage = async (file) => {
+    if (!file?.path) {
+        return;
+    }
+
+    try {
+        await deleteFile(file.path);
+    } catch (cleanupError) {
+        console.error('Uploaded user image could not be rolled back', cleanupError.message);
+    }
+};
+
+/**
  * Registers a new user and returns the created profile without the password.
  */
 const register = async (req, res) => {
@@ -22,6 +37,7 @@ const register = async (req, res) => {
 
         const userDuplicated = await User.findOne({ email: newUser.email });
         if (userDuplicated) {
+            await rollbackUploadedUserImage(req.file);
             return res.status(400).json("Error: User already exists");
         }
 
@@ -33,6 +49,7 @@ const register = async (req, res) => {
             user: savedUser
         });
     } catch (error) {
+        await rollbackUploadedUserImage(req.file);
         return res.status(400).json("Error: Couldn't create user: " + error.message);
     }
 };
@@ -122,25 +139,42 @@ const updateUser = async (req, res) => {
         }
 
         if (req.body.role && !isAdmin) {
+            await rollbackUploadedUserImage(req.file);
             return res.status(403).json("Error: Forbidden - Users cannot change roles");
         }
 
-        delete req.body.role; // Remove role from the request body to prevent unauthorized role changes
-        delete req.body.assignedCases; // Prevent users from assigning cases to themselves or others (Only Admins can assign cases)
-        delete req.body.password; // Prevent users from changing their password through this endpoint (Password change should be handled separately)
+        const currentUser = await User.findById(id).select('-password');
+        if (!currentUser) {
+            await rollbackUploadedUserImage(req.file);
+            return res.status(404).json("Error: User not found");
+        }
+
+        const updateData = { ...req.body };
+        delete updateData.role; // Remove role from the request body to prevent unauthorized role changes
+        delete updateData.assignedCases; // Prevent users from assigning cases to themselves or others (Only Admins can assign cases)
+        delete updateData.password; // Prevent users from changing their password through this endpoint (Password change should be handled separately)
+
+        if (req.file) {
+            updateData.image = req.file.path;
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            req.body,
+            updateData,
             { new: true, runValidators: true } // Ensure the updated data adheres to the schema
         ).select('-password');
 
-        if (!updatedUser) {
-            return res.status(404).json("Error: User not found");
+        if (req.file && currentUser.image && currentUser.image !== updatedUser.image) {
+            try {
+                await deleteFile(currentUser.image);
+            } catch (deleteError) {
+                console.error('Old user image could not be deleted', deleteError.message);
+            }
         }
 
         return res.status(200).json({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
+        await rollbackUploadedUserImage(req.file);
         return res.status(400).json("Error in updating User: " + error.message);
     }
 };
