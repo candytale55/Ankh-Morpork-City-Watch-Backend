@@ -203,3 +203,10 @@ Lectura rapida:
 - Solo admin puede crear agentes y borrar agentes.
 - Asignar agentes a casos hoy no tiene endpoint dedicado de admin: actualmente se puede enviar `assignedAgents` en `PATCH /cases/:id` (ruta autenticada, no restringida por rol).
 - Esta combinacion refleja la regla de negocio actual: auto-gestion de cuenta para user, asignacion de usuarios reservada a admin, y asignacion de agentes pendiente de endurecer si se quiere regla estricta de admin.
+
+## Debug de agentes (referencia)
+
+Durante pruebas manuales con Insomnia parecia que un `PUT /api/v1/agents/:id` podia terminar en un comportamiento similar a creacion duplicada.
+- En paralelo, cuando un update fallaba por validacion (por ejemplo, un `species` fuera del enum), la imagen nueva podia quedar subida en Cloudinary aunque la operacion de base de datos se rechazara.
+
+Se hizo un debug temporal para darle seguimiento. El detalle esta en [docs/pruebas/agents-debug-pruebas.md](./pruebas/agents-debug-pruebas.md).
