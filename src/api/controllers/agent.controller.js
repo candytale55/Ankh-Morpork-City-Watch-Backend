@@ -31,6 +31,7 @@ const rollbackUploadedImage = async (file) => {
  */
 const getAgents = async (req, res) => {
     try {
+        console.log(`[AGENTS_DEBUG_CTRL] getAgents hit | ${req.method} ${req.originalUrl}`);
         const agents = await Agent.find();
         return res.status(200).json(agents);
 
