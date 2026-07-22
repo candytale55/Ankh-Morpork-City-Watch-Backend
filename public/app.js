@@ -33,6 +33,8 @@ const elements = {
     assignAgentForm: document.querySelector('#assignAgentForm'),
     globalSearch: document.querySelector('#globalSearch'),
     refreshButton: document.querySelector('#refreshButton'),
+    profileModal: document.querySelector('#profileModal'),
+    profileModalBody: document.querySelector('#profileModalBody'),
     tabButtons: document.querySelectorAll('.tab-button'),
     viewSections: document.querySelectorAll('.view-section'),
     agentsList: document.querySelector('#agentsList'),
@@ -166,6 +168,96 @@ function getIdListLabel(ids = []) {
     return ids.map((item) => item.name || item.title || item._id || item).join(', ');
 }
 
+function getProfileCases(cases = []) {
+    return cases.map((caseItem) => ({
+        _id: caseItem._id,
+        title: caseItem.title || 'Untitled case',
+        status: caseItem.status || 'unknown',
+        priority: caseItem.priority || 'low'
+    }));
+}
+
+function renderProfileCases(cases = []) {
+    if (!cases.length) {
+        return '<div class="empty-state compact-empty-state">No assigned cases.</div>';
+    }
+
+    return `
+        <div class="profile-cases-list">
+            ${cases.map((caseItem) => `
+                <div class="profile-case-item" title="${escapeHtml(caseItem.title)}">
+                    <span class="profile-case-title">${escapeHtml(caseItem.title)}</span>
+                    <span class="profile-case-meta badge-row">
+                        <span class="badge">${escapeHtml(caseItem.status)}</span>
+                        <span class="badge ${caseItem.priority === 'high' ? 'priority-high' : caseItem.priority === 'medium' ? 'priority-medium' : ''}">${escapeHtml(caseItem.priority)}</span>
+                    </span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function openProfileModal(profileType, profileId) {
+    const source = profileType === 'agent'
+        ? state.agents.find((item) => item._id === profileId)
+        : state.users.find((item) => item._id === profileId);
+
+    if (!source) {
+        return;
+    }
+
+    const title = profileType === 'agent' ? source.name || source.title || 'Agent profile' : source.name || 'User profile';
+    const subtitle = profileType === 'agent'
+        ? source.title || source.organization || 'Agent'
+        : source.email || 'User';
+    const cases = getProfileCases(source.assignedCases || []);
+    const imageAlt = profileType === 'agent'
+        ? `${escapeHtml(source.name || 'Agent')} portrait`
+        : `${escapeHtml(source.name || 'User')} profile image`;
+
+    elements.profileModalBody.innerHTML = `
+        <section class="profile-layout">
+            <div class="profile-media">
+                <img src="${escapeHtml(source.image || '')}" alt="${imageAlt}">
+            </div>
+            <div class="profile-details">
+                <div>
+                    <p class="eyebrow">${profileType === 'agent' ? 'Agent fiche' : 'User fiche'}</p>
+                    <h2 id="profileModalTitle">${escapeHtml(title)}</h2>
+                    <p class="profile-subtitle">${escapeHtml(subtitle)}</p>
+                </div>
+                <div class="profile-meta-grid">
+                    ${profileType === 'agent' ? `
+                        <p class="meta-line"><strong>Name:</strong> ${escapeHtml(source.name || 'Unnamed agent')}</p>
+                        <p class="meta-line"><strong>Title:</strong> ${escapeHtml(source.title || 'No title')}</p>
+                        <p class="meta-line"><strong>Organization:</strong> ${escapeHtml(source.organization || 'No organization')}</p>
+                        <p class="meta-line"><strong>Species:</strong> ${escapeHtml(source.species || 'unknown')}</p>
+                        <p class="meta-line"><strong>Gender:</strong> ${escapeHtml(source.gender || 'unknown')}</p>
+                    ` : `
+                        <p class="meta-line"><strong>Name:</strong> ${escapeHtml(source.name || 'Unnamed user')}</p>
+                        <p class="meta-line"><strong>Email:</strong> ${escapeHtml(source.email || 'No email')}</p>
+                        <p class="meta-line"><strong>Role:</strong> ${escapeHtml(source.role || 'user')}</p>
+                        <p class="meta-line"><strong>User ID:</strong> ${escapeHtml(source._id || 'unknown')}</p>
+                    `}
+                </div>
+                <div class="profile-cases-section">
+                    <h3>Assigned cases</h3>
+                    ${renderProfileCases(cases)}
+                </div>
+            </div>
+        </section>
+    `;
+
+    elements.profileModal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+function closeProfileModal() {
+    elements.profileModal.hidden = true;
+    elements.profileModalBody.innerHTML = '';
+    document.body.classList.remove('modal-open');
+}
+
 function renderAgentThumbs(agents = []) {
     if (!agents.length) {
         return '<span class="muted-note">No assigned agents</span>';
@@ -209,7 +301,7 @@ function renderAgents() {
     }
 
     elements.agentsList.innerHTML = agents.map((agent) => `
-        <article class="agent-card">
+        <article class="agent-card profile-trigger" data-profile-type="agent" data-profile-id="${agent._id}" tabindex="0" role="button" aria-label="Open profile for ${escapeHtml(agent.name)}">
             <img src="${escapeHtml(agent.image)}" alt="${escapeHtml(agent.name)} portrait">
             <div class="card-body">
                 <h3>${escapeHtml(agent.name)}</h3>
@@ -292,7 +384,7 @@ function renderUsers() {
             </thead>
             <tbody>
                 ${users.map((user) => `
-                    <tr>
+                    <tr class="profile-row" data-profile-type="user" data-profile-id="${user._id}" tabindex="0" role="button" aria-label="Open profile for ${escapeHtml(user.name || user.email)}">
                         <td>
                             <div class="user-profile-cell">
                                 <img src="${escapeHtml(user.image)}" alt="${escapeHtml(user.name)} profile image">
@@ -345,6 +437,19 @@ function renderMe() {
         <p class="meta-line"><strong>User ID:</strong> ${escapeHtml(user._id || 'unknown')}</p>
         <p class="meta-line"><strong>Assigned cases:</strong> ${escapeHtml(getIdListLabel(user.assignedCases || []))}</p>
     `;
+}
+
+function handleProfileOpen(event, profileType) {
+    if (event.target.closest('button, select, option, input, textarea, a')) {
+        return;
+    }
+
+    const trigger = event.target.closest(`[data-profile-type="${profileType}"]`);
+    if (!trigger) {
+        return;
+    }
+
+    openProfileModal(profileType, trigger.dataset.profileId);
 }
 
 function renderAssignOptions() {
@@ -619,6 +724,7 @@ async function handleCaseListClick(event) {
 async function handleUsersClick(event) {
     const button = event.target.closest('button[data-action]');
     if (!button) {
+        handleProfileOpen(event, 'user');
         return;
     }
 
@@ -651,6 +757,20 @@ async function handleUsersClick(event) {
     }
 }
 
+function handleProfileKeydown(event, profileType) {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+    }
+
+    const trigger = event.target.closest(`[data-profile-type="${profileType}"]`);
+    if (!trigger) {
+        return;
+    }
+
+    event.preventDefault();
+    openProfileModal(profileType, trigger.dataset.profileId);
+}
+
 function setupEvents() {
     elements.loginForm.addEventListener('submit', handleLogin);
     elements.registerForm.addEventListener('submit', handleRegister);
@@ -661,7 +781,21 @@ function setupEvents() {
     elements.clearCaseFormButton.addEventListener('click', clearCaseForm);
     elements.casesList.addEventListener('click', handleCaseListClick);
     elements.usersList.addEventListener('click', handleUsersClick);
+    elements.agentsList.addEventListener('click', (event) => handleProfileOpen(event, 'agent'));
+    elements.agentsList.addEventListener('keydown', (event) => handleProfileKeydown(event, 'agent'));
+    elements.usersList.addEventListener('keydown', (event) => handleProfileKeydown(event, 'user'));
     elements.refreshButton.addEventListener('click', refreshData);
+    elements.profileModal.addEventListener('click', (event) => {
+        if (event.target.hasAttribute('data-close-profile-modal')) {
+            closeProfileModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !elements.profileModal.hidden) {
+            closeProfileModal();
+        }
+    });
 
     elements.logoutButton.addEventListener('click', () => {
         state.token = '';

@@ -1,6 +1,7 @@
 // Handles the agent CRUD endpoints used by the public catalog and admin actions.
 
 const Agent = require("../models/Agent");
+const Case = require("../models/Case");
 const { deleteFile } = require("../../utils/deleteFile");
 
 
@@ -31,8 +32,35 @@ const rollbackUploadedImage = async (file) => {
  */
 const getAgents = async (req, res) => {
     try {
-        const agents = await Agent.find();
-        return res.status(200).json(agents);
+        const agents = await Agent.find().lean();
+        const cases = await Case.find({ assignedAgents: { $exists: true, $ne: [] } })
+            .select('title status priority assignedAgents')
+            .lean();
+
+        const casesByAgent = new Map();
+
+        cases.forEach((caseItem) => {
+            (caseItem.assignedAgents || []).forEach((agentId) => {
+                const key = String(agentId);
+                if (!casesByAgent.has(key)) {
+                    casesByAgent.set(key, []);
+                }
+
+                casesByAgent.get(key).push({
+                    _id: caseItem._id,
+                    title: caseItem.title,
+                    status: caseItem.status,
+                    priority: caseItem.priority
+                });
+            });
+        });
+
+        const agentsWithCases = agents.map((agent) => ({
+            ...agent,
+            assignedCases: casesByAgent.get(String(agent._id)) || []
+        }));
+
+        return res.status(200).json(agentsWithCases);
 
     } catch (error) {
         console.error("Error in getting Agents", error);

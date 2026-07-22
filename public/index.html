@@ -255,6 +255,14 @@
         </section>
     </main>
 
+    <div id="profileModal" class="profile-modal" hidden>
+        <div class="profile-modal__backdrop" data-close-profile-modal></div>
+        <div class="profile-modal__panel" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+            <button class="profile-modal__close secondary-button" type="button" data-close-profile-modal>Close</button>
+            <div id="profileModalBody"></div>
+        </div>
+    </div>
+
     <script src="./app.js"></script>
 </body>
 

@@ -23,6 +23,10 @@ body {
     background: var(--bg);
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
 button,
 input,
 select,
@@ -352,6 +356,22 @@ textarea {
     background: var(--surface-strong);
 }
 
+.profile-trigger {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-trigger:hover,
+.profile-row:hover {
+    box-shadow: 0 14px 28px rgba(31, 37, 40, 0.12);
+}
+
+.profile-trigger:focus-visible,
+.profile-row:focus-visible {
+    outline: 3px solid rgba(23, 107, 99, 0.22);
+    outline-offset: 2px;
+}
+
 .card-body {
     display: grid;
     gap: 8px;
@@ -410,6 +430,10 @@ textarea {
 
 .case-card h3 {
     margin: 0 0 8px;
+}
+
+.compact-empty-state {
+    min-height: 0;
 }
 
 .case-description {
@@ -490,6 +514,144 @@ textarea {
     font-size: 11px;
     line-height: 1.2;
     text-align: center;
+}
+
+.profile-row {
+    cursor: pointer;
+}
+
+.profile-row td {
+    transition: background 0.2s ease;
+}
+
+.profile-row:hover td {
+    background: rgba(23, 107, 99, 0.04);
+}
+
+.profile-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.profile-modal[hidden] {
+    display: none;
+}
+
+.profile-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(22, 29, 27, 0.62);
+    backdrop-filter: blur(4px);
+}
+
+.profile-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(980px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--surface);
+    box-shadow: 0 30px 80px rgba(10, 16, 14, 0.28);
+    padding: 24px;
+}
+
+.profile-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-media img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--surface-strong);
+}
+
+.profile-details {
+    display: grid;
+    gap: 18px;
+}
+
+.profile-details h2 {
+    margin: 4px 0 0;
+    font-size: 30px;
+}
+
+.profile-subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.profile-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+}
+
+.profile-cases-section h3 {
+    margin: 0 0 10px;
+}
+
+.profile-cases-list {
+    display: grid;
+    gap: 10px;
+}
+
+.profile-case-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-strong);
+}
+
+.profile-case-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.profile-case-meta {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+    .profile-layout,
+    .profile-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-modal {
+        padding: 12px;
+    }
+
+    .profile-modal__panel {
+        max-height: calc(100vh - 24px);
+        padding: 18px;
+    }
 }
 
 .user-thumb-row {

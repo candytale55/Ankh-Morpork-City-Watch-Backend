@@ -86,7 +86,7 @@ const login = async (req, res) => {
  */
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password');
+        const users = await User.find().select('-password').populate('assignedCases', 'title status priority');
         return res.status(200).json(users);
     } catch (error) {
         return res.status(400).json("Error in getting Users: " + error.message);
@@ -99,7 +99,7 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = await User.findById(id).select('-password');
+        const user = await User.findById(id).select('-password').populate('assignedCases', 'title status priority');
 
         if (!user) {
             return res.status(404).json("Error: User not found");
