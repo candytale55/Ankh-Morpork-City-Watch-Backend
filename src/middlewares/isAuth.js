@@ -9,13 +9,12 @@ const User = require('../api/models/User');
 const isAuth = async (req, res, next) => {
     try {
         const token = req.headers.authorization.split(" ")[1]; // Obtener el token sin Bearer
-        console.log("Token:", token);
         if (!token) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
         const { id } = verifyToken(token);
-        const user = await User.findById(id); // Buscar el usuario en la base de datos utilizando el ID del token
+        const user = await User.findById(id).populate('assignedCases', 'title status priority'); // Buscar el usuario en la base de datos utilizando el ID del token
 
         if (!user) {
             return res.status(401).json({ message: "Invalid token" });

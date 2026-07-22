@@ -197,10 +197,10 @@ function renderProfileCases(cases = []) {
     `;
 }
 
-function openProfileModal(profileType, profileId) {
+function openProfileModal(profileType, profileId, sourceOverride = null) {
     const source = profileType === 'agent'
         ? state.agents.find((item) => item._id === profileId)
-        : state.users.find((item) => item._id === profileId);
+        : sourceOverride || state.users.find((item) => item._id === profileId);
 
     if (!source) {
         return;
@@ -256,6 +256,24 @@ function closeProfileModal() {
     elements.profileModal.hidden = true;
     elements.profileModalBody.innerHTML = '';
     document.body.classList.remove('modal-open');
+}
+
+async function openCurrentUserProfile() {
+    if (!state.token) {
+        setMessage('Login to view your profile.', 'error');
+        return;
+    }
+
+    if (!state.currentUser) {
+        await loadCurrentUser();
+    }
+
+    if (!state.currentUser) {
+        setMessage('Profile not available yet. Refresh and try again.', 'error');
+        return;
+    }
+
+    openProfileModal('user', state.currentUser._id, state.currentUser);
 }
 
 function renderAgentThumbs(agents = []) {
@@ -450,6 +468,15 @@ function handleProfileOpen(event, profileType) {
     }
 
     openProfileModal(profileType, trigger.dataset.profileId);
+}
+
+async function handleTabSelection(viewName) {
+    if (viewName === 'me') {
+        await openCurrentUserProfile();
+        return;
+    }
+
+    setActiveView(viewName);
 }
 
 function renderAssignOptions() {
@@ -814,7 +841,7 @@ function setupEvents() {
     });
 
     elements.tabButtons.forEach((button) => {
-        button.addEventListener('click', () => setActiveView(button.dataset.view));
+        button.addEventListener('click', () => handleTabSelection(button.dataset.view));
     });
 }
 
