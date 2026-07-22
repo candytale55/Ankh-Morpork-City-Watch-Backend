@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const { speciesEnum, genderEnum, roleEnum } = require('../../utils/enums');
+const { roleEnum } = require('../../utils/enums');
 
 const userSchema = new mongoose.Schema({
     name: {
