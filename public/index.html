@@ -97,36 +97,43 @@
                     </div>
                 </div>
 
-                <section class="panel admin-panel">
-                    <h3>Create Agent</h3>
-                    <form id="agentForm" class="form-grid">
-                        <label>
-                            Name
-                            <input name="name" type="text" required>
-                        </label>
-                        <label>
-                            Title
-                            <input name="title" type="text" required>
-                        </label>
-                        <label>
-                            Organization
-                            <input name="organization" type="text" value="Ankh-Morpork City Watch" required>
-                        </label>
-                        <label>
-                            Gender
-                            <select name="gender" required></select>
-                        </label>
-                        <label>
-                            Species
-                            <select name="species" required></select>
-                        </label>
-                        <label>
-                            Image
-                            <input name="image" type="file" accept="image/*" required>
-                        </label>
-                        <button type="submit">Create Agent</button>
-                    </form>
-                </section>
+                <details class="panel admin-panel accordion-panel">
+                    <summary class="accordion-summary">
+                        <div>
+                            <h3>Create Agent</h3>
+                            <p>Click to open the form.</p>
+                        </div>
+                    </summary>
+                    <div class="accordion-content">
+                        <form id="agentForm" class="form-grid">
+                            <label>
+                                Name
+                                <input name="name" type="text" required>
+                            </label>
+                            <label>
+                                Title
+                                <input name="title" type="text" required>
+                            </label>
+                            <label>
+                                Organization
+                                <input name="organization" type="text" value="Ankh-Morpork City Watch" required>
+                            </label>
+                            <label>
+                                Gender
+                                <select name="gender" required></select>
+                            </label>
+                            <label>
+                                Species
+                                <select name="species" required></select>
+                            </label>
+                            <label>
+                                Image
+                                <input name="image" type="file" accept="image/*" required>
+                            </label>
+                            <button type="submit">Create Agent</button>
+                        </form>
+                    </div>
+                </details>
 
                 <div id="agentsList" class="card-grid"></div>
             </section>
@@ -139,52 +146,59 @@
                     </div>
                 </div>
 
-                <section class="panel">
-                    <h3 id="caseFormTitle">Create Case</h3>
-                    <form id="caseForm" class="form-grid">
-                        <input name="caseId" type="hidden">
-                        <label>
-                            Title
-                            <input name="title" type="text" required>
-                        </label>
-                        <label>
-                            Type
-                            <select name="type" required></select>
-                        </label>
-                        <label>
-                            Status
-                            <select name="status" required></select>
-                        </label>
-                        <label>
-                            Priority
-                            <select name="priority" required></select>
-                        </label>
-                        <label>
-                            Location
-                            <input name="location" type="text" required>
-                        </label>
-                        <label>
-                            Reported by
-                            <input name="reportedBy" type="text">
-                        </label>
-                        <label>
-                            Suspect name
-                            <input name="suspectName" type="text">
-                        </label>
-                        <label>
-                            Suspect species
-                            <select name="suspectSpecies"></select>
-                        </label>
-                        <label class="wide-field">
-                            Description
-                            <textarea name="description" rows="4" required></textarea>
-                        </label>
-                        <div class="form-actions">
-                            <button type="submit">Save Case</button>
-                            <button id="clearCaseFormButton" class="secondary-button" type="button">Clear</button>
+                <details class="panel accordion-panel">
+                    <summary class="accordion-summary">
+                        <div>
+                            <h3 id="caseFormTitle">Create Case</h3>
+                            <p>Click to open or collapse the form.</p>
                         </div>
-                    </form>
-                </section>
+                    </summary>
+                    <div class="accordion-content">
+                        <form id="caseForm" class="form-grid">
+                            <input name="caseId" type="hidden">
+                            <label>
+                                Title
+                                <input name="title" type="text" required>
+                            </label>
+                            <label>
+                                Type
+                                <select name="type" required></select>
+                            </label>
+                            <label>
+                                Status
+                                <select name="status" required></select>
+                            </label>
+                            <label>
+                                Priority
+                                <select name="priority" required></select>
+                            </label>
+                            <label>
+                                Location
+                                <input name="location" type="text" required>
+                            </label>
+                            <label>
+                                Reported by
+                                <input name="reportedBy" type="text">
+                            </label>
+                            <label>
+                                Suspect name
+                                <input name="suspectName" type="text">
+                            </label>
+                            <label>
+                                Suspect species
+                                <select name="suspectSpecies"></select>
+                            </label>
+                            <label class="wide-field">
+                                Description
+                                <textarea name="description" rows="4" required></textarea>
+                            </label>
+                            <div class="form-actions">
+                                <button type="submit">Save Case</button>
+                                <button id="clearCaseFormButton" class="secondary-button" type="button">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                </details>
 
                 <section class="panel admin-panel">
                     <h3>Assign Case to User</h3>
@@ -196,6 +210,21 @@
                         <label>
                             User
                             <select name="userId" required></select>
+                        </label>
+                        <button type="submit">Assign</button>
+                    </form>
+                </section>
+
+                <section class="panel admin-panel">
+                    <h3>Assign Case to Agent</h3>
+                    <form id="assignAgentForm" class="form-grid compact-form">
+                        <label>
+                            Case
+                            <select name="caseId" required></select>
+                        </label>
+                        <label>
+                            Agent
+                            <select name="agentId" required></select>
                         </label>
                         <button type="submit">Assign</button>
                     </form>

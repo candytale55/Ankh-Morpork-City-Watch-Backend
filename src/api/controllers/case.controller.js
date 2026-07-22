@@ -1,6 +1,7 @@
 // Handles the case CRUD and assignment workflow for the backend API.
 
 const Case = require('../models/Case');
+const Agent = require('../models/Agent');
 const User = require('../models/User');
 
 /**
@@ -9,8 +10,8 @@ const User = require('../models/User');
 const getCases = async (req, res) => {
     try {
         const cases = await Case.find()
-            .populate('assignedTo', 'name email role')
-            .populate('assignedAgents', 'name title');
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
         return res.status(200).json(cases);
     } catch (error) {
         return res.status(400).json({ message: 'Error getting cases', error: error.message });
@@ -24,8 +25,8 @@ const getCase = async (req, res) => {
     try {
         const { id } = req.params;
         const oneCase = await Case.findById(id)
-            .populate('assignedTo', 'name email role')
-            .populate('assignedAgents', 'name title');
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
 
         if (!oneCase) {
             return res.status(404).json({ message: 'Case not found' });
@@ -127,8 +128,8 @@ const assignCaseToUser = async (req, res) => {
             { $addToSet: { assignedTo: userId } },
             { new: true }
         )
-            .populate('assignedTo', 'name email role')
-            .populate('assignedAgents', 'name title');
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { $addToSet: { assignedCases: caseId } },
@@ -145,11 +146,46 @@ const assignCaseToUser = async (req, res) => {
     }
 }
 
+/**
+ * Assigns a case to an agent and keeps the case document updated.
+ */
+const assignCaseToAgent = async (req, res) => {
+    try {
+        const { caseId, agentId } = req.params;
+
+        const caseToAssign = await Case.findById(caseId);
+        if (!caseToAssign) {
+            return res.status(404).json({ message: 'Case not found' });
+        }
+
+        const agentToAssign = await Agent.findById(agentId);
+        if (!agentToAssign) {
+            return res.status(404).json({ message: 'Agent not found' });
+        }
+
+        const updatedCase = await Case.findByIdAndUpdate(
+            caseId,
+            { $addToSet: { assignedAgents: agentId } },
+            { new: true }
+        )
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
+
+        return res.status(200).json({
+            message: 'Case assigned to agent successfully',
+            case: updatedCase
+        });
+    } catch (error) {
+        return res.status(400).json({ message: 'Error assigning case to agent', error: error.message });
+    }
+}
+
 module.exports = {
     getCases,
     getCase,
     postCase,
     updateCase,
     deleteCase,
-    assignCaseToUser
+    assignCaseToUser,
+    assignCaseToAgent
 };

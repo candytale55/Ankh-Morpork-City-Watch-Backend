@@ -30,6 +30,7 @@ const elements = {
     caseFormTitle: document.querySelector('#caseFormTitle'),
     clearCaseFormButton: document.querySelector('#clearCaseFormButton'),
     assignForm: document.querySelector('#assignForm'),
+    assignAgentForm: document.querySelector('#assignAgentForm'),
     globalSearch: document.querySelector('#globalSearch'),
     refreshButton: document.querySelector('#refreshButton'),
     tabButtons: document.querySelectorAll('.tab-button'),
@@ -165,6 +166,40 @@ function getIdListLabel(ids = []) {
     return ids.map((item) => item.name || item.title || item._id || item).join(', ');
 }
 
+function renderAgentThumbs(agents = []) {
+    if (!agents.length) {
+        return '<span class="muted-note">No assigned agents</span>';
+    }
+
+    return `
+        <div class="agent-thumb-row">
+            ${agents.map((agent) => `
+                <div class="agent-thumb" title="${escapeHtml(agent.name || 'Agent')}">
+                    ${agent.image ? `<img src="${escapeHtml(agent.image)}" alt="${escapeHtml(agent.name || 'Agent')} portrait">` : '<div class="agent-thumb-placeholder">No image</div>'}
+                    <span>${escapeHtml(agent.name || agent.title || 'Agent')}</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderUserThumbs(users = []) {
+    if (!users.length) {
+        return '<span class="muted-note">No assigned users</span>';
+    }
+
+    return `
+        <div class="agent-thumb-row user-thumb-row">
+            ${users.map((user) => `
+                <div class="agent-thumb user-thumb" title="${escapeHtml(user.name || 'User')}">
+                    ${user.image ? `<img src="${escapeHtml(user.image)}" alt="${escapeHtml(user.name || 'User')} portrait">` : '<div class="agent-thumb-placeholder">No image</div>'}
+                    <span>${escapeHtml(user.name || user.email || 'User')}</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
 function renderAgents() {
     const agents = getFilteredItems(state.agents);
 
@@ -208,14 +243,22 @@ function renderCases() {
             <div class="badge-row">
                 <span class="badge">${escapeHtml(caseItem.type)}</span>
                 <span class="badge">${escapeHtml(caseItem.status)}</span>
-                <span class="badge">${escapeHtml(caseItem.priority)}</span>
+                <span class="badge ${caseItem.priority === 'high' ? 'priority-high' : caseItem.priority === 'medium' ? 'priority-medium' : ''}">${escapeHtml(caseItem.priority)}</span>
             </div>
             <p class="case-description">${escapeHtml(caseItem.description)}</p>
             <p class="meta-line"><strong>Location:</strong> ${escapeHtml(caseItem.location)}</p>
             <p class="meta-line"><strong>Reported by:</strong> ${escapeHtml(caseItem.reportedBy || 'Not set')}</p>
             <p class="meta-line"><strong>Suspect:</strong> ${escapeHtml(caseItem.suspectName || 'Unknown')} (${escapeHtml(caseItem.suspectSpecies || 'unknown')})</p>
-            <p class="meta-line"><strong>Assigned users:</strong> ${escapeHtml(getIdListLabel(caseItem.assignedTo))}</p>
-            <p class="meta-line"><strong>Assigned agents:</strong> ${escapeHtml(getIdListLabel(caseItem.assignedAgents))}</p>
+            <div class="assigned-people-row">
+                <div class="assigned-agents-block">
+                    <p class="meta-line"><strong>Assigned agents:</strong></p>
+                    ${renderAgentThumbs(caseItem.assignedAgents)}
+                </div>
+                <div class="assigned-users-block">
+                    <p class="meta-line"><strong>Assigned users:</strong></p>
+                    ${renderUserThumbs(caseItem.assignedTo)}
+                </div>
+            </div>
             <div class="case-actions">
                 <button type="button" data-action="edit-case" data-id="${caseItem._id}">Edit</button>
                 <button class="danger-button" type="button" data-action="delete-case" data-id="${caseItem._id}">Delete</button>
@@ -307,9 +350,12 @@ function renderMe() {
 function renderAssignOptions() {
     const caseOptions = state.cases.map((caseItem) => `<option value="${caseItem._id}">${escapeHtml(caseItem.title)}</option>`).join('');
     const userOptions = state.users.map((user) => `<option value="${user._id}">${escapeHtml(user.name || user.email)} (${escapeHtml(user.role)})</option>`).join('');
+    const agentOptions = state.agents.map((agent) => `<option value="${agent._id}">${escapeHtml(agent.name || agent.title)}</option>`).join('');
 
     elements.assignForm.elements.caseId.innerHTML = caseOptions || '<option value="">No cases loaded</option>';
     elements.assignForm.elements.userId.innerHTML = userOptions || '<option value="">No users loaded</option>';
+    elements.assignAgentForm.elements.caseId.innerHTML = caseOptions || '<option value="">No cases loaded</option>';
+    elements.assignAgentForm.elements.agentId.innerHTML = agentOptions || '<option value="">No agents loaded</option>';
 }
 
 function renderActiveView() {
@@ -522,6 +568,22 @@ async function handleAssign(event) {
     }
 }
 
+async function handleAssignAgent(event) {
+    event.preventDefault();
+
+    try {
+        const data = getFormDataObject(event.currentTarget);
+        await apiRequest(`/cases/${data.caseId}/assign-agent/${data.agentId}`, {
+            method: 'PUT'
+        });
+
+        await refreshData();
+        setMessage('Case assigned to agent.', 'success');
+    } catch (error) {
+        setMessage(error.message, 'error');
+    }
+}
+
 async function handleCaseListClick(event) {
     const button = event.target.closest('button[data-action]');
     if (!button) {
@@ -595,6 +657,7 @@ function setupEvents() {
     elements.agentForm.addEventListener('submit', handleAgentCreate);
     elements.caseForm.addEventListener('submit', handleCaseSave);
     elements.assignForm.addEventListener('submit', handleAssign);
+    elements.assignAgentForm.addEventListener('submit', handleAssignAgent);
     elements.clearCaseFormButton.addEventListener('click', clearCaseForm);
     elements.casesList.addEventListener('click', handleCaseListClick);
     elements.usersList.addEventListener('click', handleUsersClick);
