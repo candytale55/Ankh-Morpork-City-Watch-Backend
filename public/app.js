@@ -197,6 +197,44 @@ function renderProfileCases(cases = []) {
     `;
 }
 
+function findCaseById(caseId) {
+    return state.cases.find((caseItem) => caseItem._id === caseId);
+}
+
+function isIdAssigned(items = [], id) {
+    return items.some((item) => (item && typeof item === 'object' ? item._id : item) === id);
+}
+
+function updateAssignButtonState(form, isAssigned) {
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) {
+        return;
+    }
+
+    button.textContent = isAssigned ? 'Remove' : 'Assign';
+    button.classList.toggle('danger-button', isAssigned);
+}
+
+function refreshAssignButtonStates() {
+    const userCaseId = elements.assignForm.elements.caseId.value;
+    const userId = elements.assignForm.elements.userId.value;
+    const agentCaseId = elements.assignAgentForm.elements.caseId.value;
+    const agentId = elements.assignAgentForm.elements.agentId.value;
+
+    const userCase = findCaseById(userCaseId);
+    const agentCase = findCaseById(agentCaseId);
+
+    updateAssignButtonState(
+        elements.assignForm,
+        Boolean(userCaseId && userId && userCase && isIdAssigned(userCase.assignedTo || [], userId))
+    );
+
+    updateAssignButtonState(
+        elements.assignAgentForm,
+        Boolean(agentCaseId && agentId && agentCase && isIdAssigned(agentCase.assignedAgents || [], agentId))
+    );
+}
+
 function openProfileModal(profileType, profileId, sourceOverride = null) {
     const source = profileType === 'agent'
         ? state.agents.find((item) => item._id === profileId)
@@ -488,6 +526,8 @@ function renderAssignOptions() {
     elements.assignForm.elements.userId.innerHTML = userOptions || '<option value="">No users loaded</option>';
     elements.assignAgentForm.elements.caseId.innerHTML = caseOptions || '<option value="">No cases loaded</option>';
     elements.assignAgentForm.elements.agentId.innerHTML = agentOptions || '<option value="">No agents loaded</option>';
+
+    refreshAssignButtonStates();
 }
 
 function renderActiveView() {
@@ -689,12 +729,14 @@ async function handleAssign(event) {
 
     try {
         const data = getFormDataObject(event.currentTarget);
-        await apiRequest(`/cases/${data.caseId}/assign/${data.userId}`, {
-            method: 'PUT'
-        });
+        const caseItem = findCaseById(data.caseId);
+        const isAssigned = caseItem ? isIdAssigned(caseItem.assignedTo || [], data.userId) : false;
+        const path = isAssigned ? `/cases/${data.caseId}/unassign/${data.userId}` : `/cases/${data.caseId}/assign/${data.userId}`;
+
+        await apiRequest(path, { method: 'PUT' });
 
         await refreshData();
-        setMessage('Case assigned. Duplicate assignments are ignored by the API.', 'success');
+        setMessage(isAssigned ? 'Case removed from user.' : 'Case assigned to user.', 'success');
     } catch (error) {
         setMessage(error.message, 'error');
     }
@@ -705,12 +747,14 @@ async function handleAssignAgent(event) {
 
     try {
         const data = getFormDataObject(event.currentTarget);
-        await apiRequest(`/cases/${data.caseId}/assign-agent/${data.agentId}`, {
-            method: 'PUT'
-        });
+        const caseItem = findCaseById(data.caseId);
+        const isAssigned = caseItem ? isIdAssigned(caseItem.assignedAgents || [], data.agentId) : false;
+        const path = isAssigned ? `/cases/${data.caseId}/unassign-agent/${data.agentId}` : `/cases/${data.caseId}/assign-agent/${data.agentId}`;
+
+        await apiRequest(path, { method: 'PUT' });
 
         await refreshData();
-        setMessage('Case assigned to agent.', 'success');
+        setMessage(isAssigned ? 'Case removed from agent.' : 'Case assigned to agent.', 'success');
     } catch (error) {
         setMessage(error.message, 'error');
     }
@@ -805,6 +849,10 @@ function setupEvents() {
     elements.caseForm.addEventListener('submit', handleCaseSave);
     elements.assignForm.addEventListener('submit', handleAssign);
     elements.assignAgentForm.addEventListener('submit', handleAssignAgent);
+    elements.assignForm.elements.caseId.addEventListener('change', refreshAssignButtonStates);
+    elements.assignForm.elements.userId.addEventListener('change', refreshAssignButtonStates);
+    elements.assignAgentForm.elements.caseId.addEventListener('change', refreshAssignButtonStates);
+    elements.assignAgentForm.elements.agentId.addEventListener('change', refreshAssignButtonStates);
     elements.clearCaseFormButton.addEventListener('click', clearCaseForm);
     elements.casesList.addEventListener('click', handleCaseListClick);
     elements.usersList.addEventListener('click', handleUsersClick);

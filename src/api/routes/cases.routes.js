@@ -11,7 +11,9 @@ const {
     updateCase,
     deleteCase,
     assignCaseToUser,
-    assignCaseToAgent
+    removeCaseFromUser,
+    assignCaseToAgent,
+    removeCaseFromAgent
 } = require('../controllers/case.controller');
 
 const casesRouter = express.Router();
@@ -29,10 +31,24 @@ casesRouter.put(
 );
 
 casesRouter.put(
+    '/:caseId/unassign/:userId',
+    isAuth,
+    requireRole('admin'),
+    removeCaseFromUser
+);
+
+casesRouter.put(
     '/:caseId/assign-agent/:agentId',
     isAuth,
     requireRole('admin'),
     assignCaseToAgent
+);
+
+casesRouter.put(
+    '/:caseId/unassign-agent/:agentId',
+    isAuth,
+    requireRole('admin'),
+    removeCaseFromAgent
 );
 
 

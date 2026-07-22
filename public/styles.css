@@ -73,6 +73,14 @@ button:disabled {
     background: #762121;
 }
 
+.toggle-remove {
+    background: var(--danger);
+}
+
+.toggle-remove:hover {
+    background: #762121;
+}
+
 .app-header {
     display: flex;
     align-items: center;
@@ -302,6 +310,11 @@ textarea {
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--surface);
+}
+
+.search-field input {
+    min-height: 36px;
+    padding: 9px 10px;
 }
 
 .search-field {
@@ -698,13 +711,13 @@ th {
 }
 
 #usersView .table-wrap {
-    margin-top: -8px;
+    margin-top: 0;
 }
 
 #usersView th,
 #usersView td {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 #usersView th {
@@ -723,18 +736,31 @@ th {
 
 #usersView .inline-controls select,
 #usersView .inline-controls button {
-    min-height: 34px;
+    min-height: 36px;
 }
 
 #usersView .user-profile-cell {
-    grid-template-columns: 42px minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 12px;
     min-width: 0;
 }
 
 #usersView .user-profile-cell img {
-    width: 42px;
-    height: 42px;
+    width: 60px;
+    height: 60px;
+}
+
+#usersView .user-profile-cell strong,
+#usersView .user-profile-cell span {
+    line-height: 1.25;
+}
+
+#usersView .user-profile-cell strong {
+    font-size: 15px;
+}
+
+#usersView .user-profile-cell span {
+    font-size: 13px;
 }
 
 .inline-controls select {
@@ -778,7 +804,7 @@ th {
     background: var(--surface);
 }
 
-@media (max-width: 759px) {
+@media (max-width: 640px) {
     .app-header {
         display: grid;
         padding: 20px;

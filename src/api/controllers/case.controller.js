@@ -147,6 +147,47 @@ const assignCaseToUser = async (req, res) => {
 }
 
 /**
+ * Removes a user from a case and keeps both sides of the relationship in sync.
+ */
+const removeCaseFromUser = async (req, res) => {
+    try {
+        const { caseId, userId } = req.params;
+
+        const caseToUpdate = await Case.findById(caseId);
+        if (!caseToUpdate) {
+            return res.status(404).json({ message: 'Case not found' });
+        }
+
+        const userToUpdate = await User.findById(userId);
+        if (!userToUpdate) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const updatedCase = await Case.findByIdAndUpdate(
+            caseId,
+            { $pull: { assignedTo: userId } },
+            { new: true }
+        )
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $pull: { assignedCases: caseId } },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            message: 'Case removed from user successfully',
+            case: updatedCase,
+            user: updatedUser
+        });
+    } catch (error) {
+        return res.status(400).json({ message: 'Error removing case from user', error: error.message });
+    }
+}
+
+/**
  * Assigns a case to an agent and keeps the case document updated.
  */
 const assignCaseToAgent = async (req, res) => {
@@ -180,6 +221,40 @@ const assignCaseToAgent = async (req, res) => {
     }
 }
 
+/**
+ * Removes an agent from a case.
+ */
+const removeCaseFromAgent = async (req, res) => {
+    try {
+        const { caseId, agentId } = req.params;
+
+        const caseToUpdate = await Case.findById(caseId);
+        if (!caseToUpdate) {
+            return res.status(404).json({ message: 'Case not found' });
+        }
+
+        const agentToUpdate = await Agent.findById(agentId);
+        if (!agentToUpdate) {
+            return res.status(404).json({ message: 'Agent not found' });
+        }
+
+        const updatedCase = await Case.findByIdAndUpdate(
+            caseId,
+            { $pull: { assignedAgents: agentId } },
+            { new: true }
+        )
+            .populate('assignedTo', 'name email role image')
+            .populate('assignedAgents', 'name title image');
+
+        return res.status(200).json({
+            message: 'Case removed from agent successfully',
+            case: updatedCase
+        });
+    } catch (error) {
+        return res.status(400).json({ message: 'Error removing case from agent', error: error.message });
+    }
+}
+
 module.exports = {
     getCases,
     getCase,
@@ -187,5 +262,7 @@ module.exports = {
     updateCase,
     deleteCase,
     assignCaseToUser,
-    assignCaseToAgent
+    removeCaseFromUser,
+    assignCaseToAgent,
+    removeCaseFromAgent
 };
