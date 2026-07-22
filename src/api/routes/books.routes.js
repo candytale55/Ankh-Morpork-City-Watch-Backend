@@ -7,7 +7,9 @@ const {
     getBooks,
     postBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    addAgentToBook,
+    removeAgentFromBook
 } = require('../controllers/book.controller');
 
 const booksRouter = express.Router();
@@ -15,6 +17,8 @@ const booksRouter = express.Router();
 booksRouter.get('/', getBooks);
 booksRouter.post('/', isAuth, requireRole('admin'), postBook);
 booksRouter.put('/:id', isAuth, requireRole('admin'), updateBook);
+booksRouter.put('/:bookId/agents/:agentId', isAuth, addAgentToBook);
+booksRouter.delete('/:bookId/agents/:agentId', isAuth, requireRole('admin'), removeAgentFromBook);
 booksRouter.delete('/:id', isAuth, requireRole('admin'), deleteBook);
 
 module.exports = booksRouter;
