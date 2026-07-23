@@ -78,6 +78,7 @@
                 <button class="tab-button active" type="button" data-view="agents">Agents</button>
                 <button class="tab-button" type="button" data-view="cases">Cases</button>
                 <button class="tab-button" type="button" data-view="users">Users</button>
+                <button class="tab-button" type="button" data-view="books">Books</button>
                 <button class="tab-button" type="button" data-view="me">Me</button>
             </nav>
 
@@ -241,6 +242,62 @@
                     </div>
                 </div>
                 <div id="usersList" class="table-wrap"></div>
+            </section>
+
+            <section id="booksView" class="view-section" aria-labelledby="booksTitle">
+                <div class="section-heading">
+                    <div>
+                        <h2 id="booksTitle">Books</h2>
+                        <p>Catalog, edit, and link City Watch agents to each book.</p>
+                    </div>
+                </div>
+
+                <details class="panel accordion-panel">
+                    <summary class="accordion-summary">
+                        <div>
+                            <h3 id="bookFormTitle">Create Book</h3>
+                            <p>Click to open or collapse the form.</p>
+                        </div>
+                    </summary>
+                    <div class="accordion-content">
+                        <form id="bookForm" class="form-grid">
+                            <input name="bookId" type="hidden">
+                            <label>
+                                Title
+                                <input name="title" type="text" required>
+                            </label>
+                            <label>
+                                Saga
+                                <input name="saga" type="text" required>
+                            </label>
+                            <label>
+                                Published date
+                                <input name="publishedDate" type="date" required>
+                            </label>
+                            <div class="form-actions">
+                                <button type="submit">Save Book</button>
+                                <button id="clearBookFormButton" class="secondary-button" type="button">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                </details>
+
+                <section class="panel admin-panel">
+                    <h3>Assign Agent to Book</h3>
+                    <form id="assignBookAgentForm" class="form-grid compact-form">
+                        <label>
+                            Book
+                            <select name="bookId" required></select>
+                        </label>
+                        <label>
+                            Agent
+                            <select name="agentId" required></select>
+                        </label>
+                        <button type="submit">Assign</button>
+                    </form>
+                </section>
+
+                <div id="booksList" class="case-list"></div>
             </section>
 
             <section id="meView" class="view-section" aria-labelledby="meTitle">

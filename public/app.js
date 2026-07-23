@@ -16,6 +16,7 @@ const state = {
     search: '',
     agents: [],
     cases: [],
+    books: [],
     users: []
 };
 
@@ -27,10 +28,14 @@ const elements = {
     registerForm: document.querySelector('#registerForm'),
     agentForm: document.querySelector('#agentForm'),
     caseForm: document.querySelector('#caseForm'),
+    bookForm: document.querySelector('#bookForm'),
     caseFormTitle: document.querySelector('#caseFormTitle'),
+    bookFormTitle: document.querySelector('#bookFormTitle'),
     clearCaseFormButton: document.querySelector('#clearCaseFormButton'),
+    clearBookFormButton: document.querySelector('#clearBookFormButton'),
     assignForm: document.querySelector('#assignForm'),
     assignAgentForm: document.querySelector('#assignAgentForm'),
+    assignBookAgentForm: document.querySelector('#assignBookAgentForm'),
     globalSearch: document.querySelector('#globalSearch'),
     refreshButton: document.querySelector('#refreshButton'),
     profileModal: document.querySelector('#profileModal'),
@@ -39,6 +44,7 @@ const elements = {
     viewSections: document.querySelectorAll('.view-section'),
     agentsList: document.querySelector('#agentsList'),
     casesList: document.querySelector('#casesList'),
+    booksList: document.querySelector('#booksList'),
     usersList: document.querySelector('#usersList'),
     meProfile: document.querySelector('#meProfile')
 };
@@ -201,6 +207,10 @@ function findCaseById(caseId) {
     return state.cases.find((caseItem) => caseItem._id === caseId);
 }
 
+function findBookById(bookId) {
+    return state.books.find((bookItem) => bookItem._id === bookId);
+}
+
 function isIdAssigned(items = [], id) {
     return items.some((item) => (item && typeof item === 'object' ? item._id : item) === id);
 }
@@ -220,9 +230,12 @@ function refreshAssignButtonStates() {
     const userId = elements.assignForm.elements.userId.value;
     const agentCaseId = elements.assignAgentForm.elements.caseId.value;
     const agentId = elements.assignAgentForm.elements.agentId.value;
+    const bookId = elements.assignBookAgentForm.elements.bookId.value;
+    const bookAgentId = elements.assignBookAgentForm.elements.agentId.value;
 
     const userCase = findCaseById(userCaseId);
     const agentCase = findCaseById(agentCaseId);
+    const book = findBookById(bookId);
 
     updateAssignButtonState(
         elements.assignForm,
@@ -232,6 +245,11 @@ function refreshAssignButtonStates() {
     updateAssignButtonState(
         elements.assignAgentForm,
         Boolean(agentCaseId && agentId && agentCase && isIdAssigned(agentCase.assignedAgents || [], agentId))
+    );
+
+    updateAssignButtonState(
+        elements.assignBookAgentForm,
+        Boolean(bookId && bookAgentId && book && isIdAssigned(book.agents || [], bookAgentId))
     );
 }
 
@@ -415,6 +433,46 @@ function renderCases() {
     `).join('');
 }
 
+function formatDateLabel(dateValue) {
+    if (!dateValue) {
+        return 'Unknown';
+    }
+
+    const parsedDate = new Date(dateValue);
+    if (Number.isNaN(parsedDate.getTime())) {
+        return 'Unknown';
+    }
+
+    return parsedDate.toLocaleDateString();
+}
+
+function renderBooks() {
+    const books = getFilteredItems(state.books);
+
+    if (!books.length) {
+        elements.booksList.innerHTML = '<div class="empty-state">No books found.</div>';
+        return;
+    }
+
+    elements.booksList.innerHTML = books.map((book) => `
+        <article class="case-card book-card">
+            <h3>${escapeHtml(book.title)}</h3>
+            <div class="badge-row">
+                <span class="badge">${escapeHtml(book.saga)}</span>
+                <span class="badge">${escapeHtml(formatDateLabel(book.publishedDate))}</span>
+            </div>
+            <div class="assigned-agents-block book-agents-block">
+                <p class="meta-line"><strong>Agents in book:</strong></p>
+                ${renderAgentThumbs(book.agents)}
+            </div>
+            <div class="case-actions">
+                <button type="button" data-action="edit-book" data-id="${book._id}">Edit</button>
+                <button class="danger-button" type="button" data-action="delete-book" data-id="${book._id}">Delete</button>
+            </div>
+        </article>
+    `).join('');
+}
+
 function renderUsers() {
     if (!state.token) {
         elements.usersList.innerHTML = '<div class="empty-state">Login as admin to load users.</div>';
@@ -519,6 +577,7 @@ async function handleTabSelection(viewName) {
 
 function renderAssignOptions() {
     const caseOptions = state.cases.map((caseItem) => `<option value="${caseItem._id}">${escapeHtml(caseItem.title)}</option>`).join('');
+    const bookOptions = state.books.map((bookItem) => `<option value="${bookItem._id}">${escapeHtml(bookItem.title)}</option>`).join('');
     const userOptions = state.users.map((user) => `<option value="${user._id}">${escapeHtml(user.name || user.email)} (${escapeHtml(user.role)})</option>`).join('');
     const agentOptions = state.agents.map((agent) => `<option value="${agent._id}">${escapeHtml(agent.name || agent.title)}</option>`).join('');
 
@@ -526,6 +585,8 @@ function renderAssignOptions() {
     elements.assignForm.elements.userId.innerHTML = userOptions || '<option value="">No users loaded</option>';
     elements.assignAgentForm.elements.caseId.innerHTML = caseOptions || '<option value="">No cases loaded</option>';
     elements.assignAgentForm.elements.agentId.innerHTML = agentOptions || '<option value="">No agents loaded</option>';
+    elements.assignBookAgentForm.elements.bookId.innerHTML = bookOptions || '<option value="">No books loaded</option>';
+    elements.assignBookAgentForm.elements.agentId.innerHTML = agentOptions || '<option value="">No agents loaded</option>';
 
     refreshAssignButtonStates();
 }
@@ -541,6 +602,10 @@ function renderActiveView() {
 
     if (state.activeView === 'users') {
         renderUsers();
+    }
+
+    if (state.activeView === 'books') {
+        renderBooks();
     }
 
     if (state.activeView === 'me') {
@@ -582,6 +647,10 @@ async function loadCases() {
     state.cases = await apiRequest('/cases');
 }
 
+async function loadBooks() {
+    state.books = await apiRequest('/books', { auth: false });
+}
+
 async function loadUsers() {
     if (!state.token) {
         state.users = [];
@@ -603,6 +672,7 @@ async function refreshData() {
         await loadCurrentUser();
         await loadAgents();
         await loadCases();
+        await loadBooks();
         await loadUsers();
         renderActiveView();
         setMessage('Data refreshed.', 'success');
@@ -638,6 +708,28 @@ function clearCaseForm() {
     elements.caseForm.elements.type.value = 'case';
     elements.caseForm.elements.status.value = 'open';
     elements.caseForm.elements.priority.value = 'medium';
+}
+
+function fillBookForm(bookItem) {
+    elements.bookFormTitle.textContent = 'Edit Book';
+    elements.bookForm.elements.bookId.value = bookItem._id;
+    elements.bookForm.elements.title.value = bookItem.title || '';
+    elements.bookForm.elements.saga.value = bookItem.saga || '';
+
+    if (bookItem.publishedDate) {
+        const dateValue = new Date(bookItem.publishedDate);
+        if (!Number.isNaN(dateValue.getTime())) {
+            elements.bookForm.elements.publishedDate.value = dateValue.toISOString().slice(0, 10);
+        }
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function clearBookForm() {
+    elements.bookFormTitle.textContent = 'Create Book';
+    elements.bookForm.reset();
+    elements.bookForm.elements.bookId.value = '';
 }
 
 async function handleLogin(event) {
@@ -724,6 +816,28 @@ async function handleCaseSave(event) {
     }
 }
 
+async function handleBookSave(event) {
+    event.preventDefault();
+
+    try {
+        const form = event.currentTarget;
+        const data = getFormDataObject(form);
+        const bookId = data.bookId;
+        delete data.bookId;
+
+        await apiRequest(bookId ? `/books/${bookId}` : '/books', {
+            method: bookId ? 'PUT' : 'POST',
+            body: data
+        });
+
+        clearBookForm();
+        await refreshData();
+        setMessage(bookId ? 'Book updated.' : 'Book created.', 'success');
+    } catch (error) {
+        setMessage(error.message, 'error');
+    }
+}
+
 async function handleAssign(event) {
     event.preventDefault();
 
@@ -755,6 +869,25 @@ async function handleAssignAgent(event) {
 
         await refreshData();
         setMessage(isAssigned ? 'Case removed from agent.' : 'Case assigned to agent.', 'success');
+    } catch (error) {
+        setMessage(error.message, 'error');
+    }
+}
+
+async function handleAssignBookAgent(event) {
+    event.preventDefault();
+
+    try {
+        const data = getFormDataObject(event.currentTarget);
+        const bookItem = findBookById(data.bookId);
+        const isAssigned = bookItem ? isIdAssigned(bookItem.agents || [], data.agentId) : false;
+
+        await apiRequest(`/books/${data.bookId}/agents/${data.agentId}`, {
+            method: isAssigned ? 'DELETE' : 'PUT'
+        });
+
+        await refreshData();
+        setMessage(isAssigned ? 'Agent removed from book.' : 'Agent added to book.', 'success');
     } catch (error) {
         setMessage(error.message, 'error');
     }
@@ -828,6 +961,38 @@ async function handleUsersClick(event) {
     }
 }
 
+async function handleBooksListClick(event) {
+    const button = event.target.closest('button[data-action]');
+    if (!button) {
+        return;
+    }
+
+    const id = button.dataset.id;
+    const action = button.dataset.action;
+
+    if (action === 'edit-book') {
+        const bookItem = state.books.find((item) => item._id === id);
+        if (bookItem) {
+            fillBookForm(bookItem);
+        }
+    }
+
+    if (action === 'delete-book') {
+        const confirmed = confirm('Delete this book?');
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await apiRequest(`/books/${id}`, { method: 'DELETE' });
+            await refreshData();
+            setMessage('Book deleted.', 'success');
+        } catch (error) {
+            setMessage(error.message, 'error');
+        }
+    }
+}
+
 function handleProfileKeydown(event, profileType) {
     if (event.key !== 'Enter' && event.key !== ' ') {
         return;
@@ -847,14 +1012,20 @@ function setupEvents() {
     elements.registerForm.addEventListener('submit', handleRegister);
     elements.agentForm.addEventListener('submit', handleAgentCreate);
     elements.caseForm.addEventListener('submit', handleCaseSave);
+    elements.bookForm.addEventListener('submit', handleBookSave);
     elements.assignForm.addEventListener('submit', handleAssign);
     elements.assignAgentForm.addEventListener('submit', handleAssignAgent);
+    elements.assignBookAgentForm.addEventListener('submit', handleAssignBookAgent);
     elements.assignForm.elements.caseId.addEventListener('change', refreshAssignButtonStates);
     elements.assignForm.elements.userId.addEventListener('change', refreshAssignButtonStates);
     elements.assignAgentForm.elements.caseId.addEventListener('change', refreshAssignButtonStates);
     elements.assignAgentForm.elements.agentId.addEventListener('change', refreshAssignButtonStates);
+    elements.assignBookAgentForm.elements.bookId.addEventListener('change', refreshAssignButtonStates);
+    elements.assignBookAgentForm.elements.agentId.addEventListener('change', refreshAssignButtonStates);
     elements.clearCaseFormButton.addEventListener('click', clearCaseForm);
+    elements.clearBookFormButton.addEventListener('click', clearBookForm);
     elements.casesList.addEventListener('click', handleCaseListClick);
+    elements.booksList.addEventListener('click', handleBooksListClick);
     elements.usersList.addEventListener('click', handleUsersClick);
     elements.agentsList.addEventListener('click', (event) => handleProfileOpen(event, 'agent'));
     elements.agentsList.addEventListener('keydown', (event) => handleProfileKeydown(event, 'agent'));
@@ -876,6 +1047,7 @@ function setupEvents() {
         state.token = '';
         state.currentUser = null;
         state.cases = [];
+        state.books = [];
         state.users = [];
         localStorage.removeItem('cityWatchToken');
         updateSessionUi();
@@ -897,6 +1069,7 @@ async function init() {
     setupEnumSelects();
     setupEvents();
     clearCaseForm();
+    clearBookForm();
     updateSessionUi();
     await refreshData();
 }

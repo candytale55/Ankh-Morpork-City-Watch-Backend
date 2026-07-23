@@ -896,3 +896,11 @@ th {
         display: block;
     }
 }
+
+.book-card {
+    border-left: 4px solid #2563eb;
+}
+
+.book-agents-block {
+    margin-top: 10px;
+}
