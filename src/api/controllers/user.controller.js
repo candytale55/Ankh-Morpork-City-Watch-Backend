@@ -81,6 +81,72 @@ const login = async (req, res) => {
     }
 };
 
+
+const changePassword = async (req, res) => { 
+    try { 
+
+        const {
+            currentPassword,
+            newPassword,
+            confirmNewPassword
+        } = req.body;
+
+        // 1. Check if all required fields are provided
+        if (!currentPassword || !newPassword || !confirmNewPassword) { 
+            return res.status(400).json({
+                message: "Missing required fields. All current, new, and confirm password fields are required"
+            });
+        }
+        
+        // Check if the new password and confirm password match
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({
+                message: "New password and confirm password do not match"
+            })
+        }
+        
+        // Get user with the current hashed password from the database
+        const user = await User.findById(req.user._id);
+        if (!user) { 
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Check if the current password is correct
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isCurrentPasswordValid) { 
+            return res.status(400).json({
+                message: "Current password is incorrect"
+            });
+        }
+
+        // Avoid reusing the same password
+        const newPasswordIsSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+        if (newPasswordIsSameAsCurrent) {
+            return res.status(400).json({
+                message: "New password cannot be the same as the current password"
+            });
+        }
+
+        // Assign the new password and save the user (in plain text, it will be hashed by the pre-save hook)
+        user.password = newPassword;
+        await user.save();
+        
+        return res.status(200).json({
+            message: "Password changed successfully"
+        });
+
+    } catch (error) { 
+        return res.status(400).json({
+            message: "Error in changing password",
+            error: error.message
+        });
+    }
+ }
+
+
+
 /**
  * Returns all users without their password hashes.
  */
@@ -248,6 +314,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     register,
     login,
+    changePassword,
     getUsers,
     getUser,
     getMe,

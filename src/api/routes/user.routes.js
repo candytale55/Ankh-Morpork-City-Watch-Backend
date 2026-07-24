@@ -7,6 +7,7 @@ const { uploadUser } = require('../../middlewares/file');
 const {
     register,
     login,
+    changePassword,
     getUsers,
     getUser,
     getMe,
@@ -19,6 +20,7 @@ const {
 usersRouter.post('/register', uploadUser.single('image'), register);
 usersRouter.post('/login', login);
 usersRouter.get('/me', isAuth, getMe); // Ruta para obtener los datos del usuario autenticado - funciona porque isAuth ya pone el usuario en req.user (ver controller)
+usersRouter.patch('/me/password', isAuth, changePassword); // Ruta para cambiar la contraseña del usuario autenticado
 usersRouter.get('/', isAuth, requireRole('admin'), getUsers);
 usersRouter.get('/:id', isAuth, requireRole('admin'), getUser);
 usersRouter.put('/:id', isAuth, uploadUser.single('image'), updateUser);
