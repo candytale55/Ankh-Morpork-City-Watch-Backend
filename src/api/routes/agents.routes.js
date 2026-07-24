@@ -4,6 +4,7 @@ const express = require('express');
 const { isAuth } = require('../../middlewares/isAuth');
 const { requireRole } = require('../../middlewares/requireRole');
 const { uploadAgent } = require('../../middlewares/file');
+const { validateObjectId } = require('../../middlewares/validateObjectId');
 const {
 	getAgents,
 	getAgentByName,
@@ -18,7 +19,21 @@ const agentsRouter = express.Router();
 agentsRouter.get('/', getAgents);
 agentsRouter.get('/search', getAgentByName);
 agentsRouter.post('/', isAuth, requireRole('admin'), uploadAgent.single('image'), postAgent);
-agentsRouter.put('/:id', isAuth, requireRole('admin'), uploadAgent.single('image'), updateAgent);
-agentsRouter.delete('/:id', isAuth, requireRole('admin'), deleteAgent);
+
+agentsRouter.put(
+	'/:id',
+	isAuth,
+	requireRole('admin'),
+	validateObjectId('id'),
+	uploadAgent.single('image'),
+	updateAgent);
+
+agentsRouter.delete(
+	'/:id',
+	isAuth,
+	requireRole('admin'),
+	validateObjectId('id'),
+	deleteAgent);
 
 module.exports = agentsRouter;
+	
