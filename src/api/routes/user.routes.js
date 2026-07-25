@@ -21,7 +21,12 @@ const {
 
 usersRouter.post('/register', uploadUser.single('image'), register);
 usersRouter.post('/login', login);
-usersRouter.post('/forgot-password', forgotPassword);
+
+usersRouter.post(
+    '/forgot-password',
+    forgotPassword
+);
+// Ruta para solicitar un restablecimiento de contraseña mediante correo electrónico
 
 
 

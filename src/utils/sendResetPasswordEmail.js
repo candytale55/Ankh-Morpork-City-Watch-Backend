@@ -14,7 +14,11 @@ const sendResetPasswordEmail = async (user, resetUrl) => {
         auth: {
             user: testEmailAccount.user,
             pass: testEmailAccount.pass
+        },
+        tls: {
+            rejectUnauthorized: false
         }
+        // Development workaround for self-signed or untrusted certificates. For production, you would use a real email service like SendGrid, Mailgun, or your own SMTP server.
     });
 
 
