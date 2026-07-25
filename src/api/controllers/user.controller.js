@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Case = require('../models/Case');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
 
@@ -85,6 +86,61 @@ const login = async (req, res) => {
 };
 
 
+const forgotPassword = async (req, res) => {
+    try { 
+
+        const { email } = req.body;
+
+        if (!email) { 
+            return res.status(400).json({
+                message: "Email is required"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "If the account exists, a reset link has been sent."
+                // We don't reveal whether the email exists to prevent user enumeration
+            });
+        }
+        
+        // Generate a cryptographically secure token that will be sent to the user.
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Store only the hash in DB, never the raw token, so leaked DB data cannot be used directly.
+        const resetTokenHash = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+        
+        user.resetPasswordToken = resetTokenHash;
+        // Token expiration timestamp (in ms) used later by resetPassword with `$gt: Date.now()`.
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour from now
+
+        await user.save();
+
+        // This URL should match your frontend route/page that captures the token and submits the new password.
+        const resetUrl = `${process.env.APP_URL}/resetToken=${resetToken}`;
+
+        await sendResetPasswordEmail(
+            user.email,
+            resetUrl
+        );
+
+        return res.status(200).json({
+            message: "If the account exists, a reset link has been sent."
+        });
+
+
+    } catch (error) { 
+        return res.status(500).json({
+            message: "Error requesting password reset",
+            error: error.message
+        });
+    }
+ }
 
 
 
@@ -92,12 +148,15 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
+        // TODO: Remove this debug log in production. It can expose sensitive information.
+        console.log("Received body fields:", Object.keys(req.body));
 
         const {
             currentPassword,
             newPassword,
             confirmNewPassword
         } = req.body;
+
 
         // 1. Check if all required fields are provided
         if (!currentPassword || !newPassword || !confirmNewPassword) {
@@ -373,6 +432,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     register,
     login,
+    forgotPassword,
     changePassword,
     resetPassword,
     getUsers,
