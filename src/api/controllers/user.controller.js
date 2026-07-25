@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
+const { sendResetPasswordEmail } = require('../../utils/sendResetPasswordEmail');
 
 /**
  * Deletes a newly uploaded user image when an operation fails.
@@ -87,11 +88,11 @@ const login = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-    try { 
+    try {
 
         const { email } = req.body;
 
-        if (!email) { 
+        if (!email) {
             return res.status(400).json({
                 message: "Email is required"
             });
@@ -105,7 +106,7 @@ const forgotPassword = async (req, res) => {
                 // We don't reveal whether the email exists to prevent user enumeration
             });
         }
-        
+
         // Generate a cryptographically secure token that will be sent to the user.
         const resetToken = crypto.randomBytes(32).toString('hex');
 
@@ -114,7 +115,7 @@ const forgotPassword = async (req, res) => {
             .createHash('sha256')
             .update(resetToken)
             .digest('hex');
-        
+
         user.resetPasswordToken = resetTokenHash;
         // Token expiration timestamp (in ms) used later by resetPassword with `$gt: Date.now()`.
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour from now
@@ -124,23 +125,20 @@ const forgotPassword = async (req, res) => {
         // This URL should match your frontend route/page that captures the token and submits the new password.
         const resetUrl = `${process.env.APP_URL}/resetToken=${resetToken}`;
 
-        await sendResetPasswordEmail(
-            user.email,
-            resetUrl
-        );
+        await sendResetPasswordEmail(user, resetUrl);
 
         return res.status(200).json({
             message: "If the account exists, a reset link has been sent."
         });
 
 
-    } catch (error) { 
+    } catch (error) {
         return res.status(500).json({
             message: "Error requesting password reset",
             error: error.message
         });
     }
- }
+}
 
 
 

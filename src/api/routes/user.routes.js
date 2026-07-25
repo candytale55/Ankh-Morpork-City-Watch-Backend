@@ -7,6 +7,7 @@ const { uploadUser } = require('../../middlewares/file');
 const {
     register,
     login,
+    forgotPassword,
     changePassword,
     resetPassword,
     getUsers,
@@ -20,6 +21,7 @@ const {
 
 usersRouter.post('/register', uploadUser.single('image'), register);
 usersRouter.post('/login', login);
+usersRouter.post('/forgot-password', forgotPassword);
 
 
 
