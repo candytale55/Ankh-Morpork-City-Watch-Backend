@@ -33,7 +33,15 @@ const userSchema = new mongoose.Schema({
     assignedCases: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Case'
-    }]
+    }],
+    resetPasswordToken: {
+        type: String,
+        select: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        select: false
+    }
 }, { timestamps: true });
 
 

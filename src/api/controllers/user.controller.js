@@ -82,8 +82,8 @@ const login = async (req, res) => {
 };
 
 
-const changePassword = async (req, res) => { 
-    try { 
+const changePassword = async (req, res) => {
+    try {
 
         const {
             currentPassword,
@@ -92,22 +92,22 @@ const changePassword = async (req, res) => {
         } = req.body;
 
         // 1. Check if all required fields are provided
-        if (!currentPassword || !newPassword || !confirmNewPassword) { 
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
             return res.status(400).json({
                 message: "Missing required fields. All current, new, and confirm password fields are required"
             });
         }
-        
+
         // Check if the new password and confirm password match
         if (newPassword !== confirmNewPassword) {
             return res.status(400).json({
                 message: "New password and confirm password do not match"
             })
         }
-        
+
         // Get user with the current hashed password from the database
         const user = await User.findById(req.user._id);
-        if (!user) { 
+        if (!user) {
             return res.status(404).json({
                 message: "User not found"
             });
@@ -115,7 +115,7 @@ const changePassword = async (req, res) => {
 
         // Check if the current password is correct
         const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-        if (!isCurrentPasswordValid) { 
+        if (!isCurrentPasswordValid) {
             return res.status(400).json({
                 message: "Current password is incorrect"
             });
@@ -132,19 +132,70 @@ const changePassword = async (req, res) => {
         // Assign the new password and save the user (in plain text, it will be hashed by the pre-save hook)
         user.password = newPassword;
         await user.save();
-        
+
         return res.status(200).json({
             message: "Password changed successfully"
         });
 
-    } catch (error) { 
+    } catch (error) {
         return res.status(400).json({
             message: "Error in changing password",
             error: error.message
         });
     }
- }
+}
 
+
+const resetPassword = async (req, res) => {
+    try {
+
+        const { token } = req.params;
+        const { newPassword, confirmNewPassword } = req.body;
+
+        if (!newPassword || !confirmNewPassword) {
+            return res.status(400).json({
+                message: "Missing required fields. Both new and confirm password fields are required"
+            });
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({
+                message: "Passwords do not match"
+            });
+        }
+
+        // We hash the raw token from the URL so we can compare it to the hashed token stored in DB.
+        // This way, even if DB data leaks, the usable reset token itself is never stored in plain text.
+        const resetTokenHash = crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+        // Token must match and also be unexpired (`$gt: Date.now()` means expiry time is still in the future).
+        const user = await User.findOne({
+            resetPasswordToken: resetTokenHash,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        // Assign plain password; User model pre-save hook is expected to hash it before persisting.
+        user.password = newPassword;
+        // Clear reset fields so this token cannot be reused after a successful reset.
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password reset successfully. Please log in with your new password."
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error in resetting password",
+            error: error.message
+        })
+    }
+}
 
 
 /**
@@ -315,6 +366,7 @@ module.exports = {
     register,
     login,
     changePassword,
+    resetPassword,
     getUsers,
     getUser,
     getMe,
