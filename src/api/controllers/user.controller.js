@@ -2,6 +2,7 @@
 
 const User = require('../models/User');
 const Case = require('../models/Case');
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
@@ -54,6 +55,8 @@ const register = async (req, res) => {
     }
 };
 
+
+
 /**
  * Validates credentials and returns a signed token plus the user profile.
  */
@@ -81,6 +84,11 @@ const login = async (req, res) => {
     }
 };
 
+
+
+
+
+/* Allows the user to change their password */
 
 const changePassword = async (req, res) => {
     try {
