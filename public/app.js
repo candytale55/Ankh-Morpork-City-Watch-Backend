@@ -868,16 +868,17 @@ async function handleRegister(event) {
 
 async function handleForgotPassword(event) {
     event.preventDefault();
+    const form = event.currentTarget;
 
     try {
-        const data = getFormDataObject(event.currentTarget);
+        const data = getFormDataObject(form);
         const response = await apiRequest('/users/forgot-password', {
             method: 'POST',
             body: data,
             auth: false
         });
 
-        event.currentTarget.reset();
+        form.reset();
         setForgotPasswordPanel(true);
         setInlineFeedback(
             elements.forgotPasswordFeedback,
