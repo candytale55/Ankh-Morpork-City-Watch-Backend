@@ -19,16 +19,24 @@ const {
 } = require('../controllers/user.controller');
 
 
-usersRouter.post('/register', uploadUser.single('image'), register);
-usersRouter.post('/login', login);
+// User registration route with image upload
+usersRouter.post(
+    '/register',
+    uploadUser.single('image'),
+    register
+);
 
+// User login route
+usersRouter.post(
+    '/login',
+    login
+);
+
+// Route to request a password reset via email
 usersRouter.post(
     '/forgot-password',
     forgotPassword
 );
-// Ruta para solicitar un restablecimiento de contraseña mediante correo electrónico
-
-
 
 usersRouter.patch(
     '/reset-password/:token',

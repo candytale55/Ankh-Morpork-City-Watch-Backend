@@ -101,7 +101,7 @@ const forgotPassword = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({
+            return res.status(200).json({
                 message: "If the account exists, a reset link has been sent."
                 // We don't reveal whether the email exists to prevent user enumeration
             });
@@ -123,7 +123,7 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         // This URL should match your frontend route/page that captures the token and submits the new password.
-        const resetUrl = `${process.env.APP_URL}/resetToken=${resetToken}`;
+        const resetUrl = `${process.env.APP_URL}?resetToken=${resetToken}`;
 
         await sendResetPasswordEmail(user, resetUrl);
 
@@ -241,6 +241,12 @@ const resetPassword = async (req, res) => {
             resetPasswordToken: resetTokenHash,
             resetPasswordExpires: { $gt: Date.now() }
         });
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid or expired reset token"
+            });
+        }
 
         // Assign plain password; User model pre-save hook is expected to hash it before persisting.
         user.password = newPassword;

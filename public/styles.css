@@ -225,6 +225,41 @@ button:disabled {
     gap: 12px;
 }
 
+.inline-auth-panel {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+
+.inline-auth-panel[hidden] {
+    display: none;
+}
+
+.panel-note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.inline-feedback {
+    min-height: 18px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.inline-feedback.success {
+    color: var(--accent-dark);
+}
+
+.inline-feedback.error {
+    color: var(--danger);
+}
+
 .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -283,6 +318,23 @@ textarea {
 
 .message-box.error {
     color: var(--danger);
+}
+
+.link-button {
+    display: block;
+    margin-top: 10px;
+    padding: 0;
+    color: var(--accent-dark);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.link-button:hover,
+.link-button:focus-visible {
+    text-decoration: underline;
 }
 
 .tab-list,

@@ -13,6 +13,7 @@ const state = {
     token: localStorage.getItem('cityWatchToken') || '',
     currentUser: null,
     activeView: 'agents',
+    resetToken: new URLSearchParams(window.location.search).get('resetToken') || '',
     search: '',
     agents: [],
     cases: [],
@@ -25,10 +26,19 @@ const elements = {
     logoutButton: document.querySelector('#logoutButton'),
     messageBox: document.querySelector('#messageBox'),
     loginForm: document.querySelector('#loginForm'),
+    toggleForgotPasswordButton: document.querySelector('#toggleForgotPasswordButton'),
+    forgotPasswordPanel: document.querySelector('#forgotPasswordPanel'),
+    forgotPasswordForm: document.querySelector('#forgotPasswordForm'),
+    forgotPasswordFeedback: document.querySelector('#forgotPasswordFeedback'),
+    resetPasswordPanel: document.querySelector('#resetPasswordPanel'),
+    resetPasswordForm: document.querySelector('#resetPasswordForm'),
+    resetPasswordFeedback: document.querySelector('#resetPasswordFeedback'),
     registerForm: document.querySelector('#registerForm'),
     agentForm: document.querySelector('#agentForm'),
     caseForm: document.querySelector('#caseForm'),
     bookForm: document.querySelector('#bookForm'),
+    changePasswordPanel: document.querySelector('#changePasswordPanel'),
+    changePasswordForm: document.querySelector('#changePasswordForm'),
     caseFormTitle: document.querySelector('#caseFormTitle'),
     bookFormTitle: document.querySelector('#bookFormTitle'),
     clearCaseFormButton: document.querySelector('#clearCaseFormButton'),
@@ -52,6 +62,15 @@ const elements = {
 function setMessage(message, type = 'info') {
     elements.messageBox.textContent = message;
     elements.messageBox.className = `message-box ${type}`;
+}
+
+function setInlineFeedback(element, message = '', type = '') {
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.className = `inline-feedback${type ? ` ${type}` : ''}`;
 }
 
 function getErrorMessage(error) {
@@ -129,6 +148,24 @@ function updateSessionUi() {
     } else {
         elements.sessionStatus.textContent = 'Not logged in';
     }
+
+    elements.changePasswordPanel.hidden = true;
+    elements.resetPasswordPanel.hidden = !state.resetToken;
+}
+
+function setForgotPasswordPanel(isOpen) {
+    elements.forgotPasswordPanel.hidden = !isOpen;
+    elements.toggleForgotPasswordButton.textContent = isOpen ? 'Hide forgot password form' : 'Forgot your password?';
+
+    if (!isOpen) {
+        setInlineFeedback(elements.forgotPasswordFeedback, '');
+    }
+}
+
+function clearResetTokenFromUrl() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('resetToken');
+    window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
 }
 
 function setActiveView(viewName) {
@@ -270,6 +307,7 @@ function openProfileModal(profileType, profileId, sourceOverride = null) {
     const imageAlt = profileType === 'agent'
         ? `${escapeHtml(source.name || 'Agent')} portrait`
         : `${escapeHtml(source.name || 'User')} profile image`;
+    const showPasswordExpando = profileType === 'user' && state.currentUser && source._id === state.currentUser._id;
 
     elements.profileModalBody.innerHTML = `
         <section class="profile-layout">
@@ -300,6 +338,34 @@ function openProfileModal(profileType, profileId, sourceOverride = null) {
                     <h3>Assigned cases</h3>
                     ${renderProfileCases(cases)}
                 </div>
+                ${showPasswordExpando ? `
+                    <details class="profile-password-panel accordion-panel">
+                        <summary class="accordion-summary">
+                            <div>
+                                <h3>Change your password</h3>
+                                <p>Update your current password from this profile modal.</p>
+                            </div>
+                        </summary>
+                        <div class="accordion-content">
+                            <p id="modalPasswordFeedback" class="inline-feedback" aria-live="polite"></p>
+                            <form id="modalChangePasswordForm" class="form-stack profile-password-form">
+                                <label>
+                                    Current password
+                                    <input name="currentPassword" type="password" autocomplete="current-password" required>
+                                </label>
+                                <label>
+                                    Password
+                                    <input name="newPassword" type="password" autocomplete="new-password" required>
+                                </label>
+                                <label>
+                                    Confirm password
+                                    <input name="confirmNewPassword" type="password" autocomplete="new-password" required>
+                                </label>
+                                <button type="submit">Update Password</button>
+                            </form>
+                        </div>
+                    </details>
+                ` : ''}
             </div>
         </section>
     `;
@@ -734,9 +800,10 @@ function clearBookForm() {
 
 async function handleLogin(event) {
     event.preventDefault();
+    const form = event.currentTarget;
 
     try {
-        const credentials = getFormDataObject(event.currentTarget);
+        const credentials = getFormDataObject(form);
         const data = await apiRequest('/users/login', {
             method: 'POST',
             body: credentials,
@@ -751,6 +818,8 @@ async function handleLogin(event) {
         setMessage('Login successful.', 'success');
     } catch (error) {
         setMessage(error.message, 'error');
+    } finally {
+        form.reset();
     }
 }
 
@@ -768,6 +837,125 @@ async function handleRegister(event) {
         event.currentTarget.reset();
         setMessage(`User created as role "${data.user.role}".`, 'success');
     } catch (error) {
+        setMessage(error.message, 'error');
+    }
+}
+
+async function handleForgotPassword(event) {
+    event.preventDefault();
+
+    try {
+        const data = getFormDataObject(event.currentTarget);
+        const response = await apiRequest('/users/forgot-password', {
+            method: 'POST',
+            body: data,
+            auth: false
+        });
+
+        event.currentTarget.reset();
+        setForgotPasswordPanel(true);
+        setInlineFeedback(
+            elements.forgotPasswordFeedback,
+            response.message || 'If the account exists, a reset link has been sent.',
+            'success'
+        );
+        setMessage(response.message || 'If the account exists, a reset link has been sent.', 'success');
+    } catch (error) {
+        setInlineFeedback(elements.forgotPasswordFeedback, error.message, 'error');
+        setMessage(error.message, 'error');
+    }
+}
+
+async function handleResetPassword(event) {
+    event.preventDefault();
+
+    try {
+        const data = getFormDataObject(event.currentTarget);
+
+        await apiRequest(`/users/reset-password/${encodeURIComponent(state.resetToken)}`, {
+            method: 'PATCH',
+            body: data,
+            auth: false
+        });
+
+        event.currentTarget.reset();
+        setInlineFeedback(
+            elements.resetPasswordFeedback,
+            'Password reset successfully. You can now log in with the new password.',
+            'success'
+        );
+        event.currentTarget.querySelectorAll('input, button').forEach((control) => {
+            control.disabled = true;
+        });
+        setMessage('Password reset successfully. You can now log in with the new password.', 'success');
+        clearResetTokenFromUrl();
+    } catch (error) {
+        setInlineFeedback(elements.resetPasswordFeedback, error.message, 'error');
+        setMessage(error.message, 'error');
+    }
+}
+
+async function handleChangePassword(event) {
+    event.preventDefault();
+
+    try {
+        const data = getFormDataObject(event.currentTarget);
+
+        await apiRequest('/users/me/password', {
+            method: 'PATCH',
+            body: data
+        });
+
+        event.currentTarget.reset();
+        state.token = '';
+        state.currentUser = null;
+        state.cases = [];
+        state.books = [];
+        state.users = [];
+        localStorage.removeItem('cityWatchToken');
+        updateSessionUi();
+        renderActiveView();
+        setMessage('Password updated successfully. Please log in again.', 'success');
+    } catch (error) {
+        setMessage(error.message, 'error');
+    }
+}
+
+async function handleModalChangePassword(event) {
+    event.preventDefault();
+
+    try {
+        const form = event.target instanceof HTMLFormElement
+            ? event.target
+            : event.target.closest('form');
+
+        if (!form) {
+            throw new Error('Password form not found');
+        }
+
+        const data = getFormDataObject(form);
+
+        await apiRequest('/users/me/password', {
+            method: 'PATCH',
+            body: data
+        });
+
+        form.reset();
+        const modalFeedback = document.querySelector('#modalPasswordFeedback');
+        setInlineFeedback(modalFeedback, 'Password updated successfully. Closing session...', 'success');
+        state.token = '';
+        state.currentUser = null;
+        state.cases = [];
+        state.books = [];
+        state.users = [];
+        localStorage.removeItem('cityWatchToken');
+        updateSessionUi();
+        renderActiveView();
+        setMessage('Password updated successfully. Please log in again.', 'success');
+        closeProfileModal();
+    } catch (error) {
+        const modalFeedback = document.querySelector('#modalPasswordFeedback');
+        setInlineFeedback(modalFeedback, error.message, 'error');
         setMessage(error.message, 'error');
     }
 }
@@ -1009,10 +1197,17 @@ function handleProfileKeydown(event, profileType) {
 
 function setupEvents() {
     elements.loginForm.addEventListener('submit', handleLogin);
+    elements.toggleForgotPasswordButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        setForgotPasswordPanel(elements.forgotPasswordPanel.hidden);
+    });
+    elements.forgotPasswordForm.addEventListener('submit', handleForgotPassword);
+    elements.resetPasswordForm.addEventListener('submit', handleResetPassword);
     elements.registerForm.addEventListener('submit', handleRegister);
     elements.agentForm.addEventListener('submit', handleAgentCreate);
     elements.caseForm.addEventListener('submit', handleCaseSave);
     elements.bookForm.addEventListener('submit', handleBookSave);
+    elements.changePasswordForm.addEventListener('submit', handleChangePassword);
     elements.assignForm.addEventListener('submit', handleAssign);
     elements.assignAgentForm.addEventListener('submit', handleAssignAgent);
     elements.assignBookAgentForm.addEventListener('submit', handleAssignBookAgent);
@@ -1034,6 +1229,11 @@ function setupEvents() {
     elements.profileModal.addEventListener('click', (event) => {
         if (event.target.hasAttribute('data-close-profile-modal')) {
             closeProfileModal();
+        }
+    });
+    elements.profileModalBody.addEventListener('submit', (event) => {
+        if (event.target && event.target.id === 'modalChangePasswordForm') {
+            handleModalChangePassword(event);
         }
     });
 
@@ -1070,8 +1270,13 @@ async function init() {
     setupEvents();
     clearCaseForm();
     clearBookForm();
+    setForgotPasswordPanel(false);
     updateSessionUi();
     await refreshData();
+
+    if (state.resetToken) {
+        setMessage('Reset token detected. Enter your new password below.', 'info');
+    }
 }
 
 init();
