@@ -123,6 +123,39 @@ button:disabled {
     padding: 24px 32px 40px;
 }
 
+.reset-password-page {
+    position: sticky;
+    top: 10px;
+    z-index: 25;
+    display: block;
+}
+
+.reset-password-page[hidden] {
+    display: none;
+}
+
+.reset-password-card {
+    position: relative;
+    width: min(540px, 100%);
+    display: grid;
+    gap: 14px;
+    margin: 0 auto 6px;
+    border-radius: 14px;
+    box-shadow: 0 20px 35px rgba(31, 37, 40, 0.18);
+}
+
+.reset-password-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    min-height: 34px;
+    width: 34px;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 14px;
+    line-height: 1;
+}
+
 .sidebar,
 .workspace {
     min-width: 0;

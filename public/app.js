@@ -1,4 +1,6 @@
 const API_BASE = '/api/v1';
+const urlParams = new URLSearchParams(window.location.search);
+const resetToken = urlParams.get('resetToken');
 
 const enums = {
     species: ['human', 'dwarf', 'troll', 'vampire', 'werewolf', 'zombie', 'golem', 'gnome', 'goblin', 'elf', 'gargoyle', 'pictsie', 'igor', 'orangutan', 'other'],
@@ -13,7 +15,7 @@ const state = {
     token: localStorage.getItem('cityWatchToken') || '',
     currentUser: null,
     activeView: 'agents',
-    resetToken: new URLSearchParams(window.location.search).get('resetToken') || '',
+    resetToken: resetToken || '',
     search: '',
     agents: [],
     cases: [],
@@ -22,6 +24,10 @@ const state = {
 };
 
 const elements = {
+    normalApp: document.querySelector('#normalApp'),
+    resetPasswordPage: document.querySelector('#resetPasswordPage'),
+    resetPasswordPageMessage: document.querySelector('#resetPasswordPageMessage'),
+    closeResetPasswordModal: document.querySelector('#closeResetPasswordModal'),
     sessionStatus: document.querySelector('#sessionStatus'),
     logoutButton: document.querySelector('#logoutButton'),
     messageBox: document.querySelector('#messageBox'),
@@ -30,9 +36,7 @@ const elements = {
     forgotPasswordPanel: document.querySelector('#forgotPasswordPanel'),
     forgotPasswordForm: document.querySelector('#forgotPasswordForm'),
     forgotPasswordFeedback: document.querySelector('#forgotPasswordFeedback'),
-    resetPasswordPanel: document.querySelector('#resetPasswordPanel'),
     resetPasswordForm: document.querySelector('#resetPasswordForm'),
-    resetPasswordFeedback: document.querySelector('#resetPasswordFeedback'),
     registerForm: document.querySelector('#registerForm'),
     agentForm: document.querySelector('#agentForm'),
     caseForm: document.querySelector('#caseForm'),
@@ -150,7 +154,19 @@ function updateSessionUi() {
     }
 
     elements.changePasswordPanel.hidden = true;
-    elements.resetPasswordPanel.hidden = !state.resetToken;
+}
+
+function toggleResetPasswordView() {
+    const hasResetToken = Boolean(state.resetToken);
+    elements.normalApp.hidden = false;
+    elements.resetPasswordPage.hidden = !hasResetToken;
+}
+
+function closeResetPasswordModal() {
+    state.resetToken = '';
+    elements.resetPasswordPage.hidden = true;
+    clearResetTokenFromUrl();
+    setInlineFeedback(elements.resetPasswordPageMessage, '');
 }
 
 function setForgotPasswordPanel(isOpen) {
@@ -166,6 +182,15 @@ function clearResetTokenFromUrl() {
     const url = new URL(window.location.href);
     url.searchParams.delete('resetToken');
     window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
+function clearSessionState() {
+    state.token = '';
+    state.currentUser = null;
+    state.cases = [];
+    state.books = [];
+    state.users = [];
+    localStorage.removeItem('cityWatchToken');
 }
 
 function setActiveView(viewName) {
@@ -870,27 +895,50 @@ async function handleResetPassword(event) {
     event.preventDefault();
 
     try {
-        const data = getFormDataObject(event.currentTarget);
+        const form = event.target instanceof HTMLFormElement
+            ? event.target
+            : event.target.closest('form');
+
+        if (!form) {
+            throw new Error('Reset password form not found');
+        }
+
+        const data = getFormDataObject(form);
+        const { newPassword, confirmNewPassword } = data;
+
+        if (!newPassword || !confirmNewPassword) {
+            setInlineFeedback(elements.resetPasswordPageMessage, 'Both password fields are required.', 'error');
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            setInlineFeedback(elements.resetPasswordPageMessage, 'Passwords do not match.', 'error');
+            return;
+        }
 
         await apiRequest(`/users/reset-password/${encodeURIComponent(state.resetToken)}`, {
             method: 'PATCH',
-            body: data,
+            body: {
+                newPassword,
+                confirmNewPassword
+            },
             auth: false
         });
 
-        event.currentTarget.reset();
+        form.reset();
+        clearSessionState();
         setInlineFeedback(
-            elements.resetPasswordFeedback,
+            elements.resetPasswordPageMessage,
             'Password reset successfully. You can now log in with the new password.',
             'success'
         );
-        event.currentTarget.querySelectorAll('input, button').forEach((control) => {
+        form.querySelectorAll('input, button').forEach((control) => {
             control.disabled = true;
         });
         setMessage('Password reset successfully. You can now log in with the new password.', 'success');
-        clearResetTokenFromUrl();
+        closeResetPasswordModal();
     } catch (error) {
-        setInlineFeedback(elements.resetPasswordFeedback, error.message, 'error');
+        setInlineFeedback(elements.resetPasswordPageMessage, error.message, 'error');
         setMessage(error.message, 'error');
     }
 }
@@ -1203,6 +1251,7 @@ function setupEvents() {
     });
     elements.forgotPasswordForm.addEventListener('submit', handleForgotPassword);
     elements.resetPasswordForm.addEventListener('submit', handleResetPassword);
+    elements.closeResetPasswordModal.addEventListener('click', closeResetPasswordModal);
     elements.registerForm.addEventListener('submit', handleRegister);
     elements.agentForm.addEventListener('submit', handleAgentCreate);
     elements.caseForm.addEventListener('submit', handleCaseSave);
@@ -1266,6 +1315,16 @@ function setupEvents() {
 }
 
 async function init() {
+    toggleResetPasswordView();
+
+    if (state.resetToken) {
+        clearSessionState();
+        updateSessionUi();
+        setupEvents();
+        setInlineFeedback(elements.resetPasswordPageMessage, 'Enter your new password to continue.', '');
+        return;
+    }
+
     setupEnumSelects();
     setupEvents();
     clearCaseForm();
@@ -1273,10 +1332,6 @@ async function init() {
     setForgotPasswordPanel(false);
     updateSessionUi();
     await refreshData();
-
-    if (state.resetToken) {
-        setMessage('Reset token detected. Enter your new password below.', 'info');
-    }
 }
 
 init();

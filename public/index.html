@@ -20,7 +20,7 @@
         </section>
     </header>
 
-    <main class="app-shell">
+    <main id="normalApp" class="app-shell">
         <aside class="sidebar" aria-label="Authentication panel">
             <section class="panel">
                 <h2>Login</h2>
@@ -48,23 +48,6 @@
                     </form>
                     <p id="forgotPasswordFeedback" class="inline-feedback" aria-live="polite"></p>
                 </div>
-            </section>
-
-            <section id="resetPasswordPanel" class="panel" hidden>
-                <h2>Reset Password</h2>
-                <p class="panel-note">A reset token was found in the URL. Choose your new password.</p>
-                <form id="resetPasswordForm" class="form-stack">
-                    <label>
-                        New password
-                        <input name="newPassword" type="password" autocomplete="new-password" required>
-                    </label>
-                    <label>
-                        Confirm new password
-                        <input name="confirmNewPassword" type="password" autocomplete="new-password" required>
-                    </label>
-                    <button type="submit">Reset Password</button>
-                </form>
-                <p id="resetPasswordFeedback" class="inline-feedback" aria-live="polite"></p>
             </section>
 
             <section class="panel">
@@ -118,6 +101,27 @@
                     <input id="globalSearch" type="search" placeholder="Filter current view">
                 </label>
                 <button id="refreshButton" class="secondary-button" type="button">Refresh</button>
+            </section>
+
+            <section id="resetPasswordPage" class="reset-password-page" hidden>
+                <div class="panel reset-password-card" role="dialog" aria-modal="true"
+                    aria-labelledby="resetPasswordTitle">
+                    <button id="closeResetPasswordModal" class="secondary-button reset-password-close" type="button" aria-label="Close reset password modal">X</button>
+                    <h2 id="resetPasswordTitle">Reset your password</h2>
+                    <p class="panel-note">Set your new password and confirm it to complete the reset process.</p>
+                    <form id="resetPasswordForm" class="form-stack">
+                        <label>
+                            New password
+                            <input name="newPassword" type="password" autocomplete="new-password" required>
+                        </label>
+                        <label>
+                            Confirm new password
+                            <input name="confirmNewPassword" type="password" autocomplete="new-password" required>
+                        </label>
+                        <button type="submit">Reset Password</button>
+                    </form>
+                    <p id="resetPasswordPageMessage" class="inline-feedback" aria-live="polite"></p>
+                </div>
             </section>
 
             <section id="agentsView" class="view-section active-view" aria-labelledby="agentsTitle">
