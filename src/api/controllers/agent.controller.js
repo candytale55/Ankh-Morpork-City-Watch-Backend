@@ -5,13 +5,19 @@ const Case = require("../models/Case");
 const { deleteFile } = require("../../utils/deleteFile");
 
 
+/* --------------------------------------------- */
+
 /**
- * Escapes user input before embedding it in a regular expression.
+ * Escapes special characters in a string to safely use it in a regular expression.
+ * @param {string} value - The string to escape.
+ * @returns {string} - The escaped string.
  */
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
- * Deletes the file uploaded in the current request when an operation fails.
+ * Rolls back the uploaded image by deleting it from Cloudinary if an error occurs during agent creation or update.
+ * @param {Object} file - The uploaded file object containing the path to the image.
+ * @returns {Promise<void>} - A promise that resolves when the rollback is complete.
  */
 const rollbackUploadedImage = async (file) => {
     if (!file?.path) {
@@ -25,6 +31,7 @@ const rollbackUploadedImage = async (file) => {
     }
 };
 
+/* --------------------------------------------- */
 
 
 /**
@@ -68,6 +75,8 @@ const getAgents = async (req, res) => {
     }
 };
 
+/* --------------------------------------------- */
+
 /**
  * Finds agents whose name matches the query string, ignoring case.
  */
@@ -98,26 +107,30 @@ const getAgentByName = async (req, res) => {
     }
 };
 
+/* --------------------------------------------- */
+
 /**
  * Creates a new agent and stores its uploaded image path when present.
  */
 const postAgent = async (req, res) => {
     try {
+        // Normalize the agent name to ensure consistent storage and comparison
         const normalizedName = req.body?.name?.trim();
         if (!normalizedName) {
             await rollbackUploadedImage(req.file);
             return res.status(400).json({ message: "Agent name is required" });
         }
-
+        // Check for duplicate agent names (case-insensitive)
         const duplicatedAgent = await Agent.findOne({
             name: { $regex: `^${escapeRegExp(normalizedName)}$`, $options: 'i' }
         });
-
+        // If a duplicate is found, rollback the uploaded image and return a conflict response
         if (duplicatedAgent) {
             await rollbackUploadedImage(req.file);
             return res.status(409).json({ message: `Agent \"${normalizedName}\" already exists` });
         }
 
+        
         const newAgent = new Agent(req.body);
         newAgent.name = normalizedName;
 
@@ -125,56 +138,102 @@ const postAgent = async (req, res) => {
             newAgent.image = req.file.path; // Save the file path to the image field
         }
 
+        // Save the new agent to the database
         const savedAgent = await newAgent.save();
         return res.status(201).json(savedAgent);
+
     } catch (error) {
         await rollbackUploadedImage(req.file);
         return res.status(400).json({ message: "Error in posting Agent", error: error.message })
     }
 }
 
+/* --------------------------------------------- */
+
 /**
- * Updates an existing agent by id.
+ * Updates an existing agent and manages its Cloudinary image when a new one is uploaded.
  */
 const updateAgent = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // 1. Buscar el agente actual
+        // Retrieve the current agent to verify its existence
+        // and preserve the previous image URL.
         const currentAgent = await Agent.findById(id);
+
         if (!currentAgent) {
             await rollbackUploadedImage(req.file);
-            return res.status(404).json("Agent not found");
+
+            return res.status(404).json({
+                message: "Agent not found"
+            });
         }
 
-        // 2. Crear un objeto con los nuevos datos del agente
         const updateData = { ...req.body };
 
-        if (updateData.name) {
-            updateData.name = updateData.name.trim();
+        // Check if the name field is provided in the update data
+        const nameWasProvided = Object.prototype.hasOwnProperty.call(
+            updateData,
+            "name"
+        );
 
-            if (!updateData.name) {
+        if (nameWasProvided) {
+            // Validate that the name is a string and not empty after trimming
+            if (typeof updateData.name !== "string") {
                 await rollbackUploadedImage(req.file);
-                return res.status(400).json({ message: "Agent name is required" });
+
+                return res.status(400).json({
+                    message: "Agent name must be a string"
+                });
             }
 
+            // Normalize the name to ensure consistent storage and comparison
+            const normalizedName = updateData.name.trim();
+
+            // If the normalized name is empty, rollback the uploaded image 
+            if (!normalizedName) {
+                await rollbackUploadedImage(req.file);
+
+                return res.status(400).json({
+                    message: "Agent name is required"
+                });
+            }
+
+            // Check for duplicate agent names (case-insensitive) excluding the current agent
             const duplicatedAgent = await Agent.findOne({
                 _id: { $ne: id },
-                name: { $regex: `^${escapeRegExp(updateData.name)}$`, $options: 'i' }
+                name: {
+                    $regex: `^${escapeRegExp(normalizedName)}$`,
+                    $options: "i"
+                }
             });
 
+            // If a duplicate is found, rollback the uploaded image and return a conflict response
             if (duplicatedAgent) {
                 await rollbackUploadedImage(req.file);
-                return res.status(409).json({ message: `Agent \"${updateData.name}\" already exists` });
+
+                return res.status(409).json({
+                    message: `Agent "${normalizedName}" already exists`
+                });
             }
+
+            // Update the name in the update data with the normalized name
+            updateData.name = normalizedName;
         }
 
-        // 3. Añadir la nueva imagen si Multer recibió un archivo
+        // Save the new Cloudinary image URL when an image was uploaded.
         if (req.file) {
-            updateData.image = req.file.path; // Guardar la nueva ruta de la imagen
+            updateData.image = req.file.path;
         }
 
-        // 4. Actualizar el agente en la base de datos.
+        /**
+         * Update the agent, return the updated document, and validate the new values.
+         *
+         * new: true returns the agent after the update
+         * Default = new:false. It would return the agent as it was before the update
+         * 
+         * runValidators: true checks the updated values against the Agent schema.
+         */
         const updatedAgent = await Agent.findByIdAndUpdate(
             id,
             updateData,
@@ -184,12 +243,29 @@ const updateAgent = async (req, res) => {
             }
         );
 
-        // 5. Eliminar la imagen anterior solo después de una actualización exitosa.
-        if (req.file && currentAgent.image && currentAgent.image !== updatedAgent.image) {
+        // This is unlikely because the agent was found previously,
+        // but protects against deletion between both database operations.
+        if (!updatedAgent) {
+            await rollbackUploadedImage(req.file);
+
+            return res.status(404).json({
+                message: "Agent not found"
+            });
+        }
+
+        // Delete the previous image only after MongoDB was updated successfully.
+        if (
+            req.file &&
+            currentAgent.image &&
+            currentAgent.image !== updatedAgent.image
+        ) {
             try {
                 await deleteFile(currentAgent.image);
             } catch (deleteError) {
-                console.error("Old agent image could not be deleted", deleteError.message);
+                console.error(
+                    "Old agent image could not be deleted",
+                    deleteError.message
+                );
             }
         }
 
@@ -199,14 +275,17 @@ const updateAgent = async (req, res) => {
         });
 
     } catch (error) {
-        // If validation fails after upload, remove the new image to avoid orphan files.
+        // Remove the newly uploaded image if the database update failed.
         await rollbackUploadedImage(req.file);
+
         return res.status(400).json({
             message: "Error in updating Agent",
             error: error.message
         });
     }
-}
+};
+
+/* --------------------------------------------- */
 
 /**
  * Deletes an agent and removes its Cloudinary image when one exists.
@@ -232,6 +311,8 @@ const deleteAgent = async (req, res) => {
         return res.status(400).json("Error in deleting Agent")
     }
 }
+
+/* --------------------------------------------- */
 
 module.exports = {
     getAgents,
