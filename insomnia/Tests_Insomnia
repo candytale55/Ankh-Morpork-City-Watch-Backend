@@ -11,7 +11,7 @@ collection:
     meta:
       id: fld_82dbd7ef4996416c9688a09c6045a238
       created: 1784829625874
-      modified: 1785697198008
+      modified: 1785717955962
       sortKey: -1784829625874
       description: ""
     children:
@@ -154,6 +154,35 @@ collection:
                 } else {
                 	console.log("Token was not saved. Response:", responseBody);
                 }
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{PORT }}/api/v1/users/{{ _.USER_1_ID }}"
+            name: Admin gets User 2
+            meta:
+              id: req_4bcc4970839944168fb6acfcbf07a4ca
+              created: 1785716441589
+              modified: 1785716569478
+              isPrivate: false
+              description: ""
+              sortKey: -1785678089210
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/12.6.0
+                description: ""
+                disabled: false
+              - name: Authorization
+                value: Bearer {{ _.ADMIN_TOKEN }}
+                description: ""
+                disabled: false
+            authentication:
+              type: none
             settings:
               renderRequestBody: true
               encodeUrl: true
@@ -2686,7 +2715,7 @@ collection:
         meta:
           id: fld_d3145066a3ba4289a097b60ca0ffebc8
           created: 1784677314376
-          modified: 1785697685528
+          modified: 1785717438679
           sortKey: -1784829655140.17
           description: ""
         children:
@@ -2731,23 +2760,23 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - name: 05.05 Assign Cases to Users
+          - name: 05.04 Assign Cases to Users
             meta:
               id: fld_2ecbb42ddaba4874a62162ba5f2ab842
               created: 1785181014778
-              modified: 1785697458424
+              modified: 1785715958428
               sortKey: -1785181014780.3438
               description: ""
             children:
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/assign/{{ _.USER_2_ID }}"
-                name: Admin asigna caso a User 2 (GUILD)
+                name: Admin assigns GUILD to User 2
                 meta:
                   id: req_075f9db7637049f6a7c116798c5db4ac
                   created: 1783458441019
-                  modified: 1785339535165
+                  modified: 1785714872758
                   isPrivate: false
                   description: ""
-                  sortKey: -1785315107626
+                  sortKey: -1785315107688.5
                 method: PUT
                 headers:
                   - name: Authorization
@@ -2765,11 +2794,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{CASE_CLACKS}}/assign/{{ _.USER_1_ID }}"
-                name: Admin asigna User 1 al caso (CLACKS)
+                name: Admin assigns CLACKS to User 1
                 meta:
                   id: req_d472d4d9277c428c8cbddb53e2f95a45
                   created: 1783458647669
-                  modified: 1785339049714
+                  modified: 1785717208924
                   isPrivate: false
                   description: ""
                   sortKey: -1785315107638.5
@@ -2789,106 +2818,12 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - url: "{{PORT}}/api/v1/cases/{{CASE_CLACKS }}"
-                name: User actualiza datos de un caso con PATCH
-                meta:
-                  id: req_b313203259be479ea0cc9bc313f9f90c
-                  created: 1783510027740
-                  modified: 1785327471421
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785315107651
-                method: PATCH
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                    	"status": "closed",
-                    	"priority": "high"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Bearer {{ _.USER_2_TOKEN }}
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{PORT}}/api/v1/cases/{{ CASE_CLACKS }}/assign/{{ _.USER_2_ID }}"
-                name: User normal no puede asignar casos
-                meta:
-                  id: req_174f606f7a734184a4e7293cb41fd01f
-                  created: 1783528106691
-                  modified: 1785341400699
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785315107551
-                method: PUT
-                body:
-                  mimeType: application/json
-                  text: ""
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Bearer {{ _.USER_2_TOKEN }}
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: none
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{PORT}}/api/v1/cases/{{CASE_CLACKS }}"
-                name: User normal no puede actualizar created_by en un caso con PATCH
-                meta:
-                  id: req_8b4a85dc01cf4442a2eeca5070c56044
-                  created: 1784614540607
-                  modified: 1785339827395
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785315107601
-                method: PATCH
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                    	"status": "open",
-                    	"createdBy": "0000"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Bearer {{ _.USER_3_ID }}
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
               - url: "{{ PORT}}/api/v1/cases/{{CASE_CLACKS}}/assign/{{ _.USER_3_ID }}"
-                name: Admin asigna caso a usuario3 (CLACKS)
+                name: Admin assigns CLACKS to User 3
                 meta:
                   id: req_c1f7236758f44789bd2090b59fb5da8c
                   created: 1784615885311
-                  modified: 1785344557961
+                  modified: 1785714928268
                   isPrivate: false
                   description: ""
                   sortKey: -1785315107576
@@ -2914,12 +2849,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ PORT}}/api/v1/cases/{{CASE_CLACKS}}/assign/{{ _.USER_3_ID }}"
-                name: Admin asigna DE NUEVO caso a usuario3 (CLACKS) - No debe duplicarse - Ver
-                  Cloudinary
+                name: Admin assigns CLACKS to User 3 - Must fail - Check Cloudinary
                 meta:
                   id: req_4fb7633ff4b74b469f4f6e19e2faff91
                   created: 1785344649270
-                  modified: 1785344649270
+                  modified: 1785717215681
                   isPrivate: false
                   description: ""
                   sortKey: -1785315107563.5
@@ -2944,20 +2878,45 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-          - name: 05.02 Create
+              - url: "{{ _.PORT }}/api/v1/cases/{{CASE_CLACKS}}/assign/{{ _.USER_2_ID }}"
+                name: Normal user cannot assign case
+                meta:
+                  id: req_0fcd8f7a6a0643abbf518a68a1268411
+                  created: 1785714801458
+                  modified: 1785714833141
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785315107738.5
+                method: PUT
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: 05.02 Create Cases
             meta:
               id: fld_ec93ffe511224f96b4caa7f87df45e55
               created: 1785181270468
-              modified: 1785697310832
+              modified: 1785716973729
               sortKey: -1785697263214.5
               description: ""
             children:
               - url: "{{PORT }}/api/v1/cases/"
-                name: User 1 creates CLACKS
+                name: User 2 creates CLACKS
                 meta:
                   id: req_b6139168007c48488a5de417bcbffab3
                   created: 1783456665089
-                  modified: 1785697189440
+                  modified: 1785713261795
                   isPrivate: false
                   description: ""
                   sortKey: -1785181275326.375
@@ -2975,8 +2934,7 @@ collection:
                       "reportedBy": "Moist von Lipwig",
                       "suspectName": "Reaper Man",
                       "suspectSpecies": "human",
-                      "assignedAgents": ["{{ _.VIMES }}", "{{ _.DORLF }}"],
-                    	"createdBy": "{{ _.USER_1_ID }}"
+                      "assignedAgents": ["{{ _.VIMES }}", "{{ _.DORLF }}"]
                     }
                 headers:
                   - name: Content-Type
@@ -3005,11 +2963,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ PORT}}/api/v1/cases/"
-                name: User 2 creates GUILD
+                name: User 1 creates GUILD
                 meta:
                   id: req_ffc33dc0434b4873ab282f72234accf9
                   created: 1783508819854
-                  modified: 1785696863507
+                  modified: 1785713287721
                   isPrivate: false
                   description: ""
                   sortKey: -1785181274220.6719
@@ -3027,14 +2985,13 @@ collection:
                       "reportedBy": "Lord Vetinari",
                       "suspectName": "Teatime",
                       "suspectSpecies": "human",
-                      "assignedAgents": ["{{ _.CARROT }}","{{ _.NOBBY }}"],
-                      "createdBy": "{{ _.USER_1_ID }}"
+                      "assignedAgents": ["{{ _.CARROT }}","{{ _.NOBBY }}"]
                     }
                 headers:
                   - name: Content-Type
                     value: application/json
                   - name: Authorization
-                    value: Bearer {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_1_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3055,87 +3012,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/cases/"
-                name: User 3 puede listar casos
-                meta:
-                  id: req_07ba9f7ad8b14a8d8bbae6d1f99d1cdb
-                  created: 1783509187637
-                  modified: 1785696519199
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785181273114.9688
-                method: GET
-                headers:
-                  - name: Authorization
-                    value: Token {{ _.USER_3_TOKEN }}
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: none
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/cases/{{ CASE_GUILD }}"
-                name: User puede ver un caso por id (CASE_CLACKS)
-                meta:
-                  id: req_76e2a9e20d484827af61749f411b01e2
-                  created: 1783509287038
-                  modified: 1785313981865
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785181266280.75
-                method: GET
-                headers:
-                  - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: none
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{PORT}}/api/v1/cases/{{ _.CASE_CLACKS }}"
-                name: User sin Token NO puede ver un caso por id (CASE_GUILD)
-                meta:
-                  id: req_f4e34a48be184fcab755521c2a536602
-                  created: 1784613847616
-                  modified: 1785314830749
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785181270903.5625
-                method: GET
-                body:
-                  mimeType: application/json
-                  text: ""
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                authentication:
-                  type: none
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{PORT }}/api/v1/cases/"
                 name: No token cannot create CLACKS
                 meta:
                   id: req_3020270c621747e498c6b69477f0c02c
                   created: 1785181498208
-                  modified: 1785696569913
+                  modified: 1785713880850
                   isPrivate: false
                   description: ""
                   sortKey: -1785181275426.375
@@ -3178,37 +3059,12 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
-                name: User puede ver un caso por id (CASE_CLACKS)
-                meta:
-                  id: req_dabadf394e1d4895a5b3b53f1941fe27
-                  created: 1785182203699
-                  modified: 1785324017103
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785181266480.75
-                method: GET
-                headers:
-                  - name: Authorization
-                    value: Token {{ _.USER_1_TOKEN }}
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: none
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
               - url: "{{PORT }}/api/v1/cases/"
                 name: Invalid token cannot create CLACKS
                 meta:
                   id: req_efacb7969561472299372cd62f7f1cfc
                   created: 1785319820078
-                  modified: 1785696590070
+                  modified: 1785713884988
                   isPrivate: false
                   description: ""
                   sortKey: -1785181275376.375
@@ -3259,19 +3115,19 @@ collection:
             meta:
               id: fld_09d858e93df74af28f9ce8c6b78b9315
               created: 1785182661906
-              modified: 1785697279550
+              modified: 1785711371200
               sortKey: -1785697263227
               description: ""
             children:
               - url: "{{PORT }}/api/v1/cases/"
-                name: User con Token equivocado NO puede listar casos
+                name: Wrong token cannot list cases
                 meta:
                   id: req_0caa0d89e23646f885cf3670f98db793
                   created: 1784613941537
-                  modified: 1785696310418
+                  modified: 1785711314819
                   isPrivate: false
                   description: ""
-                  sortKey: -1785182705371
+                  sortKey: -1785182705389.75
                 method: GET
                 headers:
                   - name: Authorization
@@ -3289,11 +3145,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/cases/"
-                name: User sin token NO puede listar casos
+                name: No token cannot list cases
                 meta:
                   id: req_fe6e9e4c49f845c99cc696bef9e4cee5
                   created: 1785315265693
-                  modified: 1785315307263
+                  modified: 1785710979061
                   isPrivate: false
                   description: ""
                   sortKey: -1785182705396
@@ -3308,20 +3164,20 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-          - name: 05.06 Assign Agents to Cases
+          - name: 05.05 Assign Agents to Cases
             meta:
               id: fld_eec89534091d4045bc18d827f440838d
               created: 1785342294417
-              modified: 1785697560825
-              sortKey: -1785181014780.246
+              modified: 1785716110126
+              sortKey: -1785181014780.3193
               description: ""
             children:
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_CLACKS }}/assign-agent/{{ _.CARROT }}"
-                name: Admin add Agent CARROT to Case CLACKS
+                name: Assign Carrot to CLACKS
                 meta:
                   id: req_c30724b22c534418b27ad1bb1ae6c43f
                   created: 1784743710271
-                  modified: 1785408747357
+                  modified: 1785715240830
                   isPrivate: false
                   description: ""
                   sortKey: -1785405404072
@@ -3344,11 +3200,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/assign-agent/{{ _.VIMES }}"
-                name: Admin add VIMES to Case GUILD
+                name: Assign Vimes to GUILD
                 meta:
                   id: req_b5fcd3c297ec4586b6b36acf75e3b5c6
                   created: 1785405646067
-                  modified: 1785418768761
+                  modified: 1785715314958
                   isPrivate: false
                   description: ""
                   sortKey: -1785379540487.5
@@ -3372,11 +3228,11 @@ collection:
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_CLACKS }}/assign-agent/{{ _.DETRITUS
                   }}"
-                name: Admin add Agent DETRITUS to Case CLACKS
+                name: Assign Detritus to CLACKS
                 meta:
                   id: req_993c8dd630df41b79fd55af616248b2b
                   created: 1785418612614
-                  modified: 1785418621304
+                  modified: 1785715258436
                   isPrivate: false
                   description: ""
                   sortKey: -1785392472279.75
@@ -3399,11 +3255,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_CLACKS }}/assign-agent/{{ _.CHEERY }}"
-                name: Admin add Agent CHEERY to Case CLACKS
+                name: Assign Cheery to CLACKS
                 meta:
                   id: req_74ccdcb7205b4620972789c4a96c939e
                   created: 1785418728701
-                  modified: 1785418738592
+                  modified: 1785715299322
                   isPrivate: false
                   description: ""
                   sortKey: -1785386006383.625
@@ -3427,11 +3283,11 @@ collection:
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/assign-agent/{{ _.DOWNSPOUT
                   }}"
-                name: Admin add Agent Downspout to case GUILD
+                name: Assign Downspout to GUILD
                 meta:
                   id: req_5cceb98ffc85420b99e9ade9bf4ef917
                   created: 1785419065024
-                  modified: 1785419298506
+                  modified: 1785715329772
                   isPrivate: false
                   description: ""
                   sortKey: -1785369841643.3125
@@ -3453,74 +3309,149 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - name: 03.04 Remove Agents from Cases
+              - url: "{{ PORT}}/api/v1/cases/{{ _.CASE_GUILD }}"
+                name: User gets GUILD
                 meta:
-                  id: fld_d4e135548f494dba9596a1cf3e183888
-                  created: 1785419348555
-                  modified: 1785419352547
-                  sortKey: -1785369841593.3125
+                  id: req_b0945043a903415b8413e6135eaa876b
+                  created: 1785715392056
+                  modified: 1785715415082
+                  isPrivate: false
                   description: ""
-                children:
-                  - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/unassign-agent/{{ _.DOWNSPOUT
-                      }}"
-                    name: Admin remove Agent Downspout to case GUILD
-                    meta:
-                      id: req_2bc4d3d307944eaab5e6f114b5d645bc
-                      created: 1785405760122
-                      modified: 1785419357428
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1785419357323
-                    method: PUT
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Bearer {{ _.ADMIN_TOKEN }}
-                        description: ""
-                        disabled: false
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/unassign-agent/{{ _.VIMES }}"
-                    name: Admin remove VIMES from Case GUILD
-                    meta:
-                      id: req_dfaf9a5a0dd94030b4d6c86836fbfe33
-                      created: 1785419386473
-                      modified: 1785419744048
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1785419357423
-                    method: PUT
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Bearer {{ _.ADMIN_TOKEN }}
-                        description: ""
-                        disabled: false
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
+                  sortKey: -1785369841605.8125
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: User gets CLACKS
+                meta:
+                  id: req_8c464282d27546f38cfe92dfc6b85035
+                  created: 1785715434067
+                  modified: 1785715434067
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785369841612.0625
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: 03.06 Remove Agents from Cases
+            meta:
+              id: fld_d4e135548f494dba9596a1cf3e183888
+              created: 1785419348555
+              modified: 1785716130216
+              sortKey: -1785181014780.295
+              description: ""
+            children:
+              - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/unassign-agent/{{ _.DOWNSPOUT
+                  }}"
+                name: Admin remove Agent Downspout to case GUILD
+                meta:
+                  id: req_2bc4d3d307944eaab5e6f114b5d645bc
+                  created: 1785405760122
+                  modified: 1785419357428
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785419357323
+                method: PUT
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}/unassign-agent/{{ _.VIMES }}"
+                name: Admin remove VIMES from Case GUILD
+                meta:
+                  id: req_dfaf9a5a0dd94030b4d6c86836fbfe33
+                  created: 1785419386473
+                  modified: 1785419744048
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785419357423
+                method: PUT
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ _.CASE_GUILD }}"
+                name: User gets GUILD
+                meta:
+                  id: req_721f1c10708943dc890b676086de2e3a
+                  created: 1785715451263
+                  modified: 1785715455452
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785419357273
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
           - name: 05.00 Setup Users
             meta:
               id: fld_494207772efe4c8d964cc05c7cdd3bf9
               created: 1785696036279
-              modified: 1785697274736
+              modified: 1785712029220
               sortKey: -1785697263252
               description: ""
             children:
@@ -3529,10 +3460,10 @@ collection:
                 meta:
                   id: req_734503159edb4fc1b6bff23002472ddf
                   created: 1785001344325
-                  modified: 1785696051438
+                  modified: 1785710782537
                   isPrivate: false
                   description: ""
-                  sortKey: -1785696045287
+                  sortKey: -1785696045612
                 method: POST
                 body:
                   mimeType: application/json
@@ -3671,10 +3602,10 @@ collection:
                 meta:
                   id: req_96ff3d4a52f240e492263811f04047bd
                   created: 1785180019812
-                  modified: 1785696048526
+                  modified: 1785710774659
                   isPrivate: false
                   description: ""
-                  sortKey: -1785696045187
+                  sortKey: -1785696045787
                 method: POST
                 body:
                   mimeType: multipart/form-data
@@ -3734,10 +3665,10 @@ collection:
                 meta:
                   id: req_f67b701851cb4b818d0254c290ddfba1
                   created: 1785180019812
-                  modified: 1785696045146
+                  modified: 1785710772253
                   isPrivate: false
                   description: ""
-                  sortKey: -1785696045087
+                  sortKey: -1785696045687
                 method: POST
                 body:
                   mimeType: application/json
@@ -3776,10 +3707,10 @@ collection:
                 meta:
                   id: req_6806bf2b34304f8b9141270ac714747f
                   created: 1785308421539
-                  modified: 1785696054241
+                  modified: 1785710778647
                   isPrivate: false
                   description: ""
-                  sortKey: -1785696045387
+                  sortKey: -1785696045637
                 method: POST
                 body:
                   mimeType: multipart/form-data
@@ -3829,57 +3760,230 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-          - name: 05.04 Read and Update Cases
+          - name: 05.03 Read and Update Cases
             meta:
               id: fld_91799926208c426e829f347066783ca9
               created: 1785697263202
-              modified: 1785697406172
+              modified: 1785715941423
               sortKey: -1785697263202
               description: ""
-          - name: 05.07 Unassing Agents from Cases
-            meta:
-              id: fld_ffe3642b4aea42fb9d763c5a61ea9655
-              created: 1785697534864
-              modified: 1785697625598
-              sortKey: -1785181014780.2217
-              description: ""
-          - name: 05.08 Relationship Deletion Cases
-            meta:
-              id: fld_58af05b3fcfa496bb43970f64696c701
-              created: 1785697607997
-              modified: 1785697621482
-              sortKey: -1785181014780.1973
-              description: ""
             children:
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_1 }}"
-                name: 29. Borrar usuario elimina imagen y limpia assignedTo en casos
+              - url: "{{PORT }}/api/v1/cases/"
+                name: User 3 lists cases
                 meta:
-                  id: req_3c1af6a845654c52bcfa229de73c5750
-                  created: 1781647101524
-                  modified: 1785697846950
+                  id: req_07ba9f7ad8b14a8d8bbae6d1f99d1cdb
+                  created: 1783509187637
+                  modified: 1785713896889
                   isPrivate: false
                   description: ""
-                  sortKey: -1785697815090
-                method: DELETE
+                  sortKey: -1785713896820
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_3_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_GUILD }}"
+                name: User 2 gets GUILD
+                meta:
+                  id: req_76e2a9e20d484827af61749f411b01e2
+                  created: 1783509287038
+                  modified: 1785713972536
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785713896810.625
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT}}/api/v1/cases/{{CASE_CLACKS }}"
+                name: User updates permitted CLACKS fields with PATCH
+                meta:
+                  id: req_b313203259be479ea0cc9bc313f9f90c
+                  created: 1783510027740
+                  modified: 1785714162282
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785713896809.8438
+                method: PATCH
                 body:
                   mimeType: application/json
-                  text: ""
+                  text: |-
+                    {
+                    	"status": "closed",
+                    	"priority": "high"
+                    }
                 headers:
                   - name: Content-Type
                     value: application/json
+                  - name: Authorization
+                    value: Bearer {{ _.USER_2_TOKEN }}
+                    description: ""
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT}}/api/v1/cases/{{CASE_CLACKS }}"
+                name: Admin cannot modify createdBy
+                meta:
+                  id: req_8b4a85dc01cf4442a2eeca5070c56044
+                  created: 1784614540607
+                  modified: 1785714323066
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785713896809.0625
+                method: PATCH
+                body:
+                  mimeType: application/json
+                  text: |-
+                    {
+                    	"createdBy": "0000"
+                    }
+                headers:
+                  - name: Content-Type
+                    value: application/json
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: User 1 gets CLACKS
+                meta:
+                  id: req_dabadf394e1d4895a5b3b53f1941fe27
+                  created: 1785182203699
+                  modified: 1785713970138
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785713896813.75
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.USER_1_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: No token cannot get case CLACKS
+                meta:
+                  id: req_891b5503814447148b6056879fca648a
+                  created: 1785714019305
+                  modified: 1785714033534
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785713896812.1875
+                method: GET
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: 05.07 Relationship Deletion Cases
+            meta:
+              id: fld_58af05b3fcfa496bb43970f64696c701
+              created: 1785697607997
+              modified: 1785717438679
+              sortKey: -1785181014780.1973
+              description: ""
+            children:
+              - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}"
+                name: Admin deletes CASE_GUILD
+                meta:
+                  id: req_50de52380fb74c22998eab9b0941e03b
+                  created: 1783459866673
+                  modified: 1785717943703
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785697814990
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
+                name: Delete User 3
+                meta:
+                  id: req_3b311c68d12d4afbbb25ab13ed3763ed
+                  created: 1785180084802
+                  modified: 1785717264397
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785697814915
+                method: DELETE
+                headers:
                   - name: User-Agent
                     value: insomnia/12.6.0
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_Token }}
+                    value: Token {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
                   afterResponse: >-
                     if (insomnia.response.code === 200 || insomnia.response.code
                     === 204){ 
-                    	insomnia.environment.unset("User_1_id")
+                    	insomnia.environment.unset("USER_3_ID");
+                    	insomnia.environment.unset("USER_3_TOKEN");
                     }
                 settings:
                   renderRequestBody: true
@@ -3889,30 +3993,27 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - url: "{{ _.BASE }}/api/v1/cases/{{ _.CASE_2_ID }}"
-                name: 28. Borrar caso limpia assignedCases del usuario
+              - url: "{{ _.PORT }}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: Normal user can't delete cases
                 meta:
-                  id: req_50de52380fb74c22998eab9b0941e03b
-                  created: 1783459866673
-                  modified: 1785697831517
+                  id: req_4e5b29e2329e48eebaa58dc405e4cb3d
+                  created: 1785323948701
+                  modified: 1785717910451
                   isPrivate: false
                   description: ""
-                  sortKey: -1785697814990
+                  sortKey: -1785697815190
                 method: DELETE
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzQ1ODEwMSwiZXhwIjoxNzg2MDUwMTAxfQ.wLeCVmzSC9K-HV6_962QWRJuiN4sTEbtiDnONMM2ReI
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
-                authentication:
-                  type: bearer
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzQ1ODEwMSwiZXhwIjoxNzg2MDUwMTAxfQ.wLeCVmzSC9K-HV6_962QWRJuiN4sTEbtiDnONMM2ReI
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204) {
+                    	insomnia.environment.unset("CASE_CLACKS")
+                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -3921,316 +4022,114 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - name: Users_Login
+              - url: "{{PORT }}/api/v1/users/{{ _.USER_2_ID }}"
+                name: Get User 2 - Confirm CASE_GUILD is absent from assignedCases
                 meta:
-                  id: fld_14c68233e2ad4483aa6a0648dc18479a
-                  created: 1785180084802
-                  modified: 1785697814950
-                  sortKey: -1785697814890
+                  id: req_551b8175d737455187f4c1179c058971
+                  created: 1785716834560
+                  modified: 1785717050594
+                  isPrivate: false
                   description: ""
-                children:
-                  - url: "{{ PORT}}/api/v1/users/register"
-                    name: Register User 3
-                    meta:
-                      id: req_1b26d585fe75487aa4ae02d0e02dd71d
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784661572011.75
-                    method: POST
-                    body:
-                      mimeType: multipart/form-data
-                      params:
-                        - name: name
-                          value: User 3
-                          description: ""
-                          disabled: false
-                        - name: email
-                          value: user3@example.com
-                          description: ""
-                          disabled: false
-                        - name: password
-                          value: User@12345
-                          description: ""
-                          disabled: false
-                        - name: image
-                          value: ""
-                          description: ""
-                          disabled: false
-                          fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\User_3.jpg
-                          type: file
-                        - name: role
-                          value: user
-                          description: ""
-                          disabled: false
-                    headers:
-                      - name: Content-Type
-                        value: multipart/form-data
-                    scripts:
-                      afterResponse: >+
-                        const responseBody = insomnia.response.json()
-
-
-                        if (responseBody.user?._id) {
-                        	insomnia.environment.set("USER_3_ID", responseBody.user._id)	
-                        } else {
-                        	console.log("User ID was not saved. Response:", responseBody)
-                        }
-                        												 
-
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_1_ID }}"
-                    name: Delete User 1
-                    meta:
-                      id: req_2f3ac04aeeb94b0fa0f5f58b2a6491ce
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784659829201.5
-                    method: DELETE
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Token {{ _.ADMIN_TOKEN }}
-                        description: ""
-                        disabled: false
-                    scripts:
-                      afterResponse: >-
-                        if (insomnia.response.code === 200 ||
-                        insomnia.response.code === 204){ 
-                        	insomnia.environment.unset("USER_1_ID")
-                        	insomnia.environment.unset("USER_1_TOKEN")
-                        }
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
-                    name: Delete User 3
-                    meta:
-                      id: req_3b311c68d12d4afbbb25ab13ed3763ed
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784656343668.5
-                    method: DELETE
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Token {{ _.ADMIN_TOKEN }}
-                        description: ""
-                        disabled: false
-                    scripts:
-                      afterResponse: >-
-                        if (insomnia.response.code === 200 ||
-                        insomnia.response.code === 204){ 
-                        	insomnia.environment.unset("USER_3_ID");
-                        	insomnia.environment.unset("USER_3_TOKEN");
-                        }
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_2_ID }}"
-                    name: Delete User 2
-                    meta:
-                      id: req_7d4c2635ae0d42a3a3a48a5757faf222
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784658086435
-                    method: DELETE
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Token {{ _.ADMIN_TOKEN }}
-                        description: ""
-                        disabled: false
-                    scripts:
-                      afterResponse: >-
-                        if (insomnia.response.code === 200 ||
-                        insomnia.response.code === 204){ 
-                        	insomnia.environment.unset("USER_2_ID");
-                        	insomnia.environment.unset("USER_2_TOKEN");
-                        }
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ PORT}}/api/v1/users/login"
-                    name: Login User 2
-                    meta:
-                      id: req_843b215de8d5420b8c2b56a1f366f4e6
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784661572018
-                    method: POST
-                    body:
-                      mimeType: application/json
-                      text: |-
-                        {
-                            "email": "user2@example.com",
-                            "password": "User@12345"
-                        }
-                    headers:
-                      - name: Content-Type
-                        value: application/json
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                    scripts:
-                      afterResponse: >-
-                        const responseBody = insomnia.response.json()
-
-
-                        if (responseBody.user?._id){
-                        	insomnia.environment.set("USER_2_TOKEN", responseBody.token);
-                        } else {
-                        	console.log("Token was not saved. Response:", responseBody);
-                        }
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ PORT}}/api/v1/users/register"
-                    name: Register User 2
-                    meta:
-                      id: req_a77b150544b44cc7ac178f21fe4a43f5
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784661572105.5
-                    method: POST
-                    body:
-                      mimeType: multipart/form-data
-                      params:
-                        - name: name
-                          value: User 2
-                          description: ""
-                          disabled: false
-                        - name: email
-                          value: user2@example.com
-                          description: ""
-                          disabled: false
-                        - name: password
-                          value: User@12345
-                          description: ""
-                          disabled: false
-                        - name: image
-                          value: ""
-                          description: ""
-                          disabled: false
-                          fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\User_2.jpg
-                          type: file
-                        - name: role
-                          value: user
-                          description: ""
-                          disabled: false
-                    headers:
-                      - name: Content-Type
-                        value: multipart/form-data
-                    scripts:
-                      afterResponse: >+
-                        const responseBody = insomnia.response.json()
-
-
-                        if (responseBody.user?._id) {
-                        	insomnia.environment.set("USER_2_ID", responseBody.user._id)	
-                        } else {
-                        	console.log("User ID was not saved. Response:", responseBody)
-                        }
-                        												 
-
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: "{{ PORT}}/api/v1/users/login"
-                    name: Login User 3
-                    meta:
-                      id: req_e62cdba8104e472692a0ef75bb8db1b0
-                      created: 1785180084802
-                      modified: 1785180084802
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1784661572008.625
-                    method: POST
-                    body:
-                      mimeType: application/json
-                      text: |-
-                        {
-                            "email": "user3@example.com",
-                            "password": "User@12345"
-                        }
-                    headers:
-                      - name: Content-Type
-                        value: application/json
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                    scripts:
-                      afterResponse: >-
-                        const responseBody = insomnia.response.json()
-
-
-                        if (responseBody.user?._id){
-                        	insomnia.environment.set("USER_3_TOKEN", responseBody.token);
-                        } else {
-                        	console.log("Token was not saved. Response:", responseBody);
-                        }
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
+                  sortKey: -1785697814940
+                method: GET
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/users/{{ _.USER_2_ID }}"
+                name: Get User 2
+                meta:
+                  id: req_1e1fbd359abb41fdae93c755e5de2f5a
+                  created: 1785716944307
+                  modified: 1785716958664
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785697815090
+                method: GET
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: Gets CLACKS
+                meta:
+                  id: req_cbc547f90a72449ea5d99ca9235e9b3d
+                  created: 1785717296195
+                  modified: 1785717416691
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785697814927.5
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: Gets CLACKS - Confirm User 3 is absent from assignedTo
+                meta:
+                  id: req_9ecf158ad168447cb514915465c69a81
+                  created: 1785717397541
+                  modified: 1785717477886
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785697814896.25
+                method: GET
+                headers:
+                  - name: Authorization
+                    value: Token {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                authentication:
+                  type: none
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
       - name: 02 Passwords
         meta:
           id: fld_915dd7c6801f416783ab1979a378ec6e
@@ -5981,858 +5880,16 @@ collection:
         meta:
           id: fld_a8c86910a92943aa9ffc4b9798b23739
           created: 1785697678405
-          modified: 1785697681685
+          modified: 1785717955963
           sortKey: -1784829655139.9258
           description: ""
         children:
-          - name: Cases
-            meta:
-              id: fld_8a3bf4b1af714c2dbb8c2e562fc33511
-              created: 1783358763234
-              modified: 1785697874738
-              sortKey: -1785697714784
-              description: ""
-            children:
-              - url: http://localhost:3000/api/v1/cases/
-                name: POST Case
-                meta:
-                  id: req_e997c26c54ce43cc86e99a6d794c512e
-                  created: 1783354917022
-                  modified: 1783358771492
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783358767020
-                method: POST
-                body:
-                  mimeType: application/json
-                  text: >-
-                    {
-                        "title": "Riot Prevention: Troll and Dwarf Altercation at Treacle Mine Road",
-                        "description": "Escalating tensions between the dwarf and troll communities following inflammatory graffiti and a series of minor assaults near Treacle Mine Road have raised fears of a full-scale riot. Intelligence suggests that an agent provocateur is deliberately stoking racial hatred between the two species. The Watch must identify the instigator and prevent open conflict before thousands of dwarfs and trolls tear the city apart.",
-                        "type": "incident",
-                        "status": "open",
-                        "priority": "high",
-                        "location": "Treacle Mine Road, Ankh-Morpork",
-                        "reportedBy": "Constable Detritus",
-                        "suspectName": "Grag Ardent",
-                        "suspectSpecies": "dwarf",
-                        "assignedAgents": [],
-                        "createdBy": "6a4b64f80a48855343f2188e"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzM1ODM5NSwiZXhwIjoxNzg1OTUwMzk1fQ.8gvDrbz_5ZU7LjRhrOOL9wCdUKYfqOoC1jo63sH-eys
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/cases/
-                name: GET Cases
-                meta:
-                  id: req_df3ebc21af7e44caafc19c9a6018d35b
-                  created: 1783358502771
-                  modified: 1783358769091
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783358766920
-                method: GET
-                headers:
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzM1ODM5NSwiZXhwIjoxNzg1OTUwMzk1fQ.8gvDrbz_5ZU7LjRhrOOL9wCdUKYfqOoC1jo63sH-eys
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/cases/6a4be3d303cd8ad62b5f0180
-                name: UPDATE Cases
-                meta:
-                  id: req_eddd918bd79c4740a08ba0197672c50c
-                  created: 1783358597733
-                  modified: 1783358818217
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783358766820
-                method: PUT
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                    	"title": "Change Testing UPDATE Cases"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzM1ODM5NSwiZXhwIjoxNzg1OTUwMzk1fQ.8gvDrbz_5ZU7LjRhrOOL9wCdUKYfqOoC1jo63sH-eys
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/cases/{{ _.CASE_CLACKS }}
-                name: DELETE Case
-                meta:
-                  id: req_22bbf19fae2845a68b09e95e383f09f0
-                  created: 1785181889023
-                  modified: 1785182117695
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783358767070
-                method: DELETE
-                headers:
-                  - name: Authorization
-                    value: Bearer {{ _.USER_1_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json();
-
-
-                    if (responseBody){
-                    	insomnia.environment.unset("CASE_CLACKS");
-                    } else {
-                    	console.log("ID for CASE_CLACKS was not unset. Response: ", responseBody);
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/cases/{{ _.CASE_CLACKS }}
-                name: DELETE CASE_CLACKS
-                meta:
-                  id: req_aa6b33fc462545e781b481f927300964
-                  created: 1785182145459
-                  modified: 1785321217629
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783358767057.5
-                method: DELETE
-                headers:
-                  - name: Authorization
-                    value: Bearer {{ _.USER_1_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json();
-
-
-                    if (responseBody){
-                    	insomnia.environment.unset("CASE_CLACKS");
-                    } else {
-                    	console.log("ID for CASE_CLACKS was not unset. Response: ", responseBody);
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-          - name: Users on other users TESTS
-            meta:
-              id: fld_5f8ac0bad1de4e7b9777e330e51a7d35
-              created: 1783431910345
-              modified: 1785697795422
-              sortKey: -1785697715109
-              description: ""
-            children:
-              - url: http://localhost:3000/api/v1/users/6a4cc50c27ea7fee6ef913f6
-                name: UPDATE Users (Visit tries to update Downspout)
-                meta:
-                  id: req_a87951b9713e4327915549017e248b7b
-                  created: 1783431083220
-                  modified: 1783432721442
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783431919337
-                method: PUT
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                    	"name": "Downspout - Gargoyle"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGNmZTY3NTc3NzAzYjE1MGUyZmZlMiIsImlhdCI6MTc4MzQzMjY5MywiZXhwIjoxNzg2MDI0NjkzfQ.J72k7LVsPmRI0M8KSlSao8qbM0u1oY7izNFqCt8DkMQ
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: bearer
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGNjNTBjMjdlYTdmZWU2ZWY5MTNmNiIsImlhdCI6MTc4MzQzMTk4MCwiZXhwIjoxNzg2MDIzOTgwfQ.FpShId49XWRccusxJICSLcifmyn8EaLNNcapCr0IomM
-                  prefix: ""
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/users/6a4cc50c27ea7fee6ef913f6
-                name: DELETE User Visit tries to delete Donwspout
-                meta:
-                  id: req_485e03834b1345f6a4a3637001f664da
-                  created: 1783432145532
-                  modified: 1783432204866
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783431919437
-                method: DELETE
-                body:
-                  mimeType: application/json
-                  text: ""
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGNmZTY3NTc3NzAzYjE1MGUyZmZlMiIsImlhdCI6MTc4MzQzMjAzNiwiZXhwIjoxNzg2MDI0MDM2fQ.A4nJletI7Cqi3McksXKLy7PCeGSyPfyED35cprZiXJQ
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/users/login
-                name: LOGIN (Downspout / UserUser)
-                meta:
-                  id: req_92dd18a9b7184d258b6f40e0106b3978
-                  created: 1783432641553
-                  modified: 1783432673711
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783431919637
-                method: POST
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                        "email": "user2@example.com",
-                        "password": "User@12345"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: http://localhost:3000/api/v1/users/6a4cc50c27ea7fee6ef913f6/role
-                name: UPDATE role (Downspout tries to update its role)
-                meta:
-                  id: req_96842537d86541f696a6d08f26cd86e7
-                  created: 1783433951354
-                  modified: 1783434368706
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1783395865417.5
-                method: PATCH
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                    	"role": "admin"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: Authorization
-                    value: Token
-                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGNmZTY3NTc3NzAzYjE1MGUyZmZlMiIsImlhdCI6MTc4MzQzMzk5OSwiZXhwIjoxNzg2MDI1OTk5fQ.QuU2DzUaHm0iKSdGpr0Mk5f57cDNrcJfw1QHcLcwPx4
-                    description: ""
-                    disabled: false
-                authentication:
-                  type: bearer
-                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGNmZTY3NTc3NzAzYjE1MGUyZmZlMiIsImlhdCI6MTc4MzQzMzk5OSwiZXhwIjoxNzg2MDI1OTk5fQ.QuU2DzUaHm0iKSdGpr0Mk5f57cDNrcJfw1QHcLcwPx4
-                  prefix: ""
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-          - name: Users - Complete set
-            meta:
-              id: fld_dab929156d364c04b15b751c0a1ffbf3
-              created: 1784661556729
-              modified: 1785697755184
-              sortKey: -1785697715134
-              description: ""
-            children:
-              - url: "{{ PORT }}/api/v1/users/login"
-                name: Login User 1
-                meta:
-                  id: req_74dcf1bde7c14b9c90b56862f264790f
-                  created: 1783430793421
-                  modified: 1784829693234
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572118
-                method: POST
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                        "email": "user1@example.com",
-                        "password": "User@12345"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id){
-                    	insomnia.environment.set("USER_1_TOKEN", responseBody.token);
-                    } else {
-                    	console.log("Token was not saved. Response: ", responseBody);
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/users/login"
-                name: Login User 3
-                meta:
-                  id: req_53e417ac652145f6bc27bc620a159f57
-                  created: 1784663438516
-                  modified: 1785172318328
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572008.625
-                method: POST
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                        "email": "user3@example.com",
-                        "password": "User@12345"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id){
-                    	insomnia.environment.set("USER_3_TOKEN", responseBody.token);
-                    } else {
-                    	console.log("Token was not saved. Response:", responseBody);
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/users/register"
-                name: Register User 1
-                meta:
-                  id: req_38d5d663ffc2425f9f40ea251cfc6c08
-                  created: 1784829780508
-                  modified: 1785149707363
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572168
-                method: POST
-                body:
-                  mimeType: multipart/form-data
-                  params:
-                    - name: name
-                      value: User 1
-                      description: ""
-                      disabled: false
-                    - name: email
-                      value: user1@example.com
-                      description: ""
-                      disabled: false
-                    - name: password
-                      value: User@12345
-                      description: ""
-                      disabled: false
-                    - name: image
-                      value: ""
-                      description: ""
-                      disabled: false
-                      fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\User_1.jpg
-                      type: file
-                    - name: role
-                      value: user
-                      description: ""
-                      disabled: false
-                headers:
-                  - name: Content-Type
-                    value: multipart/form-data
-                scripts:
-                  afterResponse: "const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id) {
-
-                    \tinsomnia.environment.set(\"USER_1_ID\",
-                    responseBody.user._id);
-
-                    } else {
-
-                    \tconsole.log(\"User ID was not saved. Response:\",
-                    responseBody);
-
-                    }
-
-                    \t\t\t\t"
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/users/register"
-                name: Register User 2
-                meta:
-                  id: req_713dd84f36d145d48aac8072c64443b8
-                  created: 1784829866287
-                  modified: 1784829888256
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572105.5
-                method: POST
-                body:
-                  mimeType: multipart/form-data
-                  params:
-                    - name: name
-                      value: User 2
-                      description: ""
-                      disabled: false
-                    - name: email
-                      value: user2@example.com
-                      description: ""
-                      disabled: false
-                    - name: password
-                      value: User@12345
-                      description: ""
-                      disabled: false
-                    - name: image
-                      value: ""
-                      description: ""
-                      disabled: false
-                      fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\User_2.jpg
-                      type: file
-                    - name: role
-                      value: user
-                      description: ""
-                      disabled: false
-                headers:
-                  - name: Content-Type
-                    value: multipart/form-data
-                scripts:
-                  afterResponse: >+
-                    const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id) {
-                    	insomnia.environment.set("USER_2_ID", responseBody.user._id)	
-                    } else {
-                    	console.log("User ID was not saved. Response:", responseBody)
-                    }
-                    												 
-
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_2_ID }}"
-                name: Delete User 2
-                meta:
-                  id: req_7cb98e930c4c41b8b3886e37b6c22ca3
-                  created: 1784830356544
-                  modified: 1784830579212
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784658086435
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_2_ID");
-                    	insomnia.environment.unset("USER_2_TOKEN");
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/users/login"
-                name: Login User 2
-                meta:
-                  id: req_f7f7e58180144caca6d372f60caad661
-                  created: 1785001266856
-                  modified: 1785001322909
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572018
-                method: POST
-                body:
-                  mimeType: application/json
-                  text: |-
-                    {
-                        "email": "user2@example.com",
-                        "password": "User@12345"
-                    }
-                headers:
-                  - name: Content-Type
-                    value: application/json
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id){
-                    	insomnia.environment.set("USER_2_TOKEN", responseBody.token);
-                    } else {
-                    	console.log("Token was not saved. Response:", responseBody);
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
-                name: Delete User 3
-                meta:
-                  id: req_51c5372d1ed1466cbc267b54ea3c24e7
-                  created: 1785149621131
-                  modified: 1785149639085
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784656343668.5
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_3_ID");
-                    	insomnia.environment.unset("USER_3_TOKEN");
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ PORT}}/api/v1/users/register"
-                name: Register User 3
-                meta:
-                  id: req_41670156d5ff4d608cb52b89b2b248b9
-                  created: 1785172258657
-                  modified: 1785172310533
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784661572011.75
-                method: POST
-                body:
-                  mimeType: multipart/form-data
-                  params:
-                    - name: name
-                      value: User 3
-                      description: ""
-                      disabled: false
-                    - name: email
-                      value: user3@example.com
-                      description: ""
-                      disabled: false
-                    - name: password
-                      value: User@12345
-                      description: ""
-                      disabled: false
-                    - name: image
-                      value: ""
-                      description: ""
-                      disabled: false
-                      fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\User_3.jpg
-                      type: file
-                    - name: role
-                      value: user
-                      description: ""
-                      disabled: false
-                headers:
-                  - name: Content-Type
-                    value: multipart/form-data
-                scripts:
-                  afterResponse: >+
-                    const responseBody = insomnia.response.json()
-
-
-                    if (responseBody.user?._id) {
-                    	insomnia.environment.set("USER_3_ID", responseBody.user._id)	
-                    } else {
-                    	console.log("User ID was not saved. Response:", responseBody)
-                    }
-                    												 
-
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_1_ID }}"
-                name: Delete User 1
-                meta:
-                  id: req_b3bcab61e38c407a8499dfed3d52d802
-                  created: 1785172826328
-                  modified: 1785172826328
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784659829201.5
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_1_ID")
-                    	insomnia.environment.unset("USER_1_TOKEN")
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-          - name: Users 2
-            meta:
-              id: fld_a2f1520c88b24601be24069041c1902e
-              created: 1785180019812
-              modified: 1785697774955
-              sortKey: -1785697715084
-              description: ""
-            children:
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
-                name: Delete User 3
-                meta:
-                  id: req_4cf1061d72a04628bfa1c96f208dc2cd
-                  created: 1785180019812
-                  modified: 1785180019812
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784656343668.5
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_3_ID");
-                    	insomnia.environment.unset("USER_3_TOKEN");
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_2_ID }}"
-                name: Delete User 2
-                meta:
-                  id: req_7b705de9b2d0423eba4f39bc8f602b4f
-                  created: 1785180019812
-                  modified: 1785180019812
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784658086435
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_2_ID");
-                    	insomnia.environment.unset("USER_2_TOKEN");
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_1_ID }}"
-                name: Delete User 1
-                meta:
-                  id: req_a06365b3325641bdb9879af8c7ce7f8b
-                  created: 1785180019812
-                  modified: 1785180019812
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784659829201.5
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_1_ID")
-                    	insomnia.environment.unset("USER_1_TOKEN")
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
           - name: Delete Agents
             meta:
               id: fld_7831954ee69948b8be6bc6ffecde4407
               created: 1785188003635
-              modified: 1785697732381
-              sortKey: -1785697714934
+              modified: 1785718544759
+              sortKey: -1785697715084
               description: ""
             children:
               - url: "{{PORT}}/api/v1/agents/{{COLON}}"
@@ -7007,45 +6064,16 @@ collection:
             meta:
               id: fld_54ea3502ce224c98b78f284064ab49cf
               created: 1785320534529
-              modified: 1785697714783
-              sortKey: -1785697714734
+              modified: 1785717955963
+              sortKey: -1785697715234
               description: ""
             children:
               - url: "{{ _.PORT }}/api/v1/cases/{{ CASE_CLACKS }}"
-                name: User no puede borrar casos (CLACKS)
-                meta:
-                  id: req_4e5b29e2329e48eebaa58dc405e4cb3d
-                  created: 1785323948701
-                  modified: 1785325606564
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785323948701
-                method: DELETE
-                headers:
-                  - name: Authorization
-                    value: Bearer {{ _.USER_2_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204) {
-                    	insomnia.environment.unset("CASE_CLACKS")
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/cases/{{ CASE_CLACKS }}"
-                name: Admin borra casos (CLACKS)
+                name: Admin deletes CASE_CLACKS
                 meta:
                   id: req_aa114b0c10c24c5496b7bd3fd2c7f6f3
                   created: 1785325227895
-                  modified: 1785325624122
+                  modified: 1785717972091
                   isPrivate: false
                   description: ""
                   sortKey: -1785319528176
@@ -7070,11 +6098,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}"
-                name: Admin borra casos (GUILD)
+                name: Admin deletes CASE_GUILD
                 meta:
                   id: req_cc427f20e0a84207b806c341a474ec37
                   created: 1785341817456
-                  modified: 1785342232269
+                  modified: 1785717952259
                   isPrivate: false
                   description: ""
                   sortKey: -1785317317913.5
@@ -7102,37 +6130,10 @@ collection:
             meta:
               id: fld_2d97d20eacc14389ae758ebdb563f9ec
               created: 1785405839279
-              modified: 1785697721584
-              sortKey: -1785697714834
+              modified: 1785718549984
+              sortKey: -1785697715059
               description: ""
             children:
-              - url: "{{ _.BASE }}/api/v1/books/{{ _.NEW_BOOK_ID }}"
-                name: "27. Books: admin borra libro"
-                meta:
-                  id: req_586a6ae8721c4dff8ac657057039ab76
-                  created: 1781599120731
-                  modified: 1785678332130
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785678327406
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_1_TOKEN }}
-                    description: ""
-                    disabled: false
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_CLAY }}"
                 name: DELETE Book Feet of Clay (BK_CLAY)
                 meta:
@@ -7336,238 +6337,11 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - name: Users
-                meta:
-                  id: fld_8cd8fca4040c45268fef0a1cb11718b7
-                  created: 1783359057329
-                  modified: 1785697866045
-                  sortKey: -1785678327556
-                  description: ""
-                children:
-                  - url: http://localhost:3000/api/v1/users
-                    name: GET Users
-                    meta:
-                      id: req_0e2e9a9b46c74abb9ec8479a383a59b7
-                      created: 1781645819576
-                      modified: 1784830117706
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359062950
-                    method: GET
-                    headers:
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                      - name: Authorization
-                        value: Bearer {{}}
-                        description: ""
-                        disabled: false
-                    authentication:
-                      type: none
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: http://localhost:3000/api/v1/users/login
-                    name: LOGIN (Admin)
-                    meta:
-                      id: req_d445bf98063d44278a73fab3fb9ada1c
-                      created: 1781771813318
-                      modified: 1783416104019
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359062975
-                    method: POST
-                    body:
-                      mimeType: application/json
-                      text: |-
-                        {
-                            "email": "admin@example.com",
-                            "password": "Admin@12345"
-                        }
-                    headers:
-                      - name: Content-Type
-                        value: application/json
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: http://localhost:3000/api/v1/users/register
-                    name: Register USER (admin)
-                    meta:
-                      id: req_d854acf0c8dd4eadbbf9ba71e023617c
-                      created: 1783320396776
-                      modified: 1783417345971
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359062875
-                    method: POST
-                    body:
-                      mimeType: multipart/form-data
-                      params:
-                        - name: name
-                          value: The Admin
-                          description: ""
-                          disabled: false
-                        - name: email
-                          value: admin@example.com
-                          description: ""
-                          disabled: false
-                        - name: password
-                          value: Admin@12345
-                          description: ""
-                          disabled: false
-                        - name: image
-                          value: ""
-                          description: ""
-                          disabled: false
-                          fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\Admin.jpg
-                          type: file
-                        - name: role
-                          value: user
-                          description: ""
-                          disabled: false
-                    headers:
-                      - name: Content-Type
-                        value: multipart/form-data
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: http://localhost:3000/api/v1/users/6a4be6dc03cd8ad62b5f0182
-                    name: UPDATE Users
-                    meta:
-                      id: req_01c2fc23d076487b85906cc15fa4d53a
-                      created: 1783359113182
-                      modified: 1783359300506
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359063075
-                    method: PUT
-                    body:
-                      mimeType: application/json
-                      text: |-
-                        {
-                        	"name": "User TESTING UPDATE"
-                        }
-                    headers:
-                      - name: Content-Type
-                        value: application/json
-                      - name: Authorization
-                        value: Token
-                          eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4MzM1ODM5NSwiZXhwIjoxNzg1OTUwMzk1fQ.8gvDrbz_5ZU7LjRhrOOL9wCdUKYfqOoC1jo63sH-eys
-                        description: ""
-                        disabled: false
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: http://localhost:3000/api/v1/users/register
-                    name: Register USER (user)
-                    meta:
-                      id: req_a28917cc22e14145adf32a776146b150
-                      created: 1783415251479
-                      modified: 1783431020972
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359025950.5
-                    method: POST
-                    body:
-                      mimeType: multipart/form-data
-                      params:
-                        - name: name
-                          value: Visit the Infidel (user 2)
-                          description: ""
-                          disabled: false
-                        - name: email
-                          value: user2@example.com
-                          description: ""
-                          disabled: false
-                        - name: password
-                          value: User@12345
-                          description: ""
-                          disabled: false
-                        - name: image
-                          value: ""
-                          description: ""
-                          disabled: false
-                          fileName: C:\Users\GabrielaH\OneDrive\Documentos\backend-project-the-power\src\assets\images\Visit-the-Infidel-with-Explanatory-Pamphlets.jpg
-                          type: file
-                        - name: role
-                          value: user
-                          description: ""
-                          disabled: false
-                    headers:
-                      - name: Content-Type
-                        value: multipart/form-data
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
-                  - url: http://localhost:3000/api/v1/users/login
-                    name: LOGIN (user)
-                    meta:
-                      id: req_540c789035a74564b2edabb07ca119f7
-                      created: 1783416112121
-                      modified: 1783431620299
-                      isPrivate: false
-                      description: ""
-                      sortKey: -1783359062962.5
-                    method: POST
-                    body:
-                      mimeType: application/json
-                      text: |-
-                        {
-                            "email": "useruser@example.com",
-                            "password": "User@12345"
-                        }
-                    headers:
-                      - name: Content-Type
-                        value: application/json
-                      - name: User-Agent
-                        value: insomnia/12.6.0
-                        description: ""
-                        disabled: false
-                    authentication:
-                      type: none
-                    settings:
-                      renderRequestBody: true
-                      encodeUrl: true
-                      followRedirects: global
-                      cookies:
-                        send: true
-                        store: true
-                      rebuildPath: true
           - name: Delete Users
             meta:
               id: fld_48ab77f8601f418e904d8205392fb3b0
               created: 1785677176750
-              modified: 1785697739320
+              modified: 1785718539711
               sortKey: -1785697715034
               description: ""
             children:
@@ -7678,17 +6452,18 @@ cookieJar:
   meta:
     id: jar_066f478adab24011d8829858c39d0d4b1498f51d
     created: 1781496502637
-    modified: 1785697198005
+    modified: 1785717955959
 environments:
   name: Base Environment
   meta:
     id: env_066f478adab24011d8829858c39d0d4b1498f51d
     created: 1781496502636
-    modified: 1785697198007
+    modified: 1785717955961
     isPrivate: false
   data:
     PORT: http://localhost:3000
     ADMIN_ID: 6a4b64f80a48855343f2188e
+    WRONG_TOKEN: invalid-token
     ADMIN_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4NTY3OTIxMywiZXhwIjoxNzg4MjcxMjEzfQ.LfbeYOndrytNNmHX7yfJH1eo88e7j303eBVE-40sFL0
     VIMES: 6a6f4bd7bf510d910df974d8
     CHEERY: 6a6f4bd7bf510d910df974dc
@@ -7706,11 +6481,10 @@ environments:
     BK_MEN: 6a6f53a3df4fc26e7e790013
     BK_JINGO: 6a6f8c85df4fc26e7e790018
     BK_FIFTH: 6a6f8d5adf4fc26e7e790019
-    WRONG_TOKEN: invalid-token
-    USER_3_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmY0NzNlNzllZjUzMDVlODNjMDVlNSIsImlhdCI6MTc4NTY5NjM5MCwiZXhwIjoxNzg4Mjg4MzkwfQ.MKCbyk8OIKC7Htp_ABkJcy_IPEm6H3Tm1ontNett0ug
-    USER_2_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmY5MDhhZGY0ZmMyNmU3ZTc5MDAxYiIsImlhdCI6MTc4NTY5NjY5OCwiZXhwIjoxNzg4Mjg4Njk4fQ.9gwVrimuZJ96i05F_V6RJMfKwGVuRQh01LPjh8j9HL8
-    USER_1_ID: 6a6f908fdf4fc26e7e79001c
-    USER_1_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmY5MDhmZGY0ZmMyNmU3ZTc5MDAxYyIsImlhdCI6MTc4NTY5NjQwMywiZXhwIjoxNzg4Mjg4NDAzfQ.abzhrcGqMBt-MeK9w5tRw4ng2m6g7MT51usHYrJXZrQ
-    CASE_GUILD: 6a6f9264df4fc26e7e790021
-    CASE_CLACKS: 6a6f93addf4fc26e7e790023
+    USER_1_ID: 6a6fcd819c01a102dc48207a
+    USER_1_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmZjZDgxOWMwMWExMDJkYzQ4MjA3YSIsImlhdCI6MTc4NTcxMjAwNiwiZXhwIjoxNzg4MzA0MDA2fQ.mJMVv7ABIinCRpzsmDHTBhUprOHkzo5l4RKg6drFOIo
+    USER_2_ID: 6a6fcd8d9c01a102dc48207b
+    USER_2_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmZjZDhkOWMwMWExMDJkYzQ4MjA3YiIsImlhdCI6MTc4NTcxMjAxOCwiZXhwIjoxNzg4MzA0MDE4fQ.DaEx9a0pJsrzKC9lCpz2FX7ev4ET6bd_dXv26gFu56Q
+    CASE_CLACKS: 6a6fd0c29c01a102dc48207e
     "": ""
+    CASE_GUILD: 6a6fe0ed9c01a102dc482080
