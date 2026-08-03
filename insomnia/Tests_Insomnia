@@ -11,7 +11,7 @@ collection:
     meta:
       id: fld_82dbd7ef4996416c9688a09c6045a238
       created: 1784829625874
-      modified: 1785717955962
+      modified: 1785749174130
       sortKey: -1784829625874
       description: ""
     children:
@@ -162,35 +162,6 @@ collection:
                 send: true
                 store: true
               rebuildPath: true
-          - url: "{{PORT }}/api/v1/users/{{ _.USER_1_ID }}"
-            name: Admin gets User 2
-            meta:
-              id: req_4bcc4970839944168fb6acfcbf07a4ca
-              created: 1785716441589
-              modified: 1785716569478
-              isPrivate: false
-              description: ""
-              sortKey: -1785678089210
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/12.6.0
-                description: ""
-                disabled: false
-              - name: Authorization
-                value: Bearer {{ _.ADMIN_TOKEN }}
-                description: ""
-                disabled: false
-            authentication:
-              type: none
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
           - name: 04.01 Read and permission checks
             meta:
               id: fld_6b065eaecf944c8993252eb0037736c6
@@ -227,7 +198,7 @@ collection:
                 meta:
                   id: req_b6637ee261dd43bebc161ef8a8c59942
                   created: 1781598767123
-                  modified: 1785677913563
+                  modified: 1785750308182
                   isPrivate: false
                   description: ""
                   sortKey: -1785677563328
@@ -249,18 +220,9 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.USER_3_TOKEN }}
+                    value: Bearer {{ _.USER_3_TOKEN }}
                     description: ""
                     disabled: false
-                scripts:
-                  afterResponse: |-
-                    const responseBody = insomnia.response.json();
-
-                    if (responseBody?._id){
-                    		insomnia.environment.set("BK_MEN")
-                    } else {
-                    	console.log("Didn't set Book ID ", responseBody);
-                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -282,16 +244,50 @@ collection:
                 meta:
                   id: req_b65ca9cc227d431a8b7ded7805df1881
                   created: 1785679819125
-                  modified: 1785679823458
+                  modified: 1785750536721
                   isPrivate: false
                   description: ""
-                  sortKey: -1785677993384
+                  sortKey: -1785680291590.25
                 method: GET
                 headers:
                   - name: User-Agent
                     value: insomnia/12.6.0
                     description: ""
                     disabled: false
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
+                name: Delete User 3
+                meta:
+                  id: req_075fec64187c4ce68dbf8c7742eda48e
+                  created: 1785750476426
+                  modified: 1785750534000
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785679525521.5
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("USER_3_ID");
+                    	insomnia.environment.unset("USER_3_TOKEN");
+                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -313,7 +309,7 @@ collection:
                     meta:
                       id: req_f2841736dcb546b7927dd7cf528f9c96
                       created: 1785677989646
-                      modified: 1785681077608
+                      modified: 1785749585545
                       isPrivate: false
                       description: ""
                       sortKey: -1785681061171
@@ -335,7 +331,7 @@ collection:
                         description: ""
                         disabled: false
                       - name: Authorization
-                        value: Token {{ _.ADMIN_TOKEN }}
+                        value: Bearer {{ _.ADMIN_TOKEN }}
                         description: ""
                         disabled: false
                     scripts:
@@ -387,7 +383,7 @@ collection:
                     meta:
                       id: req_e44ad893fd844b449aaf40437a5ec25b
                       created: 1785680395223
-                      modified: 1785681073952
+                      modified: 1785749590054
                       isPrivate: false
                       description: ""
                       sortKey: -1785681061071
@@ -407,7 +403,7 @@ collection:
                         description: ""
                         disabled: false
                       - name: Authorization
-                        value: Token {{ _.ADMIN_TOKEN }}
+                        value: Bearer {{ _.ADMIN_TOKEN }}
                         description: ""
                         disabled: false
                     settings:
@@ -501,7 +497,7 @@ collection:
                     meta:
                       id: req_05d1c3eda29645c9889bcf9025797871
                       created: 1785694778267
-                      modified: 1785694778267
+                      modified: 1785750344338
                       isPrivate: false
                       description: ""
                       sortKey: -1785685738619
@@ -522,15 +518,6 @@ collection:
                         value: Bearer {{ _.ADMIN_TOKEN }}
                         description: ""
                         disabled: false
-                    scripts:
-                      afterResponse: |-
-                        const responseBody = insomnia.response.json()
-
-                        if (responseBody?._id){
-                        	insomnia.environment.set("BK_SNUFF", responseBody._id);
-                        } else {
-                        	console.log("Didn't set Book ID 	", responseBody);
-                        }
                     settings:
                       renderRequestBody: true
                       encodeUrl: true
@@ -700,11 +687,11 @@ collection:
                         store: true
                       rebuildPath: true
                   - url: "{{ _.PORT }}/api/v1/books/{{ _.BK_GUARDS }}/agents/{{ _.SALLY }}"
-                    name: Admin removes Agent to Book (SALLY - BK_GUARDS)
+                    name: Admin removes Agent from Book (SALLY - BK_GUARDS)
                     meta:
                       id: req_a52a88ec36d8407bb417f77160dd7bfc
                       created: 1785694637347
-                      modified: 1785694643080
+                      modified: 1785751483797
                       isPrivate: false
                       description: ""
                       sortKey: -1785692029409
@@ -1127,7 +1114,7 @@ collection:
                 meta:
                   id: req_3b7b4e5248614c6c85c8e6eea286e492
                   created: 1784670911043
-                  modified: 1785173065489
+                  modified: 1785750002387
                   isPrivate: false
                   description: ""
                   sortKey: -1785172553704
@@ -1138,7 +1125,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -1346,7 +1333,7 @@ collection:
                 meta:
                   id: req_67d191f705b1494c81e1067c2c708ada
                   created: 1785173077138
-                  modified: 1785173091622
+                  modified: 1785750008810
                   isPrivate: false
                   description: ""
                   sortKey: -1785172553604
@@ -1357,7 +1344,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -1657,7 +1644,7 @@ collection:
                 meta:
                   id: req_b21612ca37bf4a57ae1ab586766c743c
                   created: 1785173191450
-                  modified: 1785674822822
+                  modified: 1785750090496
                   isPrivate: false
                   description: ""
                   sortKey: -1785172553763.375
@@ -1668,7 +1655,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Bearer {{ _.USER_1_ID }}
+                    value: Bearer {{ _.USER_1_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -2116,7 +2103,7 @@ collection:
                 meta:
                   id: req_3130f9c40be64b0db8ea5a1ff042e1e1
                   created: 1785175482532
-                  modified: 1785674047354
+                  modified: 1785750165116
                   isPrivate: false
                   description: ""
                   sortKey: -1785172553821.1875
@@ -2127,7 +2114,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Bearer {{ _.USER_3_WRONG_TOKEN }}
+                    value: Bearer {{ _.WRONG_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -2514,7 +2501,7 @@ collection:
                 meta:
                   id: req_e5e2dcbbc5cc44a88cab25678badf6de
                   created: 1785175482532
-                  modified: 1785674302844
+                  modified: 1785749334692
                   isPrivate: false
                   description: ""
                   sortKey: -1785172553704.1953
@@ -2525,7 +2512,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -2614,7 +2601,7 @@ collection:
                 meta:
                   id: req_3424c971eb91443b8d4f75cc1f10608c
                   created: 1785671040592
-                  modified: 1785671040592
+                  modified: 1785749375768
                   isPrivate: false
                   description: ""
                   sortKey: -1784656343668.5
@@ -2625,7 +2612,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -2648,7 +2635,7 @@ collection:
                 meta:
                   id: req_9dd76dd13afb42739c8b4e89464c27ae
                   created: 1785671040592
-                  modified: 1785671040592
+                  modified: 1785749381035
                   isPrivate: false
                   description: ""
                   sortKey: -1784659829201.5
@@ -2659,7 +2646,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -2682,7 +2669,7 @@ collection:
                 meta:
                   id: req_847d74eb05da4ca694e637c103db63ca
                   created: 1785677098041
-                  modified: 1785677098041
+                  modified: 1785749370806
                   isPrivate: false
                   description: ""
                   sortKey: -1784657215051.75
@@ -2693,7 +2680,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -2823,17 +2810,12 @@ collection:
                 meta:
                   id: req_c1f7236758f44789bd2090b59fb5da8c
                   created: 1784615885311
-                  modified: 1785714928268
+                  modified: 1785750731073
                   isPrivate: false
                   description: ""
                   sortKey: -1785315107576
                 method: PUT
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: Authorization
                     value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
@@ -2849,21 +2831,16 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ PORT}}/api/v1/cases/{{CASE_CLACKS}}/assign/{{ _.USER_3_ID }}"
-                name: Admin assigns CLACKS to User 3 - Must fail - Check Cloudinary
+                name: Admin reassigns CLACKS to User 3 - relationship is not duplicated
                 meta:
                   id: req_4fb7633ff4b74b469f4f6e19e2faff91
                   created: 1785344649270
-                  modified: 1785717215681
+                  modified: 1785750722712
                   isPrivate: false
                   description: ""
                   sortKey: -1785315107563.5
                 method: PUT
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: Authorization
                     value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
@@ -3314,14 +3291,14 @@ collection:
                 meta:
                   id: req_b0945043a903415b8413e6135eaa876b
                   created: 1785715392056
-                  modified: 1785715415082
+                  modified: 1785749708355
                   isPrivate: false
                   description: ""
                   sortKey: -1785369841605.8125
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3339,14 +3316,14 @@ collection:
                 meta:
                   id: req_8c464282d27546f38cfe92dfc6b85035
                   created: 1785715434067
-                  modified: 1785715434067
+                  modified: 1785749714554
                   isPrivate: false
                   description: ""
                   sortKey: -1785369841612.0625
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3359,11 +3336,11 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-          - name: 03.06 Remove Agents from Cases
+          - name: 05.06 Remove Agents from Cases
             meta:
               id: fld_d4e135548f494dba9596a1cf3e183888
               created: 1785419348555
-              modified: 1785716130216
+              modified: 1785751140908
               sortKey: -1785181014780.295
               description: ""
             children:
@@ -3427,14 +3404,14 @@ collection:
                 meta:
                   id: req_721f1c10708943dc890b676086de2e3a
                   created: 1785715451263
-                  modified: 1785715455452
+                  modified: 1785749696979
                   isPrivate: false
                   description: ""
                   sortKey: -1785419357273
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3773,14 +3750,14 @@ collection:
                 meta:
                   id: req_07ba9f7ad8b14a8d8bbae6d1f99d1cdb
                   created: 1783509187637
-                  modified: 1785713896889
+                  modified: 1785749791262
                   isPrivate: false
                   description: ""
                   sortKey: -1785713896820
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_3_TOKEN }}
+                    value: Bearer {{ _.USER_3_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3798,14 +3775,14 @@ collection:
                 meta:
                   id: req_76e2a9e20d484827af61749f411b01e2
                   created: 1783509287038
-                  modified: 1785713972536
+                  modified: 1785749738381
                   isPrivate: false
                   description: ""
                   sortKey: -1785713896810.625
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_2_TOKEN }}
+                    value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3886,14 +3863,14 @@ collection:
                 meta:
                   id: req_dabadf394e1d4895a5b3b53f1941fe27
                   created: 1785182203699
-                  modified: 1785713970138
+                  modified: 1785749749554
                   isPrivate: false
                   description: ""
                   sortKey: -1785713896813.75
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.USER_1_TOKEN }}
+                    value: Bearer {{ _.USER_1_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -3930,8 +3907,8 @@ collection:
             meta:
               id: fld_58af05b3fcfa496bb43970f64696c701
               created: 1785697607997
-              modified: 1785717438679
-              sortKey: -1785181014780.1973
+              modified: 1785751005998
+              sortKey: -1785181014780.2705
               description: ""
             children:
               - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}"
@@ -3964,7 +3941,7 @@ collection:
                 meta:
                   id: req_3b311c68d12d4afbbb25ab13ed3763ed
                   created: 1785180084802
-                  modified: 1785717264397
+                  modified: 1785749625459
                   isPrivate: false
                   description: ""
                   sortKey: -1785697814915
@@ -3975,7 +3952,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -4085,14 +4062,14 @@ collection:
                 meta:
                   id: req_cbc547f90a72449ea5d99ca9235e9b3d
                   created: 1785717296195
-                  modified: 1785717416691
+                  modified: 1785749671348
                   isPrivate: false
                   description: ""
                   sortKey: -1785697814927.5
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -4110,14 +4087,14 @@ collection:
                 meta:
                   id: req_9ecf158ad168447cb514915465c69a81
                   created: 1785717397541
-                  modified: 1785717477886
+                  modified: 1785749678555
                   isPrivate: false
                   description: ""
                   sortKey: -1785697814896.25
                 method: GET
                 headers:
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 authentication:
@@ -4292,7 +4269,7 @@ collection:
                 meta:
                   id: req_d2962fd96272460b838c1bd7b3963f04
                   created: 1784830391107
-                  modified: 1784963034726
+                  modified: 1785749466131
                   isPrivate: false
                   description: ""
                   sortKey: -1784963025724
@@ -4303,7 +4280,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -4600,7 +4577,7 @@ collection:
                 meta:
                   id: req_f3dac605b73f4d34b2097b22cbfedbcf
                   created: 1785145849034
-                  modified: 1785145853264
+                  modified: 1785749474487
                   isPrivate: false
                   description: ""
                   sortKey: -1785001217914
@@ -4611,7 +4588,7 @@ collection:
                     description: ""
                     disabled: false
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -4823,7 +4800,7 @@ collection:
             meta:
               id: req_63515b2d5e9248e29a47d8340c8b9d82
               created: 1785671040592
-              modified: 1785677120134
+              modified: 1785749514987
               isPrivate: false
               description: ""
               sortKey: -1785184581743.3125
@@ -4834,7 +4811,7 @@ collection:
                 description: ""
                 disabled: false
               - name: Authorization
-                value: Token {{ _.ADMIN_TOKEN }}
+                value: Bearer {{ _.ADMIN_TOKEN }}
                 description: ""
                 disabled: false
             scripts:
@@ -4883,7 +4860,7 @@ collection:
                 meta:
                   id: req_314baec5ec684c82b1716155e21d36ac
                   created: 1783529971733
-                  modified: 1785676317229
+                  modified: 1785749504052
                   isPrivate: false
                   description: "Este es el caso que se estaba duplicando. Ver # Debug de agentes
                     (referencia) en dev-notes.md"
@@ -4922,7 +4899,7 @@ collection:
                   - name: Content-Type
                     value: multipart/form-data
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -5140,7 +5117,7 @@ collection:
                 meta:
                   id: req_ef820a5d8a054284b7191c651d28e371
                   created: 1784647931580
-                  modified: 1785676427313
+                  modified: 1785750420783
                   isPrivate: false
                   description: ""
                   sortKey: -1785185245751
@@ -5181,16 +5158,6 @@ collection:
                     value: Bearer {{ _.USER_2_TOKEN }}
                     description: ""
                     disabled: false
-                scripts:
-                  afterResponse: >-
-                    const responseBody = insomnia.response.json();
-
-
-                    if (responseBody?._id) {
-                    	insomnia.environment.set("DORLF", responseBody._id);
-                    } else {
-                    	console.log("Agent ID was not saved. Response:", responseBody);
-                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -5332,7 +5299,7 @@ collection:
                 meta:
                   id: req_c99e598b4b31467e94509bb29f1a578d
                   created: 1785186162307
-                  modified: 1785676762022
+                  modified: 1785750393400
                   isPrivate: false
                   description: ""
                   sortKey: -1785185245626
@@ -5373,16 +5340,6 @@ collection:
                     value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
-                scripts:
-                  afterResponse: >
-                    const responseBody = insomnia.response.json();
-
-
-                    if (responseBody?._id){
-                    	insomnia.environment.set("DOWNSPOUT", responseBody._id);	
-                    } else {
-                    	console.log("Agent ID was not saved. Response:", responseBody);
-                    }
                 settings:
                   renderRequestBody: true
                   encodeUrl: true
@@ -5880,34 +5837,29 @@ collection:
         meta:
           id: fld_a8c86910a92943aa9ffc4b9798b23739
           created: 1785697678405
-          modified: 1785717955963
-          sortKey: -1784829655139.9258
+          modified: 1785751605703
+          sortKey: -1784829647823.5664
           description: ""
         children:
           - name: Delete Agents
             meta:
               id: fld_7831954ee69948b8be6bc6ffecde4407
               created: 1785188003635
-              modified: 1785718544759
+              modified: 1785749081489
               sortKey: -1785697715084
               description: ""
             children:
               - url: "{{PORT}}/api/v1/agents/{{COLON}}"
-                name: Admin delete Agent Colon
+                name: Admin delete COLON
                 meta:
                   id: req_189431c934154f90aab9d9efd8560903
                   created: 1781498422867
-                  modified: 1785344049376
+                  modified: 1785751365325
                   isPrivate: false
                   description: ""
                   sortKey: -1785188047717
                 method: DELETE
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: User-Agent
                     value: insomnia/12.6.0
                     description: ""
@@ -5931,23 +5883,18 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT}}/api/v1/agents/{{PESSIMAL}}"
-                name: Admin borra agente (PESSIMAL)
+                name: Admin deletes PESSIMAL
                 meta:
                   id: req_a97b4081f8eb4b61abd5e749513bade5
                   created: 1783533050927
-                  modified: 1785188620887
+                  modified: 1785751339136
                   isPrivate: false
                   description: ""
                   sortKey: -1785188047417
                 method: DELETE
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
+                    value: Bearer {{ _.ADMIN_TOKEN }}
                     description: ""
                     disabled: false
                 scripts:
@@ -5965,21 +5912,16 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT}}/api/v1/agents/{{ _.NOBBY }}"
-                name: Admin tries to delete Nobby
+                name: Admin deletes NOBBY
                 meta:
                   id: req_6ef34858113146dbb01735b56e736b76
                   created: 1784647744277
-                  modified: 1785344086126
+                  modified: 1785751355712
                   isPrivate: false
                   description: ""
                   sortKey: -1785188047667
                 method: DELETE
-                body:
-                  mimeType: application/json
-                  text: ""
                 headers:
-                  - name: Content-Type
-                    value: application/json
                   - name: User-Agent
                     value: insomnia/12.6.0
                     description: ""
@@ -6003,11 +5945,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ PORT}}/api/v1/agents/{{ SALLY }}"
-                name: Admin borra a la agente (SALLY)
+                name: Admin deletes SALLY
                 meta:
                   id: req_b311c07f692f43e29d918a5c5306acc2
                   created: 1784656838612
-                  modified: 1785344101351
+                  modified: 1785751331206
                   isPrivate: false
                   description: ""
                   sortKey: -1785188047517
@@ -6032,11 +5974,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{ _.PORT }}/api/v1/agents/{{ _.DOWNSPOUT }}"
-                name: Admin deletes agent DOWNSPOUT
+                name: Admin deletes DOWNSPOUT
                 meta:
                   id: req_dff453d0ff224d7782f5955a6229707f
                   created: 1785188079946
-                  modified: 1785188101242
+                  modified: 1785751346505
                   isPrivate: false
                   description: ""
                   sortKey: -1785188047617
@@ -6060,11 +6002,40 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/agents/{{ _.DORFL }}"
+                name: Admin deletes DORFL
+                meta:
+                  id: req_7cdea56bc5fc470c9268668145420c1c
+                  created: 1785750774389
+                  modified: 1785751324575
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047567
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("DORFL")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
           - name: Delete Cases
             meta:
               id: fld_54ea3502ce224c98b78f284064ab49cf
               created: 1785320534529
-              modified: 1785717955963
+              modified: 1785749174130
               sortKey: -1785697715234
               description: ""
             children:
@@ -6097,49 +6068,20 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}"
-                name: Admin deletes CASE_GUILD
-                meta:
-                  id: req_cc427f20e0a84207b806c341a474ec37
-                  created: 1785341817456
-                  modified: 1785717952259
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1785317317913.5
-                method: DELETE
-                headers:
-                  - name: Authorization
-                    value: Bearer {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204) {
-                    	insomnia.environment.unset("CASE_GUILD")
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
           - name: Delete Books
             meta:
               id: fld_2d97d20eacc14389ae758ebdb563f9ec
               created: 1785405839279
-              modified: 1785718549984
-              sortKey: -1785697715059
+              modified: 1785750814341
+              sortKey: -1785697715159
               description: ""
             children:
               - url: "{{PORT }}/api/v1/books/{{ _.BK_CLAY }}"
-                name: DELETE Book Feet of Clay (BK_CLAY)
+                name: DELETE Book (BK_CLAY)
                 meta:
                   id: req_53b8217d82f34c239572c8597ae3792f
                   created: 1785353957998
-                  modified: 1785695338661
+                  modified: 1785751240235
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327356
@@ -6164,11 +6106,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_SNUFF }}"
-                name: DELETE Book Feet of Clay (BK_SNUFF)
+                name: DELETE Book (BK_SNUFF)
                 meta:
                   id: req_422d828e4311494aabc239ecd9cc9d92
                   created: 1785404447577
-                  modified: 1785678329967
+                  modified: 1785751179539
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327456
@@ -6193,11 +6135,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_JINGO }}"
-                name: DELETE Book Feet of Clay (BK_JINGO)
+                name: DELETE Book (BK_JINGO)
                 meta:
                   id: req_707c64fbe7534f15907a043f6e4c3bf8
                   created: 1785404485969
-                  modified: 1785695319364
+                  modified: 1785751189653
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327381
@@ -6222,11 +6164,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_THUD }}"
-                name: DELETE Book Feet of Clay (BK_THUD)
+                name: DELETE Book (BK_THUD)
                 meta:
                   id: req_ef0ee5e468e147bc95746ae06e9712c5
                   created: 1785404793287
-                  modified: 1785678335775
+                  modified: 1785751203400
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327368.5
@@ -6251,11 +6193,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_FIFTH }}"
-                name: DELETE Book Feet of Clay (BK_FIFTH)
+                name: DELETE Book (BK_FIFTH)
                 meta:
                   id: req_9683bb7bb4b24903994d352e24a0535a
                   created: 1785404820701
-                  modified: 1785678337442
+                  modified: 1785751229057
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327362.25
@@ -6280,11 +6222,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_GUARDS }}"
-                name: DELETE Book Feet of Clay (BK_GUARDS)
+                name: DELETE Book (BK_GUARDS)
                 meta:
                   id: req_dff5a5f03af94d11a50611144c579122
                   created: 1785404871140
-                  modified: 1785678339308
+                  modified: 1785751217692
                   isPrivate: false
                   description: ""
                   sortKey: -1785678327365.375
@@ -6309,11 +6251,11 @@ collection:
                     store: true
                   rebuildPath: true
               - url: "{{PORT }}/api/v1/books/{{ _.BK_MEN }}"
-                name: DELETE Book Feet of Clay (BK_MEN)
+                name: DELETE Book (BK_MEN)
                 meta:
                   id: req_3ccce9510d07473ba2b4deea2a8344de
                   created: 1785680737226
-                  modified: 1785680758793
+                  modified: 1785751251144
                   isPrivate: false
                   description: ""
                   sortKey: -1785678238832
@@ -6341,8 +6283,8 @@ collection:
             meta:
               id: fld_48ab77f8601f418e904d8205392fb3b0
               created: 1785677176750
-              modified: 1785718539711
-              sortKey: -1785697715034
+              modified: 1785750820232
+              sortKey: -1785697715121.5
               description: ""
             children:
               - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_2_ID }}"
@@ -6370,40 +6312,6 @@ collection:
                     === 204){ 
                     	insomnia.environment.unset("USER_2_ID");
                     	insomnia.environment.unset("USER_2_TOKEN");
-                    }
-                settings:
-                  renderRequestBody: true
-                  encodeUrl: true
-                  followRedirects: global
-                  cookies:
-                    send: true
-                    store: true
-                  rebuildPath: true
-              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
-                name: Delete User 3
-                meta:
-                  id: req_66260cee9c6a48deacb23802cf70446e
-                  created: 1785677176750
-                  modified: 1785677176750
-                  isPrivate: false
-                  description: ""
-                  sortKey: -1784656343668.5
-                method: DELETE
-                headers:
-                  - name: User-Agent
-                    value: insomnia/12.6.0
-                    description: ""
-                    disabled: false
-                  - name: Authorization
-                    value: Token {{ _.ADMIN_TOKEN }}
-                    description: ""
-                    disabled: false
-                scripts:
-                  afterResponse: >-
-                    if (insomnia.response.code === 200 || insomnia.response.code
-                    === 204){ 
-                    	insomnia.environment.unset("USER_3_ID");
-                    	insomnia.environment.unset("USER_3_TOKEN");
                     }
                 settings:
                   renderRequestBody: true
@@ -6447,44 +6355,606 @@ collection:
                     send: true
                     store: true
                   rebuildPath: true
+      - name: 06 Emergency Clean-Up - Don't Run Normally
+        meta:
+          id: fld_c246c506c10d401f800934328cf402b6
+          created: 1785750914039
+          modified: 1785750914039
+          sortKey: -1784829640506.963
+          description: ""
+        children:
+          - name: Delete Cases
+            meta:
+              id: fld_1c0b1441e5a74ef58665115782f12ab6
+              created: 1785750914039
+              modified: 1785750914039
+              sortKey: -1785697715234
+              description: ""
+            children:
+              - url: "{{ _.PORT }}/api/v1/cases/{{ _.CASE_GUILD }}"
+                name: Admin deletes CASE_GUILD
+                meta:
+                  id: req_b717eda40f314e5bb66d82793f042d81
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785317317913.5
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204) {
+                    	insomnia.environment.unset("CASE_GUILD")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/cases/{{ CASE_CLACKS }}"
+                name: Admin deletes CASE_CLACKS
+                meta:
+                  id: req_dd27daaecbb343ba946852353bcf850d
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785319528176
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204) {
+                    	insomnia.environment.unset("CASE_CLACKS")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: Delete Users
+            meta:
+              id: fld_7ddee6e6c86648008b5a76d4ddf714a5
+              created: 1785750914039
+              modified: 1785750914039
+              sortKey: -1785697715121.5
+              description: ""
+            children:
+              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_2_ID }}"
+                name: Delete User 2
+                meta:
+                  id: req_90be0333aa83415f8282686ac32e900d
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1784657215051.75
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Token {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("USER_2_ID");
+                    	insomnia.environment.unset("USER_2_TOKEN");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_1_ID }}"
+                name: Delete User 1
+                meta:
+                  id: req_cb2b7b7c6fc34be3955218749c11129b
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1784659829201.5
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Token {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("USER_1_ID")
+                    	insomnia.environment.unset("USER_1_TOKEN")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/users/{{ _.USER_3_ID }}"
+                name: Delete User 3
+                meta:
+                  id: req_db56346bdf254a6d8150f0a857716a72
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1784656343668.5
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Token {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("USER_3_ID");
+                    	insomnia.environment.unset("USER_3_TOKEN");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: Delete Agents
+            meta:
+              id: fld_e0a1434541414041b9ed83885a21fb4a
+              created: 1785750914039
+              modified: 1785750914039
+              sortKey: -1785697715084
+              description: ""
+            children:
+              - url: "{{PORT}}/api/v1/agents/{{PESSIMAL}}"
+                name: Admin deletes Agent PESSIMAL
+                meta:
+                  id: req_2a35018a25a947caabdf000cfb767351
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047417
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("PESSIMAL")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT}}/api/v1/agents/{{COLON}}"
+                name: Admin delete Agent Colon
+                meta:
+                  id: req_2d8a82da8ca6465faa41ab7c3bb3e23b
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047717
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("COLON");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ PORT}}/api/v1/agents/{{ SALLY }}"
+                name: Admin deletes Agente SALLY
+                meta:
+                  id: req_301e6202c08144e4b88cca8e86570abf
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047517
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("SALLY");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/agents/{{ _.DOWNSPOUT }}"
+                name: Admin deletes Agent DOWNSPOUT
+                meta:
+                  id: req_7c0f500f59cf40ce8048151905bb782b
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047617
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("DOWNSPOUT")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{ _.PORT }}/api/v1/agents/{{ _.DORFL }}"
+                name: Admin deletes Agent DORFL
+                meta:
+                  id: req_87d7837ab5cb49149427146a370c90bc
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047567
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("DORFL")
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT}}/api/v1/agents/{{ _.NOBBY }}"
+                name: Admin deletes Agent Nobby
+                meta:
+                  id: req_dc7c7810891e46518aaf905d33c21050
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785188047667
+                method: DELETE
+                headers:
+                  - name: User-Agent
+                    value: insomnia/12.6.0
+                    description: ""
+                    disabled: false
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("NOBBY");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+          - name: Delete Books
+            meta:
+              id: fld_f429df0e66b045efb1fa5c55a58d9d9e
+              created: 1785750914039
+              modified: 1785750914039
+              sortKey: -1785697715159
+              description: ""
+            children:
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_THUD }}"
+                name: DELETE Book Feet of Clay (BK_THUD)
+                meta:
+                  id: req_01537113ec7e4aae9f3ae36446abc900
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327368.5
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_THUD");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_JINGO }}"
+                name: DELETE Book Feet of Clay (BK_JINGO)
+                meta:
+                  id: req_2827e097030d4c318e7183c2399cee04
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327381
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_JINGO");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_GUARDS }}"
+                name: DELETE Book Feet of Clay (BK_GUARDS)
+                meta:
+                  id: req_6742aaa626f34a86a1d5f5e190d1a92f
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327365.375
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_GUARDS");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_MEN }}"
+                name: DELETE Book Feet of Clay (BK_MEN)
+                meta:
+                  id: req_9499ae0566a143a3a274f12a2e09ea1d
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678238832
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_MEN");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_SNUFF }}"
+                name: DELETE Book Feet of Clay (BK_SNUFF)
+                meta:
+                  id: req_cdb2749d0dd74a6e8811ba31465b5d0f
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327456
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_SNUFF");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_CLAY }}"
+                name: DELETE Book Feet of Clay (BK_CLAY)
+                meta:
+                  id: req_fba75f85ac9d47fe8e04cff2878ae92c
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327356
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_CLAY");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
+              - url: "{{PORT }}/api/v1/books/{{ _.BK_FIFTH }}"
+                name: DELETE Book Feet of Clay (BK_FIFTH)
+                meta:
+                  id: req_fbf85b66f9c44c90a010850dd35feb8c
+                  created: 1785750914039
+                  modified: 1785750914039
+                  isPrivate: false
+                  description: ""
+                  sortKey: -1785678327362.25
+                method: DELETE
+                headers:
+                  - name: Authorization
+                    value: Bearer {{ _.ADMIN_TOKEN }}
+                    description: ""
+                    disabled: false
+                scripts:
+                  afterResponse: >-
+                    if (insomnia.response.code === 200 || insomnia.response.code
+                    === 204){ 
+                    	insomnia.environment.unset("BK_FIFTH");
+                    }
+                settings:
+                  renderRequestBody: true
+                  encodeUrl: true
+                  followRedirects: global
+                  cookies:
+                    send: true
+                    store: true
+                  rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
     id: jar_066f478adab24011d8829858c39d0d4b1498f51d
     created: 1781496502637
-    modified: 1785717955959
+    modified: 1785749174127
 environments:
   name: Base Environment
   meta:
     id: env_066f478adab24011d8829858c39d0d4b1498f51d
     created: 1781496502636
-    modified: 1785717955961
+    modified: 1785752096824
     isPrivate: false
   data:
     PORT: http://localhost:3000
     ADMIN_ID: 6a4b64f80a48855343f2188e
     WRONG_TOKEN: invalid-token
-    ADMIN_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGI2NGY4MGE0ODg1NTM0M2YyMTg4ZSIsImlhdCI6MTc4NTY3OTIxMywiZXhwIjoxNzg4MjcxMjEzfQ.LfbeYOndrytNNmHX7yfJH1eo88e7j303eBVE-40sFL0
-    VIMES: 6a6f4bd7bf510d910df974d8
-    CHEERY: 6a6f4bd7bf510d910df974dc
-    DETRITUS: 6a6f4bd7bf510d910df974db
-    ANGUA: 6a6f4bd7bf510d910df974da
-    CARROT: 6a6f4bd7bf510d910df974d9
-    DORLF: 6a6f4daadf4fc26e7e790004
-    PESSIMAL: 6a6f4dbbdf4fc26e7e790005
-    SALLY: 6a6f4dd7df4fc26e7e790006
-    NOBBY: 6a6f4ddbdf4fc26e7e790007
-    COLON: 6a6f4de7df4fc26e7e790008
-    BK_GUARDS: 6a6f4fa3df4fc26e7e79000c
-    BK_THUD: 6a6f843adf4fc26e7e790015
-    BK_CLAY: 6a6f4fafdf4fc26e7e79000f
-    BK_MEN: 6a6f53a3df4fc26e7e790013
-    BK_JINGO: 6a6f8c85df4fc26e7e790018
-    BK_FIFTH: 6a6f8d5adf4fc26e7e790019
-    USER_1_ID: 6a6fcd819c01a102dc48207a
-    USER_1_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmZjZDgxOWMwMWExMDJkYzQ4MjA3YSIsImlhdCI6MTc4NTcxMjAwNiwiZXhwIjoxNzg4MzA0MDA2fQ.mJMVv7ABIinCRpzsmDHTBhUprOHkzo5l4RKg6drFOIo
-    USER_2_ID: 6a6fcd8d9c01a102dc48207b
-    USER_2_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNmZjZDhkOWMwMWExMDJkYzQ4MjA3YiIsImlhdCI6MTc4NTcxMjAxOCwiZXhwIjoxNzg4MzA0MDE4fQ.DaEx9a0pJsrzKC9lCpz2FX7ev4ET6bd_dXv26gFu56Q
-    CASE_CLACKS: 6a6fd0c29c01a102dc48207e
     "": ""
-    CASE_GUILD: 6a6fe0ed9c01a102dc482080
