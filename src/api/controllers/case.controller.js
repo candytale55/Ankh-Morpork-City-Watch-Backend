@@ -7,6 +7,13 @@ const User = require('../models/User');
 /* ----------------------------------- */
 
 /**
+ * Escapes special characters in a string to safely use it in a regular expression.
+ */
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/* ----------------------------------- */
+
+/**
  * Returns all cases with the assigned users and agents populated.
  */
 const getCases = async (req, res) => {
@@ -47,17 +54,53 @@ const getCase = async (req, res) => {
  */
 const postCase = async (req, res) => {
     try {
-        delete req.body.assignedTo; // Prevent assigning users during case creation
-        delete req.body.createdBy; // Prevent setting createdBy during case creation
 
-        const normalizedCaseName = req.body.name.trim();
+	const createData = { ...req.body };
+
+	// Prevent protected relationships from being set during creation.
+        delete createData.assignedTo; 
+        delete createData.createdBy;
+
+	// Validate title
+	if (typeof createData.title !== 'string'){
+	    return res.status(400).json({
+	      message: 'Case title must be a string' 
+	  });
+	}
+
+	// Normalize title
+	const normalizedTitle = createData.title.trim();
+
+	if (!normalizedTitle){
+	    return res.status(400).json({
+		message: 'Case title cannot be empty'
+	    });
+	}
+
+	// Check for duplicate title (case-insensitive)
+	const duplicateCase = await Case.findOne({
+	    title: {
+		$regex: `^${escapeRegExp(normalizedTitle)}$`,
+		$options: 'i'
+	    }
+	});
+
+	if (duplicateCase) {
+	    return res.status(409).json({
+		message:  `A case titled "${normalizedTitle}" already exists`
+	    });
+	}
+
+	createData.title = normalizedTitle;
+
 
         const newCase = new Case({
-            ...req.body,
+            ...createData,
             createdBy: req.user._id // Set to the authenticated user's ID
         });
         
         const savedCase = await newCase.save();
+
         return res.status(201).json(savedCase);
     } catch (error) {
         return res.status(400).json({ message: 'Error posting case', error: error.message });
