@@ -62,7 +62,7 @@ const register = async (req, res) => {
 
         if (userDuplicated) {
             await rollbackUploadedUserImage(req.file);
-            return res.status(400).json("Error: User already exists");
+            return res.status(409).json("Error: User already exists");
         }
 
         const savedUser = await newUser.save();
