@@ -114,21 +114,86 @@ const postCase = async (req, res) => {
  */
 const updateCase = async (req, res) => {
     try {
+
         const { id } = req.params;
-        delete req.body.assignedTo; // Prevent assigning users during case update
-        delete req.body.createdBy; // Prevent setting createdBy during case update
+
+
+	// Check if the case exists before attempting to update
+	const currentCase = await Case.findById(id);
+
+	if (!currentCase){
+	    return res.status(404).json({
+		message: 'Case not found'
+	    });
+	}
+
+	const updateData = { ...req.body };
+
+	// Prevent protected relationships from being changed directly
+        delete updateData.assignedTo; 
+        delete updateData.createdBy; 
+
+	// Check whether title was included in the request
+	const titleWasProvided = Object.prototype.hasOwnProperty.call(
+	    updateData,
+	    'title'
+	);
+
+	if (titleWasProvided){
+	    if (typeof updateData.title !== 'string'){
+		return res.status(400).json({
+		    message: 'Case title must be a string'
+		});
+	    }
+
+  	    const normalizedTitle = updateData.title.trim();
+
+       	    if (!normalizedTitle){
+	       return res.status(400).json({
+		   message: 'Case title cannot be empty'
+	       });
+	    }
+
+
+	    // Check for another case with the same title
+ 	    const duplicateCase = await Case.findOne({
+	       _id: { $ne: id },
+	       title: {
+		  $regex: `^${escapeRegExp(normalizedTitle)}$`,
+		  $options: 'i'
+	       }
+	     });
+
+
+	    if (duplicateCase){
+	        return res.status(409).json({
+		   message: `A case titled "${normalizedTitle}" already exists`
+	        });
+	     }
+
+	   updateData.title = normalizedTitle; 
+
+	}
+
         const updatedCase = await Case.findByIdAndUpdate(
             id,
-            req.body,
-            { new: true, runValidators: true });
+            updateData,
+            { 
+		new: true, 
+		runValidators: true 
+	    });
 
         if (!updatedCase) {
             return res.status(404).json({ message: 'Case not found' });
         }
 
         return res.status(200).json(updatedCase);
+
     } catch (error) {
-        return res.status(400).json({ message: 'Error updating case', error: error.message });
+        return res.status(400).json({ 
+	    message: 'Error updating case', 
+	    error: error.message 
+	});
     }
 }
 
