@@ -9,6 +9,9 @@ const { generateToken } = require('../../utils/jwt');
 const { deleteFile } = require('../../utils/deleteFile');
 const { sendResetPasswordEmail } = require('../../utils/sendResetPasswordEmail');
 
+
+/* --------------------------------------------------------- */
+
 /**
  * Deletes a newly uploaded user image when an operation fails.
  */
@@ -24,21 +27,39 @@ const rollbackUploadedUserImage = async (file) => {
     }
 };
 
+/* --------------------------------------------------------- */
 /**
  * Registers a new user and returns the created profile without the password.
  */
 const register = async (req, res) => {
     try {
-        const newUser = new User(req.body);
+
+ 	// Validate and normalize email before creating the user
+        if (!req.body.email || typeof req.body.email !== "string") {
+            await rollbackUploadedUserImage(req.file);
+            return res.status(400).json("Error: Email is required");
+        }
+
+	const normalizedEmail = req.body.email.trim().toLowerCase();
+
+        if (!normalizedEmail) {
+            await rollbackUploadedUserImage(req.file);
+            return res.status(400).json("Error: Email is required");
+        }
+
+	const newUser = new User(req.body);
+
 
         // Force the role to 'user' to prevent users from registering as admins
         newUser.role = 'user';
+
 
         if (req.file) {
             newUser.image = req.file.path;
         }
 
         const userDuplicated = await User.findOne({ email: newUser.email });
+
         if (userDuplicated) {
             await rollbackUploadedUserImage(req.file);
             return res.status(400).json("Error: User already exists");
@@ -57,8 +78,7 @@ const register = async (req, res) => {
     }
 };
 
-
-
+/* --------------------------------------------------------- */
 /**
  * Validates credentials and returns a signed token plus the user profile.
  */
@@ -86,6 +106,7 @@ const login = async (req, res) => {
     }
 };
 
+/* --------------------------------------------------------- */
 
 const forgotPassword = async (req, res) => {
     try {
@@ -141,7 +162,7 @@ const forgotPassword = async (req, res) => {
 }
 
 
-
+/* --------------------------------------------------------- */
 /* Allows the user to change their password */
 
 const changePassword = async (req, res) => {
@@ -210,6 +231,7 @@ const changePassword = async (req, res) => {
     }
 }
 
+/* --------------------------------------------------------- */
 
 const resetPassword = async (req, res) => {
     try {
@@ -268,7 +290,7 @@ const resetPassword = async (req, res) => {
     }
 }
 
-
+/* --------------------------------------------------------- */
 /**
  * Returns all users without their password hashes.
  */
@@ -281,6 +303,7 @@ const getUsers = async (req, res) => {
     }
 };
 
+/* --------------------------------------------------------- */
 /**
  * Returns one user by id without its password hash.
  */
@@ -367,6 +390,7 @@ const updateUser = async (req, res) => {
     }
 };
 
+/* --------------------------------------------------------- */
 /**
  * Updates only the role field of a user.
  */
@@ -396,7 +420,7 @@ const updateUserRole = async (req, res) => {
 };
 
 
-
+/* --------------------------------------------------------- */
 /**
  * Deletes a user and removes their references from assigned cases.
  */
@@ -432,6 +456,9 @@ const deleteUser = async (req, res) => {
         return res.status(400).json("Error in deleting User: " + error.message);
     }
 };
+
+
+/* --------------------------------------------------------- */
 
 module.exports = {
     register,

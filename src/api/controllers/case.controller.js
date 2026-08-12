@@ -4,6 +4,8 @@ const Case = require('../models/Case');
 const Agent = require('../models/Agent');
 const User = require('../models/User');
 
+/* ----------------------------------- */
+
 /**
  * Returns all cases with the assigned users and agents populated.
  */
@@ -18,6 +20,7 @@ const getCases = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Returns a single case by id with its related documents populated.
  */
@@ -38,7 +41,7 @@ const getCase = async (req, res) => {
     }
 };
 
-
+/* ----------------------------------- */
 /**
  * Creates a new case for the authenticated user.
  */
@@ -47,10 +50,13 @@ const postCase = async (req, res) => {
         delete req.body.assignedTo; // Prevent assigning users during case creation
         delete req.body.createdBy; // Prevent setting createdBy during case creation
 
+        const normalizedCaseName = req.body.name.trim();
+
         const newCase = new Case({
             ...req.body,
             createdBy: req.user._id // Set to the authenticated user's ID
         });
+        
         const savedCase = await newCase.save();
         return res.status(201).json(savedCase);
     } catch (error) {
@@ -59,6 +65,7 @@ const postCase = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Updates a case by id without allowing direct reassignment of protected fields.
  */
@@ -82,6 +89,7 @@ const updateCase = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Deletes a case and removes its id from every user's assigned cases list.
  */
@@ -108,6 +116,7 @@ const deleteCase = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Assigns a case to a user and keeps both sides of the relationship in sync.
  */
@@ -146,6 +155,7 @@ const assignCaseToUser = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Removes a user from a case and keeps both sides of the relationship in sync.
  */
@@ -187,6 +197,7 @@ const removeCaseFromUser = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Assigns a case to an agent and keeps the case document updated.
  */
@@ -221,6 +232,7 @@ const assignCaseToAgent = async (req, res) => {
     }
 }
 
+/* ----------------------------------- */
 /**
  * Removes an agent from a case.
  */
@@ -254,6 +266,8 @@ const removeCaseFromAgent = async (req, res) => {
         return res.status(400).json({ message: 'Error removing case from agent', error: error.message });
     }
 }
+
+/* ----------------------------------- */
 
 module.exports = {
     getCases,
