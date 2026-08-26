@@ -4,9 +4,35 @@ Notas de implementacion y decisiones tecnicas del proyecto. Este archivo amplia 
 
 ## Autenticacion y permisos
 
-La autenticacion se maneja con JWT. Cuando un usuario hace login, `user.controller.js` genera un token con el id del usuario. En las rutas protegidas, `isAuth` verifica el token, busca el usuario en MongoDB y guarda ese usuario en `req.user`.
+La autenticacion se maneja mediante JWT.
 
-La autorizacion por rol se separa en `requireRole`. Este middleware recibe un rol requerido, por ejemplo `requireRole('admin')`, y comprueba que exista `req.user` y que su `role` coincida. Por eso siempre debe usarse despues de `isAuth`.
+Cuando un usuario hace login, `user.controller.js` valida las credenciales y genera un token que contiene el id del usuario.
+
+En las rutas protegidas, `isAuth`:
+
+1. obtiene el token del header `Authorization`;
+2. verifica el JWT;
+3. obtiene el id del usuario;
+4. busca el usuario en MongoDB;
+5. guarda ese usuario en `req.user`.
+
+El token se envia como:
+
+```text
+Authorization: Bearer <token>
+```
+
+La autorizacion por rol se separa en `requireRole`.
+
+Este middleware recibe el rol requerido, por ejemplo:
+
+```js
+requireRole('admin')
+```
+
+y comprueba que exista `req.user` y que su `role` coincida.
+
+Por eso debe utilizarse despues de `isAuth`.
 
 Ejemplo:
 
@@ -14,7 +40,9 @@ Ejemplo:
 usersRouter.patch('/:id/role', isAuth, requireRole('admin'), updateUserRole);
 ```
 
-Esto deja claro que solo un usuario autenticado con rol admin puede cambiar roles.
+El login, cambio de contraseña y recuperacion de contraseña estan documentados con mas detalle en:
+
+[autenticacion-y-passwords.md](autenticacion-y-passwords.md)
 
 ## Registro y primer admin
 
@@ -28,25 +56,57 @@ El primer admin se crea siguiendo el enunciado: se registra como usuario normal 
 
 No se seedean usuarios para evitar sobrescribir o borrar accidentalmente ese primer admin. Las semillas dependen de que exista un admin con el email esperado por `cases.seed.js`.
 
-## Cambio de roles
+## Gestion de contraseñas
 
-El cambio de rol se separo en una ruta especifica:
+La actualizacion normal de un usuario no permite modificar `password`.
 
-```txt
-PATCH /api/v1/users/:id/role
+El cambio de contraseña tiene una ruta especifica:
+
+```text
+PATCH /api/v1/users/me/password
 ```
 
-La decision se tomo para no mezclar la actualizacion normal del perfil con una accion sensible de permisos. `PUT /api/v1/users/:id` actualiza datos generales, pero elimina del body los campos sensibles:
+Esta ruta requiere autenticacion y comprueba la contraseña actual antes de permitir el cambio.
+
+El modelo `User` utiliza un hook `pre('save')` para aplicar bcrypt. El hook comprueba primero:
 
 ```js
-delete req.body.role;
-delete req.body.assignedCases;
-delete req.body.password;
+if (!this.isModified('password')) return;
 ```
 
-Asi un usuario no puede elevar sus permisos, asignarse casos ni cambiar la contrasena desde la ruta general de actualizacion.
+Esto evita volver a hashear una contraseña que no ha cambiado.
 
-`updateUserRole` usa `runValidators: true` para que Mongoose valide el enum del modelo y solo acepte roles validos.
+La recuperacion de contraseña utiliza:
+
+```text
+POST  /api/v1/users/forgot-password
+PATCH /api/v1/users/reset-password/:token
+```
+
+El token original se envia al usuario, pero MongoDB almacena solamente su hash SHA-256.
+
+El token expira despues de una hora.
+
+Los campos:
+
+```text
+resetPasswordToken
+resetPasswordExpires
+```
+
+tienen `select: false` en el modelo y no se incluyen en las consultas normales.
+
+El envio del enlace se realiza mediante Nodemailer.
+
+Sin una configuracion SMTP completa, `sendResetPasswordEmail.js` crea una cuenta temporal de prueba y muestra en consola la URL desde la que se puede previsualizar el correo.
+
+La implementacion completa se explica en:
+
+[autenticacion-y-passwords.md](autenticacion-y-passwords.md)
+
+**[PENDIENTE]** Añadir las variables SMTP opcionales a `.env.example`.
+
+**[PENDIENTE]** Eliminar el log temporal de depuracion que actualmente existe en `changePassword`.
 
 ## Relacion entre Users y Cases
 
@@ -109,9 +169,29 @@ El proyecto usa dos configuraciones de subida en `file.js`:
 - `uploadUser`, que guarda imagenes en `userPortrait`;
 - `uploadAgent`, que guarda imagenes en `agentPortrait`.
 
-El campo usado por la API es `image`. En `multipart/form-data`, el archivo debe enviarse con ese nombre de campo.
+El campo utilizado por la API es:
 
-Cuando se elimina un usuario o agente, se llama a `deleteFile`, que obtiene el `publicId` desde la URL y usa `cloudinary.uploader.destroy`.
+```text
+image
+```
+
+Por tanto, en `multipart/form-data` el archivo debe enviarse con ese nombre.
+
+Cuando se crea un `User` o `Agent`, la URL proporcionada por Cloudinary se guarda en el campo `image` del documento.
+
+Cuando una operacion falla despues de haber subido una imagen nueva, los controllers utilizan funciones de rollback para intentar eliminar de Cloudinary ese archivo y evitar imagenes huerfanas.
+
+Al actualizar una imagen de usuario o agente, la nueva URL debe quedar almacenada en MongoDB y la imagen anterior debe eliminarse despues de que la actualizacion haya terminado correctamente.
+
+Cuando se elimina un usuario o agente, se llama a `deleteFile`, que obtiene el `publicId` desde la URL y utiliza:
+
+```js
+cloudinary.uploader.destroy(...)
+```
+
+Las operaciones relacionadas con Cloudinary tambien se comprueban manualmente durante las pruebas de Insomnia porque el resultado debe verificarse tanto en MongoDB como en el almacenamiento externo.
+
+**[PENDIENTE]** Volver a ejecutar todos los casos de actualizacion fallida de imagen para confirmar que no quedan archivos huerfanos despues de los cambios finales de codigo.
 
 ## Passwords en respuestas
 
@@ -153,13 +233,35 @@ El proyecto usa personajes de los libros sobre [la Guardia (City Watch)](https:/
 
 Escogi este tema porque me resulta mas facil recordar lo que estoy probando al seguir la logica de las historias.
 
-Lo ideal seria que usuarios y agentes fueran una sola coleccion, pero los requisitos del proyecto lo complican, porque el admin inicial debe crearse como user y luego modificarse manualmente en MongoDB, por lo que no puedo seedear usuarios. 
+Lo ideal seria que usuarios y agentes fueran una sola coleccion, pero los requisitos del proyecto lo complican porque el admin inicial debe crearse como `User` y despues modificarse manualmente en MongoDB. Por esa razon no se seedean usuarios.
 
-`Users` son asignados a casos por los `Admin` y entonces agregan los `Agentes` a los mismos. Podría entenderse que son los *Owners* del caso. 
+Los `Users` representan a los usuarios de la aplicacion y pueden ser asignados a casos.
 
-`Agent` permite conservar referencias a personajes/agentes de la City Watch. Se usa tambien en las semillas y en la relacion `Case.assignedAgents`.
+Los `Agents` representan personajes de la City Watch y se relacionan con los casos mediante `Case.assignedAgents`.
 
-`Book` se conserva como material de referencia y consulta. Cualquier usuario puede hacer `GET`, pero crear, editar y borrar libros requiere autenticacion y rol admin. En un principio pensaba borrar esta coleccion, pero ya fue documentada e incluida en `docs/pruebas-manuales-insomnia.md`.
+La asignacion y desasignacion de agentes a casos utiliza endpoints dedicados:
+
+```text
+PUT /api/v1/cases/:caseId/assign-agent/:agentId
+PUT /api/v1/cases/:caseId/unassign-agent/:agentId
+```
+
+Ambos requieren:
+
+```text
+isAuth
+requireRole('admin')
+```
+
+`Book` se conserva como material adicional de referencia y relaciona libros con agentes.
+
+La lectura de la lista de libros es publica. Las operaciones principales de creacion, actualizacion y borrado requieren rol admin.
+
+**[PENDIENTE]** Añadir `GET /api/v1/agents/:id` para completar la lectura individual de `Agent`.
+
+**[PENDIENTE]** Añadir `GET /api/v1/books/:id` para completar la lectura individual de `Book`.
+
+**[PENDIENTE]** Revisar `PUT /api/v1/books/:bookId/agents/:agentId`. Actualmente requiere autenticacion, pero no `requireRole('admin')`, mientras que la eliminacion de un agente del libro si requiere admin. Definir una regla consistente antes de cerrar la documentacion.
 
 ## Esquema (Mermaid)
 
@@ -168,45 +270,146 @@ flowchart LR
     U[Usuario]
     AD[Admin]
 
-    UC1((Crear cuenta 'user'))
-    UC2((Borrar su propia cuenta))
-    UC3((Asignar usuario a caso))
-    UC4((Borrar cualquier cuenta))
-    UC5((Crear agente))
-    UC6((Asignar agente a caso))
-    UC7((Borrar agente))
+    UC1((Crear cuenta user))
+    UC2((Login))
+    UC3((Gestionar su cuenta))
+    UC4((Crear y consultar casos))
+    UC5((Asignar usuarios a casos))
+    UC6((Gestionar agentes))
+    UC7((Asignar agentes a casos))
+    UC8((Gestionar libros))
+    UC9((Cambiar roles))
 
     U --> UC1
     U --> UC2
+    U --> UC3
+    U --> UC4
 
-    AD --> UC1
-    AD --> UC3
+    AD --> UC2
     AD --> UC4
     AD --> UC5
+    AD --> UC6
     AD --> UC7
+    AD --> UC8
+    AD --> UC9
 
-    U -. "hoy puede via PATCH /cases/:id" .-> UC6
-    AD -. "tambien puede via PATCH /cases/:id" .-> UC6
-
-    UC3 -. "solo admin\nrequireRole('admin')" .-> AD
-    UC2 -. "si id autenticado = id objetivo" .-> U
-    UC5 -. "solo admin\nPOST /agents" .-> AD
-    UC7 -. "solo admin\nDELETE /agents/:id" .-> AD
+    UC5 -. "requireRole('admin')" .-> AD
+    UC6 -. "requireRole('admin')" .-> AD
+    UC7 -. "requireRole('admin')" .-> AD
+    UC9 -. "requireRole('admin')" .-> AD
 ```
 
 Lectura rapida:
 
-- Cualquier persona puede crear cuenta por register, pero siempre nace con role user.
-- Un usuario autenticado puede borrar su propia cuenta.
+- Cualquier persona puede registrarse, pero toda cuenta nueva nace con `role: "user"`.
+- Un usuario puede iniciar sesion y consultar su propio perfil.
+- Un usuario autenticado puede cambiar su propia contraseña.
+- Un usuario puede borrar su propia cuenta.
+- Un admin puede borrar cuentas de otros usuarios.
+- Solo admin puede cambiar roles.
 - Solo admin puede asignar usuarios a casos.
-- Admin tambien puede borrar cuentas de otros usuarios.
-- Solo admin puede crear agentes y borrar agentes.
-- Asignar agentes a casos hoy no tiene endpoint dedicado de admin: actualmente se puede enviar `assignedAgents` en `PATCH /cases/:id` (ruta autenticada, no restringida por rol).
-- Esta combinacion refleja la regla de negocio actual: auto-gestion de cuenta para user, asignacion de usuarios reservada a admin, y asignacion de agentes pendiente de endurecer si se quiere regla estricta de admin.
+- La asignacion y desasignacion de agentes a casos utiliza endpoints dedicados protegidos para admin.
+- Crear, actualizar y borrar agentes requiere admin.
+- Crear, actualizar y borrar libros requiere admin.
 
-## Debug de agentes (referencia)
+**[PENDIENTE]** Revisar el permiso del endpoint que añade agentes a libros antes de considerar completamente correcta la ultima regla.
 
-Durante pruebas manuales con Insomnia parecia que un `PUT /api/v1/agents/:id` podia terminar en un comportamiento similar a creacion duplicada.
-- En paralelo, cuando un update fallaba por validacion (por ejemplo, un `species` fuera del enum), la imagen nueva podia quedar subida en Cloudinary aunque la operacion de base de datos se rechazara.
+## Historial de depuracion de imagenes
 
-Se hizo un debug temporal para darle seguimiento. El detalle esta en [docs/pruebas/agents-debug-pruebas.md](./pruebas/agents-debug-pruebas.md).
+Durante el desarrollo se detectaron problemas en actualizaciones de agentes relacionados con operaciones fallidas y archivos que ya habian sido subidos a Cloudinary.
+
+Como resultado se añadieron mecanismos de rollback para intentar eliminar una imagen nueva cuando la operacion de base de datos no puede completarse.
+
+La documentacion principal describe ahora el comportamiento esperado y no depende de los archivos temporales utilizados durante el proceso de debug.
+
+**[PENDIENTE]** Confirmar mediante la ultima ejecucion de Insomnia que todas las rutas de creacion y actualizacion que utilizan imagen realizan correctamente el rollback cuando falla la operacion.
+
+## Pendientes conocidos antes de entrega
+
+Esta seccion registra diferencias conocidas entre el estado actual y el estado final esperado del proyecto.
+
+No deben interpretarse como funcionalidades terminadas.
+
+### CRUD
+
+**[PENDIENTE]** Implementar `getAgentById` y su ruta:
+
+```text
+GET /api/v1/agents/:id
+```
+
+**[PENDIENTE]** Implementar `getBookById` y su ruta:
+
+```text
+GET /api/v1/books/:id
+```
+
+### Cases
+
+**[PENDIENTE]** Terminar la normalizacion y prevencion de titulos duplicados en `postCase`.
+
+En el codigo actual existe una referencia a:
+
+```js
+req.body.name.trim()
+```
+
+aunque el modelo utiliza `title`.
+
+Este punto debe corregirse antes de volver a probar la creacion de casos.
+
+**[PENDIENTE]** Revisar que `updateCase` aplique la misma politica de duplicados definida para la creacion.
+
+### Validacion de IDs
+
+Existe el middleware:
+
+```text
+validateObjectId
+```
+
+y ya se utiliza en algunas rutas.
+
+**[PENDIENTE]** Revisar todas las rutas que reciben IDs y aplicar una politica consistente:
+
+```text
+ID mal formado              -> 400
+ID valido pero inexistente  -> 404
+```
+
+### Books
+
+**[PENDIENTE]** Decidir si añadir agentes a libros debe ser una operacion exclusivamente de admin:
+
+```text
+PUT /api/v1/books/:bookId/agents/:agentId
+```
+
+Actualmente la ruta requiere autenticacion, pero no `requireRole('admin')`.
+
+### Limpieza
+
+**[PENDIENTE]** Eliminar imports no utilizados y logs temporales de depuracion.
+
+**[PENDIENTE]** Revisar comentarios TODO antes de la entrega.
+
+### Configuracion
+
+**[PENDIENTE]** Añadir a `.env.example` las variables SMTP opcionales utilizadas por Nodemailer.
+
+### Pruebas
+
+**[PENDIENTE]** Volver a exportar la coleccion final de Insomnia despues de modificar el codigo.
+
+**[PENDIENTE]** Ejecutar la coleccion completa de principio a fin utilizando un entorno limpio.
+
+**[PENDIENTE]** Confirmar despues de esa ejecucion:
+
+- ausencia de recursos temporales;
+- ausencia de imagenes huerfanas en Cloudinary;
+- limpieza correcta de relaciones;
+- comportamiento correcto de IDs invalidos e inexistentes;
+- rechazo de duplicados;
+- funcionamiento de login, cambio y recuperacion de contraseña.
+
+Solo despues de esta revision debe actualizarse `justificacion-requisitos.md` para marcar definitivamente el CRUD y las pruebas como cerrados.
