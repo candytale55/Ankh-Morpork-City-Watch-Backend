@@ -61,7 +61,7 @@ Las respuestas de la API no incluyen la contraseña.
 
 ## Cambio de contraseña
 
-Un usuario autenticado puede cambiar su contraseña mediante:
+Un usuario autenticado puede cambiar su contraseña desde el perfil de la cuenta.
 
 ```text
 PATCH /api/v1/users/me/password
@@ -77,6 +77,12 @@ Body:
 }
 ```
 
+En el frontend, el usuario hace clic en "ME" y luego en _Change your password_.
+
+![Sección del perfil para cambiar la contraseña](./shots/me-change-password.JPG)
+
+![Formulario de cambio de contraseña del usuario](./shots/me-change-password-open.JPG)
+
 El backend comprueba que:
 
 - la contraseña actual sea correcta;
@@ -87,7 +93,7 @@ La actualización general del perfil no permite modificar directamente `password
 
 ## Recuperación de contraseña
 
-Si el usuario no recuerda su contraseña, inicia el proceso con:
+Si el usuario no recuerda su contraseña, puede solicitar un enlace de recuperación desde la pantalla de login.
 
 ```text
 POST /api/v1/users/forgot-password
@@ -101,13 +107,9 @@ Body:
 }
 ```
 
-El backend genera un token temporal de recuperación.
+El backend genera un token temporal de recuperación. El valor original se envía al usuario, mientras que MongoDB guarda solo el hash SHA-256 junto con la fecha de expiración.
 
-El token original se envía al usuario, mientras que MongoDB guarda solamente su hash SHA-256 junto con su fecha de expiración.
-
-El token tiene una validez de una hora.
-
-El enlace se construye utilizando `APP_URL`:
+El token tiene una validez de una hora y se construye con `APP_URL`:
 
 ```env
 APP_URL=http://localhost:3000
@@ -119,33 +121,35 @@ Ejemplo:
 http://localhost:3000/?resetToken=<temporary-token>
 ```
 
+En el frontend, el usuario despliega el formulario desde el enlace _Forgot your password_ bajo el botón de login.
+
+![Formulario de recuperación de contraseña en la pantalla de login](./shots/forgot-password-form.png)
+
+La API responde con un mensaje genérico para no revelar si el correo existe o no en la base de datos.
+
+![Respuesta genérica al solicitar recuperación de contraseña](./shots/if-the-account-exists.JPG)
+
 ## Correo de recuperación
 
-Nodemailer envía un mensaje con el enlace temporal.
+Nodemailer envía un mensaje con el enlace temporal. Durante el desarrollo se utiliza una cuenta de prueba que permite abrir una vista previa del correo desde un enlace mostrado en la terminal.
 
-Durante el desarrollo se utiliza una cuenta de prueba que permite abrir una previsualización del correo desde un enlace mostrado en la terminal.
+![Vista previa del correo de recuperación desde la terminal de desarrollo](./shots/Email-Bash.JPG)
 
-En otro entorno, este sistema de correo de prueba podría sustituirse por un servicio de correo real mediante un servidor SMTP.
+Al seguir la URL se abre el correo de prueba con el token temporal.
 
-**[PENDIENTE: CAPTURA]**
-
-Añadir captura de la terminal con el enlace de previsualización:
-
-```markdown
-![Nodemailer preview URL](shots/password-reset-terminal.png)
-```
-
-**[PENDIENTE: CAPTURA]**
-
-Añadir captura del correo de recuperación:
-
-```markdown
-![Password reset email](shots/password-reset-email.png)
-```
+![Correo de recuperación enviado por Nodemailer](./shots/Email-nodemailer.JPG)
 
 ## Restablecer la contraseña
 
-Al abrir el enlace de recuperación, el frontend obtiene `resetToken` de la URL y muestra el formulario para introducir la nueva contraseña.
+Al abrir el enlace de recuperación entregado en el, el frontend obtiene `resetToken` de la URL y muestra el formulario para introducir la nueva contraseña.
+
+![Formulario para definir una nueva contraseña desde la URL de recuperación](./shots/reset-your-password-form.JPG)
+
+En Insomnia, el token temporal se copia en la ruta para completar el cambio.
+
+![Token temporal insertado en la petición de reset de contraseña en Insomnia](./shots/insomnia-temp-token.JPG)
+
+(Ver [pruebas-manuales-insomnia.md](./pruebas-manuales-insomnia.md) para más información)
 
 El frontend envía:
 
@@ -171,13 +175,9 @@ El backend:
 
 Después del cambio, el usuario puede iniciar sesión normalmente con la nueva contraseña.
 
-**[PENDIENTE: CAPTURA OPCIONAL]**
 
-Si se conserva una captura del formulario:
 
-```markdown
-![Password reset form](shots/password-reset-form.png)
-```
+En otro entorno, este sistema de correo de prueba podría sustituirse por un servicio SMTP real.
 
 ## Flujo resumido
 
@@ -232,9 +232,3 @@ También puede probarse desde navegador abriendo directamente el enlace recibido
 La organización completa de las pruebas se encuentra en:
 
 [pruebas-manuales-insomnia.md](pruebas-manuales-insomnia.md)
-
-## Pendientes
-
-- **[PENDIENTE]** Añadir las capturas definitivas.
-- **[PENDIENTE]** Eliminar el log temporal existente en `changePassword`.
-- **[PENDIENTE]** Repetir el flujo completo después de la limpieza final del código.
