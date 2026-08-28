@@ -29,12 +29,3 @@ Esta carpeta concentra la documentacion funcional, tecnica y de pruebas del back
 - [shots/](shots)
   - Capturas del frontend y de los flujos documentados.
 
-## Estado de la documentacion
-
-La documentacion se esta revisando durante la ultima fase de correccion del proyecto.
-
-Los marcadores **[PENDIENTE]** identifican funcionalidades, pruebas o comprobaciones que todavia deben revisarse antes de la entrega final.
-
-**[PENDIENTE]** Añadir las capturas definitivas del flujo de recuperacion de contraseña.
-
-**[PENDIENTE]** Revisar y eliminar los marcadores que ya no correspondan despues de la ultima ejecucion completa de pruebas.

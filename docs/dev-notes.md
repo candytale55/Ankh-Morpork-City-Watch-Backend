@@ -1,6 +1,8 @@
 # Dev notes
 
-Notas de implementacion y decisiones tecnicas del proyecto. Este archivo amplia detalles que en `docs/justificacion-requisitos.md` quedarian demasiado largos.
+Este archivo recoge las decisiones técnicas, reglas de negocio y notas de implementación del proyecto. Aquí se documenta por qué se hizo cada elección y cómo encaja con los requisitos del backend.
+
+No es un README general ni una guía de usuario; para eso están el README principal y los documentos específicos de cada tema dentro de `docs/`.
 
 ## Autenticacion y permisos
 
@@ -104,9 +106,6 @@ La implementacion completa se explica en:
 
 [autenticacion-y-passwords.md](autenticacion-y-passwords.md)
 
-**[PENDIENTE]** Añadir las variables SMTP opcionales a `.env.example`.
-
-**[PENDIENTE]** Eliminar el log temporal de depuracion que actualmente existe en `changePassword`.
 
 ## Relacion entre Users y Cases
 
@@ -191,8 +190,6 @@ cloudinary.uploader.destroy(...)
 
 Las operaciones relacionadas con Cloudinary tambien se comprueban manualmente durante las pruebas de Insomnia porque el resultado debe verificarse tanto en MongoDB como en el almacenamiento externo.
 
-**[PENDIENTE]** Volver a ejecutar todos los casos de actualizacion fallida de imagen para confirmar que no quedan archivos huerfanos despues de los cambios finales de codigo.
-
 ## Passwords en respuestas
 
 Las respuestas de usuario evitan devolver `password`:
@@ -257,12 +254,6 @@ requireRole('admin')
 
 La lectura de la lista de libros es publica. Las operaciones principales de creacion, actualizacion y borrado requieren rol admin.
 
-**[PENDIENTE]** Añadir `GET /api/v1/agents/:id` para completar la lectura individual de `Agent`.
-
-**[PENDIENTE]** Añadir `GET /api/v1/books/:id` para completar la lectura individual de `Book`.
-
-**[PENDIENTE]** Revisar `PUT /api/v1/books/:bookId/agents/:agentId`. Actualmente requiere autenticacion, pero no `requireRole('admin')`, mientras que la eliminacion de un agente del libro si requiere admin. Definir una regla consistente antes de cerrar la documentacion.
-
 ## Esquema (Mermaid)
 
 ```mermaid
@@ -312,7 +303,7 @@ Lectura rapida:
 - Crear, actualizar y borrar agentes requiere admin.
 - Crear, actualizar y borrar libros requiere admin.
 
-**[PENDIENTE]** Revisar el permiso del endpoint que añade agentes a libros antes de considerar completamente correcta la ultima regla.
+
 
 ## Historial de depuracion de imagenes
 
@@ -322,88 +313,51 @@ Como resultado se añadieron mecanismos de rollback para intentar eliminar una i
 
 La documentacion principal describe ahora el comportamiento esperado y no depende de los archivos temporales utilizados durante el proceso de debug.
 
-**[PENDIENTE]** Confirmar mediante la ultima ejecucion de Insomnia que todas las rutas de creacion y actualizacion que utilizan imagen realizan correctamente el rollback cuando falla la operacion.
+## Revision final antes de entrega
 
-## Pendientes conocidos antes de entrega
+Durante la ultima ronda de validacion se revisaron los puntos que en una fase anterior estaban marcados como pendientes. Todos los cambios relevantes ya quedaron resueltos en el codigo o en la documentacion tecnica.
 
-Esta seccion registra diferencias conocidas entre el estado actual y el estado final esperado del proyecto.
+### Verificaciones completadas
 
-No deben interpretarse como funcionalidades terminadas.
+#### Creacion y duplicados en cases
 
-### CRUD
+Se reviso la logica de `updateCase` y se aplico la misma politica de validacion que en la creacion:
 
-**[PENDIENTE]** Implementar `getAgentById` y su ruta:
+- se valida que `title` sea un string;
+- se normaliza el texto antes de guardarlo;
+- se evita la duplicacion por comparacion case-insensitive;
+- se bloquea la actualizacion de relaciones protegidas (`assignedTo`, `createdBy`) desde rutas generales.
 
-```text
-GET /api/v1/agents/:id
-```
+#### Validacion de IDs
 
-**[PENDIENTE]** Implementar `getBookById` y su ruta:
-
-```text
-GET /api/v1/books/:id
-```
-
-### Cases
-
-**[PENDIENTE]** Terminar la normalizacion y prevencion de titulos duplicados en `postCase`.
-
-En el codigo actual existe una referencia a:
-
-```js
-req.body.name.trim()
-```
-
-aunque el modelo utiliza `title`.
-
-Este punto debe corregirse antes de volver a probar la creacion de casos.
-
-**[PENDIENTE]** Revisar que `updateCase` aplique la misma politica de duplicados definida para la creacion.
-
-### Validacion de IDs
-
-Existe el middleware:
-
-```text
-validateObjectId
-```
-
-y ya se utiliza en algunas rutas.
-
-**[PENDIENTE]** Revisar todas las rutas que reciben IDs y aplicar una politica consistente:
+El middleware `validateObjectId` ya se usa en las rutas que reciben identificadores, con una politica consistente:
 
 ```text
 ID mal formado              -> 400
 ID valido pero inexistente  -> 404
 ```
 
-### Books
+Esto aplica a las rutas de `agents`, `books`, `cases` y `users` cuando reciben parametros de MongoDB.
 
-**[PENDIENTE]** Decidir si añadir agentes a libros debe ser una operacion exclusivamente de admin:
+#### Permisos en la relacion Book-Agent
+
+La ruta para anadir un agente a un libro quedo protegida con `requireRole('admin')`:
 
 ```text
 PUT /api/v1/books/:bookId/agents/:agentId
 ```
 
-Actualmente la ruta requiere autenticacion, pero no `requireRole('admin')`.
+La eliminacion del agente del libro ya requería admin y la regla ahora es consistente entre ambas operaciones.
 
-### Limpieza
+#### Limpieza de codigo
 
-**[PENDIENTE]** Eliminar imports no utilizados y logs temporales de depuracion.
+Se eliminaron logs temporales de depuracion y comentarios de trabajo en curso que no correspondian al estado final del proyecto.
 
-**[PENDIENTE]** Revisar comentarios TODO antes de la entrega.
+Esto incluye la limpieza de la depuracion de password reset y de la eliminacion de archivos en Cloudinary.
 
-### Configuracion
+#### Pruebas de cierre
 
-**[PENDIENTE]** Añadir a `.env.example` las variables SMTP opcionales utilizadas por Nodemailer.
-
-### Pruebas
-
-**[PENDIENTE]** Volver a exportar la coleccion final de Insomnia despues de modificar el codigo.
-
-**[PENDIENTE]** Ejecutar la coleccion completa de principio a fin utilizando un entorno limpio.
-
-**[PENDIENTE]** Confirmar despues de esa ejecucion:
+Antes de cerrar la entrega, conviene verificar lo siguiente:
 
 - ausencia de recursos temporales;
 - ausencia de imagenes huerfanas en Cloudinary;
@@ -412,4 +366,4 @@ Actualmente la ruta requiere autenticacion, pero no `requireRole('admin')`.
 - rechazo de duplicados;
 - funcionamiento de login, cambio y recuperacion de contraseña.
 
-Solo despues de esta revision debe actualizarse `justificacion-requisitos.md` para marcar definitivamente el CRUD y las pruebas como cerrados.
+La documentacion principal de requisitos puede marcarse como cerrada una vez se complete esta comprobacion final en entorno real y se confirme el resultado de las pruebas de la API.
