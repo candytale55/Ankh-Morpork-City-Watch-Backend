@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const mongoose = require('mongoose');
+const { connectCloudinary } = require('../../config/cloudinary');
 const { launchAgentsSeed } = require('./agents.seed');
 const { launchCasesSeed } = require('./cases.seed');
 
@@ -10,9 +11,9 @@ const { launchCasesSeed } = require('./cases.seed');
  */
 const launchSeeds = async () => {
     try {
+        connectCloudinary();
         await mongoose.connect(process.env.DB_URL);
         console.log("Connected to the database successfully for seeding");
-
 
         await launchAgentsSeed();
         await launchCasesSeed();
