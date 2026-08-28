@@ -4,6 +4,7 @@ const usersRouter = require('express').Router();
 const { requireRole } = require('../../middlewares/requireRole');
 const { isAuth } = require('../../middlewares/isAuth');
 const { uploadUser } = require('../../middlewares/file');
+const { validateObjectId } = require('../../middlewares/validateObjectId');
 const {
     register,
     login,
@@ -60,9 +61,9 @@ usersRouter.patch(
 
 
 usersRouter.get('/', isAuth, requireRole('admin'), getUsers);
-usersRouter.get('/:id', isAuth, requireRole('admin'), getUser);
-usersRouter.put('/:id', isAuth, uploadUser.single('image'), updateUser);
-usersRouter.patch('/:id/role', isAuth, requireRole('admin'), updateUserRole);
-usersRouter.delete('/:id', isAuth, deleteUser); // Un usuario puede eliminar su propia cuenta, pero no la de otros usuarios. La lógica para verificar que es el mismo usuario se implementará en el controlador.
+usersRouter.get('/:id', isAuth, requireRole('admin'), validateObjectId('id'), getUser);
+usersRouter.put('/:id', isAuth, validateObjectId('id'), uploadUser.single('image'), updateUser);
+usersRouter.patch('/:id/role', isAuth, requireRole('admin'), validateObjectId('id'), updateUserRole);
+usersRouter.delete('/:id', isAuth, validateObjectId('id'), deleteUser);
 
 module.exports = usersRouter;

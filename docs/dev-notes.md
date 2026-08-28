@@ -315,7 +315,7 @@ La documentacion principal describe ahora el comportamiento esperado y no depend
 
 ## Revision final antes de entrega
 
-Durante la ultima ronda de validacion se revisaron los puntos que en una fase anterior estaban marcados como pendientes. Todos los cambios relevantes ya quedaron resueltos en el codigo o en la documentacion tecnica.
+Durante la ultima ronda de validacion se revisaron los puntos clave del proyecto y se cerraron los ajustes relevantes en el codigo y en la documentacion tecnica.
 
 ### Verificaciones completadas
 

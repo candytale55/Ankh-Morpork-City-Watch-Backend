@@ -49,11 +49,17 @@ const userSchema = new mongoose.Schema({
  * Hashes the password before saving a user document.
  */
 userSchema.pre('save', function () {
-
     if (!this.isModified('password')) return; // Only hash the password if it has been modified or is new
 
-    this.password = bcrypt.hashSync(this.password, 10);
+    const isAlreadyHashed = [
+        '$2a$',
+        '$2b$',
+        '$2y$'
+    ].some(prefix => this.password.startsWith(prefix));
 
+    if (isAlreadyHashed) return;
+
+    this.password = bcrypt.hashSync(this.password, 10);
 });
 
 const User = mongoose.model('User', userSchema, 'users');
