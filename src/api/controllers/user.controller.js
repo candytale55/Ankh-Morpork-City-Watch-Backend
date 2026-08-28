@@ -34,20 +34,20 @@ const rollbackUploadedUserImage = async (file) => {
 const register = async (req, res) => {
     try {
 
- 	// Validate and normalize email before creating the user
+        // Validate and normalize email before creating the user
         if (!req.body.email || typeof req.body.email !== "string") {
             await rollbackUploadedUserImage(req.file);
             return res.status(400).json("Error: Email is required");
         }
 
-	const normalizedEmail = req.body.email.trim().toLowerCase();
+        const normalizedEmail = req.body.email.trim().toLowerCase();
 
         if (!normalizedEmail) {
             await rollbackUploadedUserImage(req.file);
             return res.status(400).json("Error: Email is required");
         }
 
-	const newUser = new User(req.body);
+        const newUser = new User(req.body);
 
 
         // Force the role to 'user' to prevent users from registering as admins
@@ -167,9 +167,6 @@ const forgotPassword = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        // TODO: Remove this debug log in production. It can expose sensitive information.
-        console.log("Received body fields:", Object.keys(req.body));
-
         const {
             currentPassword,
             newPassword,
