@@ -29,6 +29,29 @@ const getBooks = async (req, res) => {
 /* ----------------------------------------------------------- */
 
 /**
+ * Returns a single book by id with its related agents populated.
+ */
+const getBook = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await Book.findById(id).populate('agents', 'name title image');
+
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+
+        return res.status(200).json(book);
+    } catch (error) {
+        return res.status(400).json({
+            message: "Error in getting Book",
+            error: error.message
+        });
+    }
+};
+
+/* ----------------------------------------------------------- */
+
+/**
  * Creates a new book document.
  */
 const postBook = async (req, res) => {
@@ -243,6 +266,7 @@ const deleteBook = async (req, res) => {
 
 module.exports = {
     getBooks,
+    getBook,
     postBook,
     updateBook,
     deleteBook,

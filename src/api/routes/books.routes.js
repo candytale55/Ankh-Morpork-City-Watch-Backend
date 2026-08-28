@@ -3,8 +3,10 @@
 const express = require('express');
 const { isAuth } = require('../../middlewares/isAuth');
 const { requireRole } = require('../../middlewares/requireRole');
+const { validateObjectId } = require('../../middlewares/validateObjectId');
 const {
     getBooks,
+    getBook,
     postBook,
     updateBook,
     deleteBook,
@@ -15,10 +17,11 @@ const {
 const booksRouter = express.Router();
 
 booksRouter.get('/', getBooks);
+booksRouter.get('/:id', validateObjectId('id'), getBook);
 booksRouter.post('/', isAuth, requireRole('admin'), postBook);
-booksRouter.put('/:id', isAuth, requireRole('admin'), updateBook);
-booksRouter.put('/:bookId/agents/:agentId', isAuth, addAgentToBook);
-booksRouter.delete('/:bookId/agents/:agentId', isAuth, requireRole('admin'), removeAgentFromBook);
-booksRouter.delete('/:id', isAuth, requireRole('admin'), deleteBook);
+booksRouter.put('/:id', isAuth, requireRole('admin'), validateObjectId('id'), updateBook);
+booksRouter.put('/:bookId/agents/:agentId', isAuth, validateObjectId('bookId', 'agentId'), addAgentToBook);
+booksRouter.delete('/:bookId/agents/:agentId', isAuth, requireRole('admin'), validateObjectId('bookId', 'agentId'), removeAgentFromBook);
+booksRouter.delete('/:id', isAuth, requireRole('admin'), validateObjectId('id'), deleteBook);
 
 module.exports = booksRouter;

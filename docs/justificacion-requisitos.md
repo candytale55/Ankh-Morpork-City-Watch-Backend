@@ -119,8 +119,6 @@ Al borrar un agente tambien se elimina su imagen.
 
 Las actualizaciones de usuario y agente permiten sustituir la imagen almacenada y contienen logica para evitar conservar una imagen nueva cuando la operacion de base de datos falla.
 
-**[PENDIENTE]** Realizar nuevamente las pruebas completas de rollback y sustitucion de imagen despues de los cambios finales del codigo.
-
 ### Evitar duplicados en el array de usuarios y no perder datos anteriores
 
 Cumplido. La asignacion de casos a usuarios se hace mediante la ruta admin:
@@ -146,23 +144,13 @@ El script `npm run seed` ejecuta `src/utils/seeds/index.seed.js`, que inserta pr
 
 ### CRUD completo de todas las colecciones
 
-**[PENDIENTE]** La mayor parte del CRUD esta implementada, pero el requisito no debe marcarse definitivamente como cerrado hasta añadir la lectura individual que falta en `Agent` y `Book`.
-
-Estado actual:
+Cumplido. Estado actual:
 
 - `users`: registro, login, listado admin, detalle admin, perfil propio, actualizacion y borrado.
 - `cases`: listado, detalle, creacion, actualizacion, borrado y operaciones de asignacion.
-- `agents`: listado, busqueda, creacion, actualizacion y borrado.
-- `books`: listado, creacion, actualizacion, borrado y gestion de relaciones con agentes.
+- `agents`: listado, detalle individual, busqueda, creacion, actualizacion y borrado.
+- `books`: listado, detalle individual, creacion, actualizacion, borrado y gestion de relaciones con agentes.
 
-Falta añadir:
-
-```text
-GET /api/v1/agents/:id
-GET /api/v1/books/:id
-```
-
-Cuando ambos endpoints esten implementados y probados, esta seccion puede cambiarse nuevamente a `Cumplido`.
 
 ### README.md con documentacion del proyecto
 
@@ -188,8 +176,6 @@ docs/dev-notes.md
 docs/autenticacion-y-passwords.md
 docs/pruebas-manuales-insomnia.md
 ```
-
-**[PENDIENTE]** Realizar una ultima revision del README despues de cerrar codigo y pruebas para eliminar cualquier marcador `[PENDIENTE]` que ya no corresponda.
 
 ### Proyecto publico en la entrega
 

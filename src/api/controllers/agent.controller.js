@@ -78,6 +78,39 @@ const getAgents = async (req, res) => {
 /* --------------------------------------------- */
 
 /**
+ * Returns a single agent by id, including the cases assigned to it.
+ */
+const getAgent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const agent = await Agent.findById(id).lean();
+
+        if (!agent) {
+            return res.status(404).json({ message: "Agent not found" });
+        }
+
+        const cases = await Case.find({ assignedAgents: id })
+            .select('title status priority assignedAgents')
+            .lean();
+
+        return res.status(200).json({
+            ...agent,
+            assignedCases: cases.map((caseItem) => ({
+                _id: caseItem._id,
+                title: caseItem.title,
+                status: caseItem.status,
+                priority: caseItem.priority
+            }))
+        });
+    } catch (error) {
+        console.error("Error in getting Agent", error);
+        return res.status(400).json({ message: "Error in getting Agent", error: error.message });
+    }
+};
+
+/* --------------------------------------------- */
+
+/**
  * Finds agents whose name matches the query string, ignoring case.
  */
 const getAgentByName = async (req, res) => {
@@ -130,7 +163,7 @@ const postAgent = async (req, res) => {
             return res.status(409).json({ message: `Agent \"${normalizedName}\" already exists` });
         }
 
-        
+
         const newAgent = new Agent(req.body);
         newAgent.name = normalizedName;
 
@@ -316,6 +349,7 @@ const deleteAgent = async (req, res) => {
 
 module.exports = {
     getAgents,
+    getAgent,
     getAgentByName,
     postAgent,
     updateAgent,
