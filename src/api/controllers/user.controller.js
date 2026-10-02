@@ -47,6 +47,8 @@ const register = async (req, res) => {
             return res.status(400).json("Error: Email is required");
         }
 
+        // TODO: Fix the registration to only accept name, email, and password from the request body.
+        /* Lo mismo pasa en el register: fuerzas bien el rol a user, pero el resto del req.body entra tal cual en el modelo, así que alguien se podría registrar mandando ya un assignedCases y asignarse casos sin pasar por un admin. Mejor coger solo name, email y password. */
         const newUser = new User(req.body);
 
 
@@ -437,6 +439,8 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
+        // TODO: Consider deleting the user first and handling the Cloudinary image deletion separately to avoid leaving the user in an inconsistent state if the image deletion fails.
+        /* En deleteUser sacas al usuario de los casos antes de borrar la imagen, y deleteFile lanza error si Cloudinary no devuelve ok (por ejemplo si la imagen ya no existe). En ese caso la petición acaba en 400, el usuario no se borra y ya se ha quedado desvinculado de sus casos, o sea, datos a medias. Podrías borrar primero el usuario y tratar el fallo de Cloudinary sin que bloquee el borrado de la cuenta. */
         await Case.updateMany(
             { assignedTo: id },
             { $pull: { assignedTo: id } }

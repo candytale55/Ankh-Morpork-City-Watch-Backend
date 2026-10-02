@@ -1,6 +1,6 @@
 /node_modules
 .env
 
-# Files to create transcriptions of my code
-project_concanator.py
-project_context.txt
+# TODO: Remove these files once transcriptions are no longer needed.
+conc.py
+project_context_back.txt
