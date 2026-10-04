@@ -47,14 +47,20 @@ const register = async (req, res) => {
             return res.status(400).json("Error: Email is required");
         }
 
-        // TODO: Fix the registration to only accept name, email, and password from the request body.
+        // TODO: Fix the registration to only accept name, email, and password from the request body - Remove comment after the fix is implemented.
         /* Lo mismo pasa en el register: fuerzas bien el rol a user, pero el resto del req.body entra tal cual en el modelo, así que alguien se podría registrar mandando ya un assignedCases y asignarse casos sin pasar por un admin. Mejor coger solo name, email y password. */
-        const newUser = new User(req.body);
+        /* Si un atacante enviaba en el cuerpo { "name": "Hack", "email": "h@test.com", "password": "...", "assignedCases": ["id1", "id2"] }, al pasar req.body completo al constructor del modelo Mongoose, assignedCases se inicializaba con esos IDs. La asignación de casos es un privilegio administrativo y no debe admitirse en el registro público. */
+        
+        // Whitelist - extract only the allowed fields from the request body
+        const { name, email, password } = req.body;
 
-
-        // Force the role to 'user' to prevent users from registering as admins
-        newUser.role = 'user';
-
+        const newUser = new User({
+            name,
+            email: normalizedEmail,
+            password,
+            role: 'user', // Force the role to 'user' during registration
+            assignedCases: [] // Avoid users assigning cases to themselves during registration
+        });
 
         if (req.file) {
             newUser.image = req.file.path;
@@ -419,9 +425,11 @@ const updateUserRole = async (req, res) => {
 };
 
 
-/* --------------------------------------------------------- */
+/* ----------------------------- */
+/* -------- DELETE USER -------- */
+/* ----------------------------- */
 /**
- * Deletes a user and removes their references from assigned cases.
+ * Deletes user and removes their references from assigned cases.
  */
 const deleteUser = async (req, res) => {
     try {
@@ -441,16 +449,29 @@ const deleteUser = async (req, res) => {
 
         // TODO: Consider deleting the user first and handling the Cloudinary image deletion separately to avoid leaving the user in an inconsistent state if the image deletion fails.
         /* En deleteUser sacas al usuario de los casos antes de borrar la imagen, y deleteFile lanza error si Cloudinary no devuelve ok (por ejemplo si la imagen ya no existe). En ese caso la petición acaba en 400, el usuario no se borra y ya se ha quedado desvinculado de sus casos, o sea, datos a medias. Podrías borrar primero el usuario y tratar el fallo de Cloudinary sin que bloquee el borrado de la cuenta. */
+
+        // 1. Delete user from MongoDB first to avoid leaving the database in an inconsistent state if Cloudinary deletion fails.
+        await deletedUser.deleteOne(); 
+        
+        // 2. Cleanup references - Remove the user from all assigned cases
         await Case.updateMany(
             { assignedTo: id },
             { $pull: { assignedTo: id } }
-        ); // Remove the user from assignedTo array in all cases
+        );
 
-        await deleteFile(deletedUser.image); // Eliminar la imagen del usuario si existe
-
-        await deletedUser.deleteOne(); // Eliminar el usuario de la base de datos
-
-
+        // 3. Delete the user's Cloudinary image if it exists
+        if (deletedUser.image) {
+            try {
+                await deleteFile(deletedUser.image); 
+            } catch (error) {
+                console.warn(
+                    `[Cloudinary Warning] Could not delete image for user ${id}:`,
+                    error.message
+                );
+            }
+            /* //TODO: Remove comment once the Cloudinary deletion logic is confirmed to be reliable.
+            Al procesar primero el borrado del registro en la base de datos y envolver deleteFile en su propio bloque try/catch, si la imagen remota ya fue eliminada o Cloudinary devuelve un error, la eliminación del usuario no se interrumpe y la base de datos se mantiene consistente. */
+        }
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
 
     } catch (error) {
