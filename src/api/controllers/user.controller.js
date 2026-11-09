@@ -47,12 +47,16 @@ const register = async (req, res) => {
             return res.status(400).json("Error: Email is required");
         }
 
-        const newUser = new User(req.body);
+        // Keep registration data limited to public account fields.
+        const { name, password } = req.body;
 
-
-        // Force the role to 'user' to prevent users from registering as admins
-        newUser.role = 'user';
-
+        const newUser = new User({
+            name,
+            email: normalizedEmail,
+            password,
+            role: 'user',
+            assignedCases: []
+        });
 
         if (req.file) {
             newUser.image = req.file.path;
@@ -417,9 +421,11 @@ const updateUserRole = async (req, res) => {
 };
 
 
-/* --------------------------------------------------------- */
+/* ----------------------------- */
+/* -------- DELETE USER -------- */
+/* ----------------------------- */
 /**
- * Deletes a user and removes their references from assigned cases.
+ * Deletes user and removes their references from assigned cases.
  */
 const deleteUser = async (req, res) => {
     try {
@@ -437,16 +443,26 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
+        // Remove the account before best-effort external image cleanup.
+        await deletedUser.deleteOne();
+        
+        // Remove the deleted account from assigned cases.
         await Case.updateMany(
             { assignedTo: id },
             { $pull: { assignedTo: id } }
-        ); // Remove the user from assignedTo array in all cases
+        );
 
-        await deleteFile(deletedUser.image); // Eliminar la imagen del usuario si existe
-
-        await deletedUser.deleteOne(); // Eliminar el usuario de la base de datos
-
-
+        // Do not block account deletion if Cloudinary cleanup fails.
+        if (deletedUser.image) {
+            try {
+                await deleteFile(deletedUser.image);
+            } catch (error) {
+                console.warn(
+                    `[Cloudinary Warning] Could not delete image for user ${id}:`,
+                    error.message
+                );
+            }
+        }
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
 
     } catch (error) {

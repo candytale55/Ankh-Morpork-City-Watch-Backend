@@ -65,13 +65,7 @@
                         Password
                         <input name="password" type="password" required>
                     </label>
-                    <label>
-                        Role
-                        <select name="role" required>
-                            <option value="user" selected>user</option>
-                            <option value="admin">admin</option>
-                        </select>
-                    </label>
+                    <p class="panel-note">New accounts are created with the user role.</p>
                     <label>
                         Image
                         <input name="image" type="file" accept="image/*" required>
@@ -90,7 +84,7 @@
             <nav class="tab-list" aria-label="Main views">
                 <button class="tab-button active" type="button" data-view="agents">Agents</button>
                 <button class="tab-button" type="button" data-view="cases">Cases</button>
-                <button class="tab-button" type="button" data-view="users">Users</button>
+                <button class="tab-button" type="button" data-view="users" data-admin-only hidden>Users</button>
                 <button class="tab-button" type="button" data-view="books">Books</button>
                 <button class="tab-button" type="button" data-view="me">Me</button>
             </nav>
@@ -132,7 +126,7 @@
                     </div>
                 </div>
 
-                <details class="panel admin-panel accordion-panel">
+                <details class="panel admin-panel accordion-panel" data-admin-only hidden>
                     <summary class="accordion-summary">
                         <div>
                             <h3>Create Agent</h3>
@@ -181,7 +175,7 @@
                     </div>
                 </div>
 
-                <details class="panel accordion-panel">
+                <details class="panel accordion-panel" data-auth-only hidden>
                     <summary class="accordion-summary">
                         <div>
                             <h3 id="caseFormTitle">Create Case</h3>
@@ -235,7 +229,7 @@
                     </div>
                 </details>
 
-                <section class="panel admin-panel">
+                <section class="panel admin-panel" data-admin-only hidden>
                     <h3>Assign Case to User</h3>
                     <form id="assignForm" class="form-grid compact-form">
                         <label>
@@ -250,7 +244,7 @@
                     </form>
                 </section>
 
-                <section class="panel admin-panel">
+                <section class="panel admin-panel" data-admin-only hidden>
                     <h3>Assign Case to Agent</h3>
                     <form id="assignAgentForm" class="form-grid compact-form">
                         <label>
@@ -268,7 +262,7 @@
                 <div id="casesList" class="case-list"></div>
             </section>
 
-            <section id="usersView" class="view-section" aria-labelledby="usersTitle">
+            <section id="usersView" class="view-section" aria-labelledby="usersTitle" data-admin-only hidden>
                 <div class="section-heading">
                     <div>
                         <h2 id="usersTitle">Users</h2>
@@ -286,7 +280,7 @@
                     </div>
                 </div>
 
-                <details class="panel accordion-panel">
+                <details class="panel accordion-panel" data-admin-only hidden>
                     <summary class="accordion-summary">
                         <div>
                             <h3 id="bookFormTitle">Create Book</h3>
@@ -316,7 +310,7 @@
                     </div>
                 </details>
 
-                <section class="panel admin-panel">
+                <section class="panel admin-panel" data-admin-only hidden>
                     <h3>Assign Agent to Book</h3>
                     <form id="assignBookAgentForm" class="form-grid compact-form">
                         <label>

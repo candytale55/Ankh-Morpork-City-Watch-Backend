@@ -1,6 +1,9 @@
+// Drives the frontend API tester's session-aware views and interactions.
 const API_BASE = '/api/v1';
 const urlParams = new URLSearchParams(window.location.search);
 const resetToken = urlParams.get('resetToken');
+const viewNames = ['agents', 'cases', 'users', 'books', 'me'];
+const savedActiveView = localStorage.getItem('cityWatchActiveView');
 
 const enums = {
     species: ['human', 'dwarf', 'troll', 'vampire', 'werewolf', 'zombie', 'golem', 'gnome', 'goblin', 'elf', 'gargoyle', 'pictsie', 'igor', 'orangutan', 'other'],
@@ -14,7 +17,8 @@ const enums = {
 const state = {
     token: localStorage.getItem('cityWatchToken') || '',
     currentUser: null,
-    activeView: 'agents',
+    activeView: viewNames.includes(savedActiveView) ? savedActiveView : 'agents',
+    lastProfileFocus: null,
     resetToken: resetToken || '',
     search: '',
     agents: [],
@@ -60,7 +64,9 @@ const elements = {
     casesList: document.querySelector('#casesList'),
     booksList: document.querySelector('#booksList'),
     usersList: document.querySelector('#usersList'),
-    meProfile: document.querySelector('#meProfile')
+    meProfile: document.querySelector('#meProfile'),
+    authOnly: document.querySelectorAll('[data-auth-only]'),
+    adminOnly: document.querySelectorAll('[data-admin-only]')
 };
 
 function setMessage(message, type = 'info') {
@@ -137,7 +143,6 @@ function fillSelect(select, values, placeholder = '') {
 function setupEnumSelects() {
     fillSelect(elements.agentForm.elements.gender, enums.gender, 'Select gender');
     fillSelect(elements.agentForm.elements.species, enums.species, 'Select species');
-    fillSelect(elements.registerForm.elements.role, enums.roles);
     fillSelect(elements.caseForm.elements.type, enums.caseTypes);
     fillSelect(elements.caseForm.elements.status, enums.caseStatuses);
     fillSelect(elements.caseForm.elements.priority, enums.casePriorities);
@@ -154,6 +159,7 @@ function updateSessionUi() {
     }
 
     elements.changePasswordPanel.hidden = true;
+    updatePermissionUi();
 }
 
 function toggleResetPasswordView() {
@@ -193,8 +199,10 @@ function clearSessionState() {
     localStorage.removeItem('cityWatchToken');
 }
 
+// Activates and persists the current workspace section.
 function setActiveView(viewName) {
     state.activeView = viewName;
+    localStorage.setItem('cityWatchActiveView', viewName);
 
     elements.tabButtons.forEach((button) => {
         button.classList.toggle('active', button.dataset.view === viewName);
@@ -226,6 +234,46 @@ function escapeHtml(value = '') {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
+}
+
+// Returns a document ID whether an API relation is populated or not.
+function getDocumentId(value) {
+    if (!value) {
+        return '';
+    }
+
+    return typeof value === 'object' ? String(value._id || '') : String(value);
+}
+
+// Identifies whether the active user has administrator privileges.
+function isAdmin() {
+    return state.currentUser?.role === 'admin';
+}
+
+// Determines whether the active user may edit the selected case.
+function canEditCase(caseItem) {
+    return isAdmin() || (
+        Boolean(state.currentUser) &&
+        getDocumentId(caseItem.createdBy) === getDocumentId(state.currentUser._id)
+    );
+}
+
+// Shows controls that the active session is authorized to use.
+function updatePermissionUi() {
+    const authenticated = Boolean(state.currentUser);
+    const admin = isAdmin();
+
+    elements.authOnly.forEach((element) => {
+        element.hidden = !authenticated;
+    });
+
+    elements.adminOnly.forEach((element) => {
+        element.hidden = !admin;
+    });
+
+    if (!admin && state.activeView === 'users') {
+        setActiveView('agents');
+    }
 }
 
 function getIdListLabel(ids = []) {
@@ -324,6 +372,7 @@ function openProfileModal(profileType, profileId, sourceOverride = null) {
         return;
     }
 
+    state.lastProfileFocus = document.activeElement;
     const title = profileType === 'agent' ? source.name || source.title || 'Agent profile' : source.name || 'User profile';
     const subtitle = profileType === 'agent'
         ? source.title || source.organization || 'Agent'
@@ -397,12 +446,16 @@ function openProfileModal(profileType, profileId, sourceOverride = null) {
 
     elements.profileModal.hidden = false;
     document.body.classList.add('modal-open');
+    elements.profileModal.querySelector('[data-close-profile-modal]')?.focus();
 }
 
+// Closes the profile modal and returns focus to its triggering control.
 function closeProfileModal() {
     elements.profileModal.hidden = true;
     elements.profileModalBody.innerHTML = '';
     document.body.classList.remove('modal-open');
+    state.lastProfileFocus?.focus();
+    state.lastProfileFocus = null;
 }
 
 async function openCurrentUserProfile() {
@@ -494,7 +547,16 @@ function renderCases() {
         return;
     }
 
-    elements.casesList.innerHTML = cases.map((caseItem) => `
+    elements.casesList.innerHTML = cases.map((caseItem) => {
+        const editable = canEditCase(caseItem);
+        const actions = editable || isAdmin() ? `
+            <div class="case-actions">
+                ${editable ? `<button type="button" data-action="edit-case" data-id="${caseItem._id}" aria-label="Edit ${escapeHtml(caseItem.title)}">Edit</button>` : ''}
+                ${isAdmin() ? `<button class="danger-button" type="button" data-action="delete-case" data-id="${caseItem._id}" aria-label="Delete ${escapeHtml(caseItem.title)}">Delete</button>` : ''}
+            </div>
+        ` : '';
+
+        return `
         <article class="case-card">
             <h3>${escapeHtml(caseItem.title)}</h3>
             <div class="badge-row">
@@ -516,12 +578,10 @@ function renderCases() {
                     ${renderUserThumbs(caseItem.assignedTo)}
                 </div>
             </div>
-            <div class="case-actions">
-                <button type="button" data-action="edit-case" data-id="${caseItem._id}">Edit</button>
-                <button class="danger-button" type="button" data-action="delete-case" data-id="${caseItem._id}">Delete</button>
-            </div>
+            ${actions}
         </article>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function formatDateLabel(dateValue) {
@@ -556,10 +616,12 @@ function renderBooks() {
                 <p class="meta-line"><strong>Agents in book:</strong></p>
                 ${renderAgentThumbs(book.agents)}
             </div>
-            <div class="case-actions">
-                <button type="button" data-action="edit-book" data-id="${book._id}">Edit</button>
-                <button class="danger-button" type="button" data-action="delete-book" data-id="${book._id}">Delete</button>
-            </div>
+            ${isAdmin() ? `
+                <div class="case-actions">
+                    <button type="button" data-action="edit-book" data-id="${book._id}" aria-label="Edit ${escapeHtml(book.title)}">Edit</button>
+                    <button class="danger-button" type="button" data-action="delete-book" data-id="${book._id}" aria-label="Delete ${escapeHtml(book.title)}">Delete</button>
+                </div>
+            ` : ''}
         </article>
     `).join('');
 }
@@ -657,13 +719,14 @@ function handleProfileOpen(event, profileType) {
     openProfileModal(profileType, trigger.dataset.profileId);
 }
 
+// Switches to a workspace section after refreshing its displayed data.
 async function handleTabSelection(viewName) {
+    setActiveView(viewName);
+    await refreshData();
+
     if (viewName === 'me') {
         await openCurrentUserProfile();
-        return;
     }
-
-    setActiveView(viewName);
 }
 
 function renderAssignOptions() {
@@ -758,13 +821,19 @@ async function loadUsers() {
     }
 }
 
+// Reloads API data while retaining the current permitted section.
 async function refreshData() {
+    const activeView = state.activeView;
+
     try {
         await loadCurrentUser();
         await loadAgents();
         await loadCases();
         await loadBooks();
         await loadUsers();
+        if (activeView !== 'users' || isAdmin()) {
+            state.activeView = activeView;
+        }
         renderActiveView();
         setMessage('Data refreshed.', 'success');
     } catch (error) {
@@ -848,19 +917,22 @@ async function handleLogin(event) {
     }
 }
 
+// Creates a new account and refreshes the visible data.
 async function handleRegister(event) {
     event.preventDefault();
+    const form = event.currentTarget;
 
     try {
-        const formData = new FormData(event.currentTarget);
+        const formData = new FormData(form);
         const data = await apiRequest('/users/register', {
             method: 'POST',
             body: formData,
             auth: false
         });
 
-        event.currentTarget.reset();
-        setMessage(`User created as role "${data.user.role}".`, 'success');
+        form.reset();
+        await refreshData();
+        setMessage(`User "${data.user.name}" created successfully. Log in to start a session.`, 'success');
     } catch (error) {
         setMessage(error.message, 'error');
     }
@@ -944,18 +1016,20 @@ async function handleResetPassword(event) {
     }
 }
 
+// Updates the password and ends the current session.
 async function handleChangePassword(event) {
     event.preventDefault();
+    const form = event.currentTarget;
 
     try {
-        const data = getFormDataObject(event.currentTarget);
+        const data = getFormDataObject(form);
 
         await apiRequest('/users/me/password', {
             method: 'PATCH',
             body: data
         });
 
-        event.currentTarget.reset();
+        form.reset();
         state.token = '';
         state.currentUser = null;
         state.cases = [];
@@ -1009,17 +1083,19 @@ async function handleModalChangePassword(event) {
     }
 }
 
+// Creates an agent and refreshes the current section.
 async function handleAgentCreate(event) {
     event.preventDefault();
+    const form = event.currentTarget;
 
     try {
-        const formData = new FormData(event.currentTarget);
+        const formData = new FormData(form);
         await apiRequest('/agents', {
             method: 'POST',
             body: formData
         });
 
-        event.currentTarget.reset();
+        form.reset();
         await refreshData();
         setMessage('Agent created.', 'success');
     } catch (error) {
@@ -1244,6 +1320,41 @@ function handleProfileKeydown(event, profileType) {
     openProfileModal(profileType, trigger.dataset.profileId);
 }
 
+// Keeps keyboard focus within the open profile modal.
+function handleProfileModalKeydown(event) {
+    if (elements.profileModal.hidden) {
+        return;
+    }
+
+    if (event.key === 'Escape') {
+        closeProfileModal();
+        return;
+    }
+
+    if (event.key !== 'Tab') {
+        return;
+    }
+
+    const focusable = [...elements.profileModal.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]'
+    )];
+
+    if (!focusable.length) {
+        return;
+    }
+
+    const first = focusable[0];
+    const last = focusable.at(-1);
+
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+}
+
 function setupEvents() {
     elements.loginForm.addEventListener('submit', handleLogin);
     elements.toggleForgotPasswordButton.addEventListener('click', (event) => {
@@ -1287,11 +1398,7 @@ function setupEvents() {
         }
     });
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !elements.profileModal.hidden) {
-            closeProfileModal();
-        }
-    });
+    document.addEventListener('keydown', handleProfileModalKeydown);
 
     elements.logoutButton.addEventListener('click', () => {
         state.token = '';

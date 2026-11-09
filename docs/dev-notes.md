@@ -48,11 +48,19 @@ El login, cambio de contraseña y recuperacion de contraseña estan documentados
 
 ## Registro y primer admin
 
-El registro fuerza siempre `role: "user"` en el controller:
+El registro construye el usuario únicamente con datos públicos y fuerza `role: "user"`:
 
 ```js
-newUser.role = 'user';
+const newUser = new User({
+  name,
+  email: normalizedEmail,
+  password,
+  role: 'user',
+  assignedCases: []
+});
 ```
+
+Por tanto, los valores enviados para `role`, `assignedCases` u otros campos internos se ignoran durante el registro.
 
 El primer admin se crea siguiendo el enunciado: se registra como usuario normal y luego se cambia manualmente su `role` a `"admin"` desde MongoAtlas.
 
@@ -134,12 +142,14 @@ El controller `assignCaseToUser` actualiza ambos lados con `$addToSet`:
 Para evitar que la asignacion se salte desde rutas generales:
 
 - `postCase` elimina `assignedTo` y `createdBy` del body.
-- `updateCase` elimina `assignedTo` y `createdBy` del body.
+- `updateCase` permite solo campos editables mediante una lista blanca; no permite modificar `assignedTo`, `assignedAgents` ni `createdBy`.
 - `updateUser` elimina `assignedCases` del body.
+
+La actualizacion de un caso requiere que el usuario autenticado sea su creador o tenga rol `admin`. Las asignaciones de usuarios y agentes siguen usando sus rutas administrativas especificas.
 
 ## Limpieza de relaciones
 
-Cuando se elimina un usuario, `deleteUser` usa `$pull` para quitar su id de `Case.assignedTo`. Luego elimina su imagen de Cloudinary y el documento de usuario.
+Cuando se elimina un usuario, `deleteUser` elimina primero el documento, usa `$pull` para quitar su id de `Case.assignedTo` y después intenta eliminar su imagen de Cloudinary. Un fallo de Cloudinary se registra, pero no bloquea el borrado ya realizado en MongoDB.
 
 Cuando se elimina un caso, `deleteCase` usa `$pull` para quitar el id del caso de `User.assignedCases`.
 

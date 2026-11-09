@@ -37,6 +37,7 @@ const deleteFile = async (url) => {
     console.log('Cloudinary delete publicId:', publicId);
     console.log('Cloudinary delete result:', result);
 
+
     if (result.result !== 'ok') {
         throw new Error(`Failed to delete file from Cloudinary for ${publicId}: ${result.result}`);
     }
