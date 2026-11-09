@@ -24,8 +24,14 @@ Esta carpeta concentra la documentacion funcional, tecnica y de pruebas del back
   - Explica el orden de ejecucion, variables temporales y scripts `After-response`.
   - Identifica las comprobaciones que todavia requieren revision manual.
 
+- [cambios-feedback.md](cambios-feedback.md)
+  - Resume las correcciones aplicadas tras el feedback.
+  - Enlaza la implementación con las pruebas automatizadas que cubren cada corrección.
+
 ## Carpetas de apoyo
 
 - [shots/](shots)
   - Capturas del frontend y de los flujos documentados.
 
+- [pruebas/agents-debug-pruebas.md](pruebas/agents-debug-pruebas.md)
+  - Registro histórico de una sesión temporal de depuración de rutas de agentes.

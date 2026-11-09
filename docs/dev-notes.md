@@ -340,14 +340,14 @@ Se reviso la logica de `updateCase` y se aplico la misma politica de validacion 
 
 #### Validacion de IDs
 
-El middleware `validateObjectId` ya se usa en las rutas que reciben identificadores, con una politica consistente:
+El middleware `validateObjectId` se usa en las rutas de `agents`, `books` y `users` que reciben identificadores. En las rutas de `cases`, los controladores gestionan los errores de conversión de identificadores:
 
 ```text
 ID mal formado              -> 400
 ID valido pero inexistente  -> 404
 ```
 
-Esto aplica a las rutas de `agents`, `books`, `cases` y `users` cuando reciben parametros de MongoDB.
+Esto aplica a las rutas que reciben parámetros de MongoDB.
 
 #### Permisos en la relacion Book-Agent
 
