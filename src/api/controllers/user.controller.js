@@ -47,19 +47,15 @@ const register = async (req, res) => {
             return res.status(400).json("Error: Email is required");
         }
 
-        // TODO: Fix the registration to only accept name, email, and password from the request body - Remove comment after the fix is implemented.
-        /* Lo mismo pasa en el register: fuerzas bien el rol a user, pero el resto del req.body entra tal cual en el modelo, así que alguien se podría registrar mandando ya un assignedCases y asignarse casos sin pasar por un admin. Mejor coger solo name, email y password. */
-        /* Si un atacante enviaba en el cuerpo { "name": "Hack", "email": "h@test.com", "password": "...", "assignedCases": ["id1", "id2"] }, al pasar req.body completo al constructor del modelo Mongoose, assignedCases se inicializaba con esos IDs. La asignación de casos es un privilegio administrativo y no debe admitirse en el registro público. */
-        
-        // Whitelist - extract only the allowed fields from the request body
-        const { name, email, password } = req.body;
+        // Keep registration data limited to public account fields.
+        const { name, password } = req.body;
 
         const newUser = new User({
             name,
             email: normalizedEmail,
             password,
-            role: 'user', // Force the role to 'user' during registration
-            assignedCases: [] // Avoid users assigning cases to themselves during registration
+            role: 'user',
+            assignedCases: []
         });
 
         if (req.file) {
