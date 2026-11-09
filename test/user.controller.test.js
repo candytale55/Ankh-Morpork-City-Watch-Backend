@@ -8,6 +8,9 @@ const deleteFilePath = require.resolve('../src/utils/deleteFile');
 const emailPath = require.resolve('../src/utils/sendResetPasswordEmail');
 
 let constructorData;
+let userToDelete;
+let caseUpdateCall;
+let shouldFailImageDeletion = false;
 
 // Mimics the User model methods used by the registration controller.
 function User(data) {
@@ -17,13 +20,28 @@ function User(data) {
 }
 
 User.findOne = async () => null;
+User.findById = () => ({
+    select: async () => userToDelete
+});
 
 require.cache[userModelPath] = { exports: User };
-require.cache[caseModelPath] = { exports: {} };
-require.cache[deleteFilePath] = { exports: { deleteFile: async () => {} } };
+require.cache[caseModelPath] = {
+    exports: {
+        updateMany: async (...args) => {
+            caseUpdateCall = args;
+        }
+    }
+};
+// Lets deletion tests simulate a Cloudinary cleanup failure.
+const deleteFile = async () => {
+    if (shouldFailImageDeletion) {
+        throw new Error('Cloudinary file not found');
+    }
+};
+require.cache[deleteFilePath] = { exports: { deleteFile } };
 require.cache[emailPath] = { exports: { sendResetPasswordEmail: async () => {} } };
 
-const { register } = require('../src/api/controllers/user.controller');
+const { register, deleteUser } = require('../src/api/controllers/user.controller');
 
 // Creates the minimal Express response object needed by the controller.
 const createResponse = () => ({
@@ -61,4 +79,36 @@ test('register ignores role and case assignments supplied by the client', async 
         role: 'user',
         assignedCases: []
     });
+});
+
+test('deletes the account and unlinks cases when Cloudinary cleanup fails', async () => {
+    let accountWasDeleted = false;
+    userToDelete = {
+        image: 'https://res.cloudinary.com/demo/image/upload/v1/user.jpg',
+        deleteOne: async () => {
+            accountWasDeleted = true;
+        }
+    };
+    caseUpdateCall = null;
+    shouldFailImageDeletion = true;
+    const originalWarn = console.warn;
+    console.warn = () => {};
+
+    try {
+        const res = createResponse();
+        await deleteUser({
+            params: { id: 'user-id' },
+            user: { _id: 'user-id', role: 'user' }
+        }, res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(accountWasDeleted, true);
+        assert.deepEqual(caseUpdateCall, [
+            { assignedTo: 'user-id' },
+            { $pull: { assignedTo: 'user-id' } }
+        ]);
+    } finally {
+        shouldFailImageDeletion = false;
+        console.warn = originalWarn;
+    }
 });

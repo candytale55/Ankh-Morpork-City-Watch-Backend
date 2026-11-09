@@ -38,14 +38,9 @@ const deleteFile = async (url) => {
     console.log('Cloudinary delete result:', result);
 
 
-    /* // TODO: Remove comment after the implementation is fixed
-    si Cloudinary responde algo diferente de 'ok' (por ejemplo, si la imagen ya no existe en el servidor remoto o las credenciales fallan), se lanza una excepción directa */
-
     if (result.result !== 'ok') {
         throw new Error(`Failed to delete file from Cloudinary for ${publicId}: ${result.result}`);
     }
-    /* Este throw provoca que la ejecución saltara al catch de deleteUser, retornando 400 Error in deleting User. Como consecuencia:   Los casos en la base de datos ya habían perdido la referencia al usuario ($pull).   La cuenta de usuario seguía existiendo en MongoDB porque deletedUser.deleteOne() nunca llegó a ejecutarse.   La base de datos quedaba en un estado inconsistente y con datos a medias. */
-    /* FIX in user.controller.js: handle the error gracefully without interrupting the main flow */
 };
 
 module.exports = { deleteFile };

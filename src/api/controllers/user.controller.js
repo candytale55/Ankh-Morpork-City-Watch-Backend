@@ -443,30 +443,25 @@ const deleteUser = async (req, res) => {
             return res.status(404).json("Error: User not found");
         }
 
-        // TODO: Consider deleting the user first and handling the Cloudinary image deletion separately to avoid leaving the user in an inconsistent state if the image deletion fails.
-        /* En deleteUser sacas al usuario de los casos antes de borrar la imagen, y deleteFile lanza error si Cloudinary no devuelve ok (por ejemplo si la imagen ya no existe). En ese caso la petición acaba en 400, el usuario no se borra y ya se ha quedado desvinculado de sus casos, o sea, datos a medias. Podrías borrar primero el usuario y tratar el fallo de Cloudinary sin que bloquee el borrado de la cuenta. */
-
-        // 1. Delete user from MongoDB first to avoid leaving the database in an inconsistent state if Cloudinary deletion fails.
-        await deletedUser.deleteOne(); 
+        // Remove the account before best-effort external image cleanup.
+        await deletedUser.deleteOne();
         
-        // 2. Cleanup references - Remove the user from all assigned cases
+        // Remove the deleted account from assigned cases.
         await Case.updateMany(
             { assignedTo: id },
             { $pull: { assignedTo: id } }
         );
 
-        // 3. Delete the user's Cloudinary image if it exists
+        // Do not block account deletion if Cloudinary cleanup fails.
         if (deletedUser.image) {
             try {
-                await deleteFile(deletedUser.image); 
+                await deleteFile(deletedUser.image);
             } catch (error) {
                 console.warn(
                     `[Cloudinary Warning] Could not delete image for user ${id}:`,
                     error.message
                 );
             }
-            /* //TODO: Remove comment once the Cloudinary deletion logic is confirmed to be reliable.
-            Al procesar primero el borrado del registro en la base de datos y envolver deleteFile en su propio bloque try/catch, si la imagen remota ya fue eliminada o Cloudinary devuelve un error, la eliminación del usuario no se interrumpe y la base de datos se mantiene consistente. */
         }
         return res.status(200).json({ message: "User deleted successfully", user: deletedUser });
 
