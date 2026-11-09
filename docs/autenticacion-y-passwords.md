@@ -79,9 +79,9 @@ Body:
 
 En el frontend, el usuario hace clic en "ME" y luego en _Change your password_.
 
-![Sección del perfil para cambiar la contraseña](./shots/me-change-password.JPG)
+![Sección del perfil para cambiar la contraseña](./shots/profile-change-password.jpg)
 
-![Formulario de cambio de contraseña del usuario](./shots/me-change-password-open.JPG)
+![Formulario de cambio de contraseña del usuario](./shots/profile-change-password-form.jpg)
 
 El backend comprueba que:
 
@@ -127,27 +127,27 @@ En el frontend, el usuario despliega el formulario desde el enlace _Forgot your 
 
 La API responde con un mensaje genérico para no revelar si el correo existe o no en la base de datos.
 
-![Respuesta genérica al solicitar recuperación de contraseña](./shots/if-the-account-exists.JPG)
+![Respuesta genérica al solicitar recuperación de contraseña](./shots/recovery-account-not-found.jpg)
 
 ## Correo de recuperación
 
 Nodemailer envía un mensaje con el enlace temporal. Durante el desarrollo se utiliza una cuenta de prueba que permite abrir una vista previa del correo desde un enlace mostrado en la terminal.
 
-![Vista previa del correo de recuperación desde la terminal de desarrollo](./shots/Email-Bash.JPG)
+![Vista previa del correo de recuperación desde la terminal de desarrollo](./shots/recovery-email-terminal.jpg)
 
 Al seguir la URL se abre el correo de prueba con el token temporal.
 
-![Correo de recuperación enviado por Nodemailer](./shots/Email-nodemailer.JPG)
+![Correo de recuperación enviado por Nodemailer](./shots/recovery-email-message.jpg)
 
 ## Restablecer la contraseña
 
 Al abrir el enlace de recuperación entregado en el, el frontend obtiene `resetToken` de la URL y muestra el formulario para introducir la nueva contraseña.
 
-![Formulario para definir una nueva contraseña desde la URL de recuperación](./shots/reset-your-password-form.JPG)
+![Formulario para definir una nueva contraseña desde la URL de recuperación](./shots/reset-password-form.jpg)
 
 En Insomnia, el token temporal se copia en la ruta para completar el cambio.
 
-![Token temporal insertado en la petición de reset de contraseña en Insomnia](./shots/insomnia-temp-token.JPG)
+![Token temporal insertado en la petición de reset de contraseña en Insomnia](./shots/insomnia-reset-token.jpg)
 
 (Ver [pruebas-manuales-insomnia.md](./pruebas-manuales-insomnia.md) para más información)
 

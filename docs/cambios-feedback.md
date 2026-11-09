@@ -7,3 +7,16 @@ Este documento resume las correcciones aplicadas a las observaciones recibidas d
 | Cualquier usuario autenticado podía actualizar cualquier caso y modificar relaciones desde `PATCH /cases/:id`. | Implementado | `updateCase` permite editar solo al creador o a un admin y copia únicamente campos incluidos en una lista blanca. | `src/api/controllers/case.controller.js`, `src/api/routes/cases.routes.js` | `test/case.controller.test.js` cubre usuario ajeno, creador, admin y relaciones protegidas. |
 | El registro aceptaba campos internos como `assignedCases` aunque forzara el rol `user`. | Implementado | El controlador construye el usuario con `name`, email normalizado y `password`; fuerza `role: 'user'` e inicializa `assignedCases` vacío. | `src/api/controllers/user.controller.js` | `test/user.controller.test.js` comprueba que `role` y `assignedCases` enviados por el cliente se ignoran. |
 | Un fallo al borrar una imagen en Cloudinary podía dejar el borrado de usuario a medias. | Implementado | Primero se elimina el usuario, después se limpian sus referencias en casos y la eliminación de la imagen se trata como limpieza no bloqueante. | `src/api/controllers/user.controller.js`, `src/utils/deleteFile.js` | `test/user.controller.test.js` simula un fallo de Cloudinary y verifica el borrado de cuenta y referencias. |
+
+## Pruebas automatizadas
+
+Ejecuta las pruebas con:
+
+```bash
+npm test
+```
+
+Las pruebas unitarias usan dobles de los modelos y servicios externos para comprobar los controladores sin requerir MongoDB ni Cloudinary:
+
+- `test/case.controller.test.js` verifica que un usuario ajeno no pueda actualizar un caso, que su creador pueda modificar solo campos permitidos y que un administrador pueda editar un caso ajeno.
+- `test/user.controller.test.js` verifica que el registro ignore los campos internos enviados por el cliente y que la eliminación de una cuenta limpie sus relaciones aunque falle la eliminación de su imagen en Cloudinary.
