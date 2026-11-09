@@ -4,6 +4,18 @@ const Case = require('../models/Case');
 const Agent = require('../models/Agent');
 const User = require('../models/User');
 
+const CASE_UPDATE_FIELDS = [
+  'title',
+  'description',
+  'type',
+  'status',
+  'priority',
+  'location',
+  'reportedBy',
+  'suspectName',
+  'suspectSpecies'
+];
+
 /* ----------------------------------- */
 
 /**
@@ -138,7 +150,7 @@ const updateCase = async (req, res) => {
 
     // Check authorization: only the creator or an admin can update the case
     const isAdmin = req.user.role === 'admin';
-    const isOwner = currentCase.createdBy //TODO: Boolean always? right now it could be undefined if case doesn't exists
+    const isOwner = currentCase.createdBy
       && currentCase.createdBy.toString() === req.user._id.toString();
 
     if (!isAdmin && !isOwner) {
@@ -148,50 +160,14 @@ const updateCase = async (req, res) => {
     }
 
 
-    // Whitelist: Extract only allowed fields (assignedTo, createdBy and assignedAgents are ignored)
-
-    const allowedFields = [
-      'title',
-      'description',
-      'type',
-      'status',
-      'priority',
-      'location',
-      'reportedBy',
-      'suspectName',
-      'suspectSpecies'
-    ];
-
-    /*  //TODO: Remove comment after the update endpoint is finalized
-    Only fields listed in allowedFields are copied into updateData, so only those fields can be updated through this endpoint.
-
-    If you add a new field to the model, you add it to allowedFields only if users should be able to edit it through this endpoint. For example, you might allow title but keep createdBy out so a user cannot change who owns the case. */
-
     const updateData = {};
-    for (const field of allowedFields) {
+    for (const field of CASE_UPDATE_FIELDS) {
       if (req.body[field] !== undefined) {
         updateData[field] = req.body[field];
       }
     }
 
-    /* ----------------------------------- */
-
     // Check whether title was included and validate it
-
-
-
-    /*  // TODO: Remove this comment after the update endpoint is finalized
-    This block validates a new title and checks for duplicates, but it runs only when title was included in updateData.
-
-    1. hasOwnProperty checks whether this update actually includes title.
-    2. It rejects values that are not strings or become empty after trim().
-    3. Case.findOne(...) looks for another case with the same title. _id: { $ne: id } excludes the case being edited, so keeping its current title is allowed.
-    4. ^...$ requires the whole title to match, and $options: 'i' ignores capitalization. escapeRegExp prevents characters in the title from acting as regex instructions.
-    5. If a match exists, it returns 409 Conflict. Otherwise, it saves the trimmed title in updateData.
-
-    As written, the duplicate search covers all cases. For example, "My Case" and "my case" count as duplicates even if different users created them.
-    */
-
     if (Object.prototype.hasOwnProperty.call(updateData, 'title')) {
       if (typeof updateData.title !== 'string') {
         return res.status(400).json({
@@ -226,15 +202,6 @@ const updateCase = async (req, res) => {
 
       updateData.title = normalizedTitle;
     }
-
-    /* ----------------------------------- */
-
-    /* //TODO: Remove this when update is complete 
-    * This code updates a case and returns the updated case to the frontend.
-    * findByIdAndUpdate(id, updateData, ...) finds the case by its ID and applies the allowed changes.
-    * new: true makes Mongoose return the case after the update. runValidators: true checks the updated fields against the schema rules.
-    * .populate('assignedTo', 'name email role image') replaces the user IDs in assignedTo with user data containing those fields. The second populate does the same for agents, selecting name, title, and image.
-    * If no case has that ID, the query returns null, so the API responds with 404. Otherwise it responds with 200 and the updated case as JSON. */
 
     const updatedCase = await Case.findByIdAndUpdate(
       id,
