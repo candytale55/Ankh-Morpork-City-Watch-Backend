@@ -116,6 +116,7 @@ npm run seed
 - [docs/dev-notes.md](docs/dev-notes.md) — Decisiones técnicas, reglas de negocio y notas de implementación.
 - [docs/autenticacion-y-passwords.md](docs/autenticacion-y-passwords.md) — Flujo de login, JWT y recuperación de contraseña.
 - [docs/pruebas-manuales-insomnia.md](docs/pruebas-manuales-insomnia.md) — Guía de pruebas manuales con Insomnia.
+- [docs/cambios-feedback.md](docs/cambios-feedback.md) — Correcciones aplicadas tras el feedback del proyecto.
 - [docs/README.md](docs/README.md) — Índice de documentación del proyecto.
 
 ## Notas de entrega
